@@ -20,6 +20,8 @@ from tqdm import tqdm
 '''
 IBWrapper is an implemented version of the abstract EWrapper class by Anthony Ng
 - https://github.com/anthonyng2/ib
+
+
 '''
 from IBWrapper import IBWrapper, contract
 from ib.ext.EClientSocket import EClientSocket
@@ -47,6 +49,9 @@ contract = contract()
 callback.initiate_variables()
 ################################################################################
 '''
+
+https://www.interactivebrokers.com/en/software/api/api.htm
+
 Requesting Account Changes:
 - I believe this allows you to subcribe to changes to your account after orders
 - this could also be implemented by an explicit call to Account Summary
@@ -92,17 +97,25 @@ df_positions = pd.DataFrame(callback.update_Position,
                             'Position','Average Cost'])
 print('df_positions:\n',df_positions[df_positions["Account"] == accountName],'\n\n')
 ################################################################################
+
 '''
 Placing Orders:
 - calls next valid order_id for placing 'BUY' or 'SELL' orders
 - I don't believe that the incrementing needs to be done but need to confirm
 '''
+
+
 tws.reqIds(1)
 order_id = callback.next_ValidId + 1
 
 contract_info = contract.create_contract("GOOG", "STK", "SMART", "USD")
+#order_info = contract.create_order(accountName, "MKT", 100, "BUY")
+
 order_info = contract.create_order(accountName, "MKT", 100, "BUY")
-#tws.placeOrder(order_id, contract_info, order_info)
+
+
+tws.placeOrder(order_id, contract_info, order_info)
+tws.cancelOrder(order_id)
 
 '''
 df_order_status = pd.DataFrame(callback.order_Status,
@@ -113,3 +126,129 @@ print('df_order_status:\n',df_order_status,'\n\n')
 '''
 
 print(callback.open_Order[:1])
+
+
+
+
+################################################################################
+
+''' Get historical data  '''
+
+
+################################################################################
+
+# [1, 321, "Error validating request:-'yd' : cause - Historical data bar size setting is invalid. Legal ones are: 1 secs, 
+# 5 secs, 10 secs, 15 secs, 30 secs, 1 min, 2 mins, 3 mins, 5 mins, 10 mins, 15 mins, 20 mins, 30 mins, 1 hour, 
+# 2 hours, 3 hours, 4 hours, 8 hours, 1 day, 1W, 1M"]
+
+tws.reqHistoricalData(tickerId=1, 
+                      contract= contract_info,
+                      endDateTime='20170208 15:59:59 EST',
+                      durationStr='2 D',
+                      barSizeSetting='1 day',
+                      whatToShow='MIDPOINT', 
+                      useRTH=   1,
+                      formatDate = 1,                      
+                      )
+'''
+# reqId - int
+# date - str
+# open - double
+# high - double
+# low - double
+# close - double
+# Volume - int
+# Counts - int
+# WAP - double
+# hasGaps - Bool
+
+# Bar data is stored in callback.historical_Data
+'''
+
+print( len(callback.historical_Data) )
+
+callback.historical_Data[-4]
+callback.historical_Data[-3]
+callback.historical_Data[-2]
+callback.historical_Data[-1]
+
+
+
+################################################################################
+''' This function will get the data from open     '''
+################################################################################
+
+callback.historical_Data = []
+
+
+def getPriceAtSpecificTime(tws=None, contract_info=None, targetDateTime='20170208 15:59:59 EST', callback=callback):
+    
+    #del callback.historical_Data[:]
+    
+    tws.reqHistoricalData( tickerId=1, 
+                      contract = contract_info,
+                      endDateTime = targetDateTime,
+                      durationStr = '10 S',
+                      barSizeSetting = '1 secs',
+                      whatToShow = 'MIDPOINT', 
+                      useRTH = 1,
+                      formatDate = 1
+                      )
+    try:
+        callback.historical_Data[1][1], callback.historical_Data[0] 
+    except:
+        callback.historical_Data[1][1], callback.historical_Data[0] 
+    
+    
+#    time = callback.historical_Data[1][1].split("-")
+    
+    return ( callback.historical_Data[1][1], callback.historical_Data[0] )
+
+
+
+
+MC = '20170208 15:59:59 EST'
+MO = '20170208 9:30:00 EST'
+
+tws.reqHistoricalData( tickerId=1, 
+                  contract = contract_info,
+                  endDateTime = MC,
+                  durationStr = '1 D',
+                  barSizeSetting = '1 secs',
+                  whatToShow = 'MIDPOINT', 
+                  useRTH = 1,
+                  formatDate = 1
+                  )
+
+callback.historical_Data
+
+CB = getPriceAtSpecificTime( tws=tws, contract_info = contract_info, targetDateTime = MO )
+
+
+
+getPriceAtSpecificTime( tws=tws, contract_info = contract_info, targetDateTime = MC )
+
+# MC then MO
+
+for i in np.arange(0, len(callback.historical_Data)):
+    
+    print(i,callback.historical_Data[i])
+
+
+#print( type(callback.historical_Data) )
+
+
+################################################################################
+''' This function will get the data from close     '''
+################################################################################
+
+
+
+
+
+
+
+
+
+
+

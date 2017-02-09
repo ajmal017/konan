@@ -54,11 +54,6 @@ class IBWrapper(EWrapper):
         # Real Time Bars
         setattr(self, 'real_timeBar', [])
 
-        
-        
-            
-        
-
 
 
     # Account and Portfolio ###################################################
@@ -110,11 +105,6 @@ class IBWrapper(EWrapper):
 
 
 
-    
-    
-    
-
-
 
 
     # Orders ###################################################################
@@ -136,9 +126,6 @@ class IBWrapper(EWrapper):
         
     def deltaNeutralValidation(self, reqId, underComp):
         pass
-
-
-
 
 
 
