@@ -12,9 +12,9 @@ import broker as br
 class Position(object):
     """docstring for Position."""
 
-    '''
+    """
     CLASS CONSTRUCTOR
-    '''
+    """
     def __init__(self, ID = '', instrument = '', ticker = '', trade_type = '',
                     amount_units = 0, amount_wealth = 0.0,
                     time_of_trade = dt.datetime.today(),
@@ -40,9 +40,9 @@ class Position(object):
         self._PL_today = 0.0
         self._PL_total = 0.0
 
-    '''
+    """
     CLASS PROPERTIES
-    '''
+    """
     def ID():
         doc = "The ID property."
         def fget(self):
@@ -227,9 +227,9 @@ class Position(object):
         return locals()
     price_per_unit_today = property(**price_per_unit_today())
 
-    '''
+    """
     CLASS PRIVATE METHODS
-    '''
+    """
     def _updatePrice(self):
         #TODO: pass to BROKER
         pass
@@ -249,9 +249,9 @@ class Position(object):
         self._updatePLToday()
         self._updatePLTotal()
 
-    '''
+    """
     CLASS PUBLIC METHODS
-    '''
+    """
     def getPosition(self):
         return self
 
@@ -306,9 +306,9 @@ class Position(object):
 class PositionStock(Position):
     """docstring for PositionStock"""
 
-    '''
+    """
     CLASS CONSTRUCTOR
-    '''
+    """
     def __init__(self, ID = '', instrument = '', ticker = '', trade_type = '',
                     amount_units = 0, amount_wealth = 0.0,
                     time_of_trade = dt.datetime.today(),
@@ -325,9 +325,9 @@ class PositionStock(Position):
 class PositionFutures(Position):
     """docstring for postionFutures."""
 
-    '''
+    """
     CLASS CONSTRUCTOR
-    '''
+    """
     def __init__(self, ID = '', instrument = '', ticker = '', trade_type = '',
                     amount_units = 0, amount_wealth = 0.0,
                     time_of_trade = dt.datetime.today(),
@@ -344,9 +344,9 @@ class PositionFutures(Position):
 class postionOptions(Position):
     """docstring for postionOptions."""
 
-    '''
+    """
     CLASS CONSTRUCTOR
-    '''
+    """
     def __init__(self, ID = '', instrument = '', ticker = '', trade_type = '',
                     amount_units = 0, amount_wealth = 0.0,
                     time_of_trade = dt.datetime.today(),
@@ -359,3 +359,7 @@ class postionOptions(Position):
                 time_of_trade = time_of_trade, date_expiry = date_expiry)
 
         self._options_class_specific_attributes = None
+
+
+def test():
+    pass
