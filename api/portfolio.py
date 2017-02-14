@@ -109,3 +109,6 @@ class Portfolio(object):
 
     def updateAccountNAV(self, accounts = [''], all = False):
         return pd.DataFrame()
+
+    def position(self):
+        pass
