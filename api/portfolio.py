@@ -6,6 +6,8 @@ Created on 2017-02-14T16:32:00Z
 @author:Joshua Hu
 """
 import pandas as pd
+import Position
+
 
 class Portfolio(object):
     """docstring for Portfolio."""
@@ -23,7 +25,7 @@ class Portfolio(object):
                                         'date_expiry', 'age', 'PL_today',
                                         'PL_total'])):
 
-        self._positions = Positions
+        self._positions = positions
 
         self._strategy_PL = 0.0
         self._account_PL = {'accountID': 0.0} #OR pd.DataFrame()
