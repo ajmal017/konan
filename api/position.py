@@ -5,8 +5,12 @@ Created on Mon Feb 13 18:16:00 2017
 @author: Joshua Hu
 """
 from __future__ import print_function
+
+import numbers
+
 import datetime as dt
 import pandas as pd
+
 import broker as br
 
 class Position(object):
@@ -73,7 +77,7 @@ class Position(object):
         def fget(self):
             return self._ticker
         def fset(self, value):
-            if type(value) != str:
+            if isinstance(value, str):
                 raise TypeError("Ticker must be of type string")
             self._ticker = value
         def fdel(self):
@@ -99,7 +103,7 @@ class Position(object):
         def fget(self):
             return self._amount_units
         def fset(self, value):
-            if type(value) != int:
+            if isinstance(value, numbers.Number):
                 raise TypeError("Amount of units must be of type integer")
             self._amount_units = value
         def fdel(self):
@@ -112,7 +116,7 @@ class Position(object):
         def fget(self):
             return self._amount_wealth
         def fset(self, value):
-            if type(value) != float:
+            if isinstance(value, numbers.Number):
                 raise TypeError("Amount of wealth must be of type float")
             if value < 0:
                 raise ValueError("Amount of wealth cannot be negative")
@@ -127,7 +131,7 @@ class Position(object):
         def fget(self):
             return self._time_of_trade
         def fset(self, value):
-            if type(value) != dt.datetime:
+            if isinstance(value, dt.datetime):
                 raise TypeError("Time of Trade must be of type \
                                     datetime.datetime")
             self._time_of_trade = value
@@ -141,7 +145,7 @@ class Position(object):
         def fget(self):
             return self._date_entry
         def fset(self, value):
-            if type(value) != dt.date:
+            if isinstance(value, dt.date):
                 raise TypeError("Date of entry must be of type datetime.date")
             self._date_entry = value
         def fdel(self):
@@ -154,7 +158,7 @@ class Position(object):
         def fget(self):
             return self._date_expiry
         def fset(self, value):
-            if type(value) != dt.date:
+            if isinstance(value, dt.datetime):
                 raise TypeError("Date of expiry must be of type datetime.date")
             self._date_expiry = value
         def fdel(self):
@@ -167,7 +171,7 @@ class Position(object):
         def fget(self):
             return self._age.days
         def fset(self, value):
-            if type(value) != dt.timedelta:
+            if isinstance(value, dt.timedelta):
                 raise TypeError("Age must be of type datetime.timedelta")
             self._age = value
         def fdel(self):
@@ -180,8 +184,8 @@ class Position(object):
         def fget(self):
             return self._PL_today
         def fset(self, value):
-            if type(value) != float:
-                raise ValueError("PL today must be of type float")
+            if isinstance(value, numbers.Number):
+                raise TypeError("PL today must be of type float")
             self._PL_today = value
         def fdel(self):
             del self._PL_today
@@ -193,8 +197,8 @@ class Position(object):
         def fget(self):
             return self._PL_total
         def fset(self, value):
-            if type(value) != float:
-                raise ValueError("PL total must be of type float")
+            if isinstance(value, numbers.Number):
+                raise TypeError("PL total must be a numeric type")
             self._PL_total = value
         def fdel(self):
             del self._PL_total
@@ -206,8 +210,8 @@ class Position(object):
         def fget(self):
             return self._price_per_unit_entry
         def fset(self, value):
-            if type(value) != float:  # Need to be more stringent. Any numeric type is okay.
-                raise ValueError("Price per unit entry must be of type float")
+            if isinstance(value, numbers.Number):  # Need to be more stringent. Any numeric type is okay.
+                raise TypeError("Price per unit entry must be of type float")
             if value < 0:
                 raise ValueError("Price per unit cannot be negative")
             self._price_per_unit_entry = value
@@ -221,8 +225,8 @@ class Position(object):
         def fget(self):
             return self._price_per_unit_today
         def fset(self, value):
-            if type(value) != float:
-                raise ValueError("Price per unit today must be of type float")
+            if isinstance(value, numbers.Number):
+                raise TypeError("Price per unit today must be of type float")
             if value < 0:
                 raise ValueError("Price per unit cannot be negative")
             self._price_per_unit_today = value
@@ -242,9 +246,11 @@ class Position(object):
         self.age = dt.date.today() - self.date_entry
 
     def _updatePLToday(self):
+        #TODO
         return self.PL_today
 
     def _updatePLTotal(self):
+        #TODO
         return self.PL_total
 
     def updatePosition(self):
@@ -304,14 +310,14 @@ class Position(object):
             position_reverse.trade_type = 'SELL'
         elif position_reverse.trade_type == 'SELL':
             position_reverse.trade_type = 'BUY'
-            
+
         # Why cant this be:
         self.trade_type = -self.trade_type
-        
-        # I will need trade_type to be +1/ -1 because I want to use it in calculations. 
+
+        # I will need trade_type to be +1/ -1 because I want to use it in calculations.
         # the conversion to BUY and SELL was just to match with Ernie's exec files.
-        
-            
+
+
 
         return position_reverse
 
