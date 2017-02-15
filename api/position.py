@@ -359,7 +359,3 @@ class postionOptions(Position):
                 time_of_trade = time_of_trade, date_expiry = date_expiry)
 
         self._options_class_specific_attributes = None
-
-
-def test():
-    pass
