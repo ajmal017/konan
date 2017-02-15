@@ -6,7 +6,7 @@ Created on Mon Feb 13 18:16:00 2017
 """
 from __future__ import print_function
 import datetime as dt
-
+import pandas as pd
 import broker as br
 
 class Position(object):
@@ -206,8 +206,10 @@ class Position(object):
         def fget(self):
             return self._price_per_unit_entry
         def fset(self, value):
-            if type(value) != float:
+            if type(value) != float:  # Need to be more stringent. Any numeric type is okay.
                 raise ValueError("Price per unit entry must be of type float")
+            if value < 0:
+                raise ValueError("Price per unit cannot be negative")
             self._price_per_unit_entry = value
         def fdel(self):
             del self._price_per_unit_entry
@@ -221,6 +223,8 @@ class Position(object):
         def fset(self, value):
             if type(value) != float:
                 raise ValueError("Price per unit today must be of type float")
+            if value < 0:
+                raise ValueError("Price per unit cannot be negative")
             self._price_per_unit_today = value
         def fdel(self):
             del self._price_per_unit_today
@@ -238,10 +242,10 @@ class Position(object):
         self.age = dt.date.today() - self.date_entry
 
     def _updatePLToday(self):
-        return PL_today
+        return self.PL_today
 
     def _updatePLTotal(self):
-        return PL_total
+        return self.PL_total
 
     def updatePosition(self):
         self._updatePrice()
@@ -256,8 +260,8 @@ class Position(object):
         return self
 
     def getCurrentPosition(self):
-        updatePosition()
-        return getPosition()
+        self.updatePosition()
+        return self.getPosition()
 
     def getPositionDF(self):
         df_position_record = pd.DataFrame(index = 'ID_position',
@@ -290,8 +294,8 @@ class Position(object):
         return df_position_record
 
     def getCurrentPositionDF(self):
-        getCurrentPosition()
-        return getPositionDF()
+        self.getCurrentPosition()
+        return self.getPositionDF()
 
     def reversePosition(self):
         print('WARNING: position_reverse may override previous object')
@@ -300,6 +304,14 @@ class Position(object):
             position_reverse.trade_type = 'SELL'
         elif position_reverse.trade_type == 'SELL':
             position_reverse.trade_type = 'BUY'
+            
+        # Why cant this be:
+        self.trade_type = -self.trade_type
+        
+        # I will need trade_type to be +1/ -1 because I want to use it in calculations. 
+        # the conversion to BUY and SELL was just to match with Ernie's exec files.
+        
+            
 
         return position_reverse
 
