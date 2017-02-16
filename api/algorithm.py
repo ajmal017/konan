@@ -28,19 +28,8 @@ class DecisionAlgorithm(object):
             del self._positions
         return locals()
 
-    @abc.abstractproperty
-    def instrument():
-        doc = "The instrument property."
-        def fget(self):
-            return self._instrument
-        def fset(self, value):
-            self._instrument = value
-        def fdel(self):
-            del self._instrument
-        return locals()
-
     @abc.abstractmethod
-    def makePosition(time = dt.datetime.now(), ticker = '', amount_unit = 0, amount_value = 0.0):
+    def createPosition(time = dt.datetime.now(), ticker = '', amount_unit = 0, amount_value = 0.0):
         raise NotImplementedError("makePosition() is not implemented")
 
     @abc.abstractmethod
@@ -54,3 +43,11 @@ class DecisionAlgorithm(object):
     @abc.abstractmethod
     def getData(data = '', trade_type = ''):
         raise NotImplementedError("getData() is not implemented")
+
+"""
+EXAMPLE USE CASE:
+#this is written in an external script
+import api.algortihm
+class Deltix_algorithm(DecisionAlgorithm):
+    ...
+"""

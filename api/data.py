@@ -34,7 +34,7 @@ from tqdm import tqdm
 
 import lib.readWriteData as rwd
 
-class repository(object):
+class Repository(object):
     def __init__(self, dir_root = '/', project = 'test/', data_file = 'test.txt'):
         self._root = dir_root #find users Dropbox folder
         self._projects = os.listdir(self.root)
@@ -120,7 +120,10 @@ class repository(object):
         return locals()
     file_path = property(**file_path())
 
-class filter(object):
+    def listProjects(self):
+        return self.projects()
+
+class Filter(object):
     """
     Base Class for data filters. Historical Filter for Backtest sub-system and Live Filter for Live Trading sub-system
     """
@@ -329,7 +332,7 @@ class filter(object):
             df = function(data,inplace=True)
         return df
 
-class histFilter(dataFilter):
+class HistoricalFilter(dataFilter):
     """
     Historical Filter for Backtest sub-system
     """
@@ -353,7 +356,7 @@ class histFilter(dataFilter):
     def spawnLiveFilter(self):
         return liveFilter(filter_lifespan = self.lifespan, filter_update_period = self.filter_update_period)
 
-class liveFilter(dataFilter):
+class LiveFilter(dataFilter):
     """
     Live Filter for Live trading sub-system
     """

@@ -3,7 +3,7 @@ Wrapper - Organised by groups. E.g., Accont and Portfolio group, Orders group et
 2016-01-31
 Updated 20 Nov 2016 for Python 3.
 '''
-from __future__ import print_function 
+from __future__ import print_function
 from ib.ext.EWrapper import EWrapper
 from ib.ext.Contract import Contract
 from ib.ext.ExecutionFilter import ExecutionFilter
@@ -17,22 +17,22 @@ class IBWrapper(EWrapper):
         setattr(self, "update_AccountValue", [])
         setattr(self, "update_Portfolio", [])
         setattr(self, 'account_Summary', [])
-        setattr(self, 'account_SummaryEnd_flag', False)       
+        setattr(self, 'account_SummaryEnd_flag', False)
         setattr(self, 'update_Position', [])
         setattr(self, 'positionEnd_flag', False)
         # Orders
         setattr(self, 'order_Status', [])
         setattr(self, 'open_Order', [])
-        setattr(self, 'open_OrderEnd_flag', True)        
+        setattr(self, 'open_OrderEnd_flag', True)
         # Market Data
         setattr(self, 'tick_Price', [])
-        setattr(self, 'tick_Size', [])        
+        setattr(self, 'tick_Size', [])
         setattr(self, 'tick_OptionComputation', [])
-        setattr(self, 'tick_Generic', [])        
-        setattr(self, 'tick_String', [])        
-        setattr(self, 'tick_EFP', [])    
-        setattr(self, 'tickSnapshotEnd_reqId', [])           
-        setattr(self, 'tickSnapshotEnd_flag', False)   
+        setattr(self, 'tick_Generic', [])
+        setattr(self, 'tick_String', [])
+        setattr(self, 'tick_EFP', [])
+        setattr(self, 'tickSnapshotEnd_reqId', [])
+        setattr(self, 'tickSnapshotEnd_flag', False)
         # Connection and Server
         setattr(self, 'connection_Closed', False)
         # Executions
@@ -44,7 +44,7 @@ class IBWrapper(EWrapper):
         setattr(self, "contract_Details_flag", False)
         # Market Depth
         setattr(self, 'update_MktDepth', [])
-        setattr(self, 'update_MktDepthL2', [])        
+        setattr(self, 'update_MktDepthL2', [])
         # Historical Data
         setattr(self, 'historical_Data', [])
         setattr(self, 'historical_DataEnd_flag', False)
@@ -60,43 +60,43 @@ class IBWrapper(EWrapper):
     def updateAccountValue(self, key, value, currency, accountName):
         update_AccountValue = self.update_AccountValue
         update_AccountValue.append((key, value, currency, accountName))
-        
-    def updatePortfolio(self, contract, position, marketPrice, marketValue, 
+
+    def updatePortfolio(self, contract, position, marketPrice, marketValue,
                         averageCost, unrealizedPnL, realizedPnL, accountName):
         update_Portfolio = self.update_Portfolio
-        update_Portfolio.append((contract.m_conId, contract.m_currency, 
+        update_Portfolio.append((contract.m_conId, contract.m_currency,
                                  contract.m_expiry, contract.m_includeExpired,
                                  contract.m_localSymbol, contract.m_multiplier,
                                  contract.m_primaryExch, contract.m_right,
                                  contract.m_secType, contract.m_strike,
                                  contract.m_symbol, contract.m_tradingClass,
                                  position, marketPrice, marketValue,
-                                 averageCost, unrealizedPnL, realizedPnL, 
-                                 accountName))    
-    
+                                 averageCost, unrealizedPnL, realizedPnL,
+                                 accountName))
+
     def updateAccountTime(self, timeStamp):
         self.update_AccountTime = timeStamp
-        
+
     def accountDownloadEnd(self, accountName=None):
         self.accountDownloadEnd_accountName = accountName
         self.accountDownloadEnd_flag = True
 
-    def accountSummary(self, reqId=None, account=None, tag=None, value=None, 
+    def accountSummary(self, reqId=None, account=None, tag=None, value=None,
                        currency=None):
         account_Summary = self.account_Summary
         account_Summary.append((reqId, account, tag, value, currency))
-        
+
     def accountSummaryEnd(self, reqId):
         self.accountSummaryEnd_reqId = reqId
         self.account_SummaryEnd_flag = True
-        
+
     def position(self, account, contract, pos, avgCost):
         update_Position = self.update_Position
-        update_Position.append((account, contract.m_conId, contract.m_currency, 
-                                contract.m_exchange, contract.m_expiry, 
-                                contract.m_includeExpired, contract.m_localSymbol, 
-                                contract.m_multiplier, contract.m_right, 
-                                contract.m_secType, contract.m_strike, 
+        update_Position.append((account, contract.m_conId, contract.m_currency,
+                                contract.m_exchange, contract.m_expiry,
+                                contract.m_includeExpired, contract.m_localSymbol,
+                                contract.m_multiplier, contract.m_right,
+                                contract.m_secType, contract.m_strike,
                                 contract.m_symbol, contract.m_tradingClass,
                                 pos, avgCost))
 
@@ -108,12 +108,12 @@ class IBWrapper(EWrapper):
 
 
     # Orders ###################################################################
-    def orderStatus(self, orderId, status, filled, remaining, avgFillPrice, 
+    def orderStatus(self, orderId, status, filled, remaining, avgFillPrice,
                     permId, parentId, lastFillPrice, clientId, whyHeld):
         order_Status = self.order_Status
-        order_Status.append((orderId, status, filled, remaining, avgFillPrice, 
+        order_Status.append((orderId, status, filled, remaining, avgFillPrice,
                             permId, parentId, lastFillPrice, clientId, whyHeld))
- 
+
     def openOrder(self, orderId, contract, order, orderState):
         open_Order = self.open_Order
         open_Order.append((orderId, contract, order, orderState))
@@ -123,7 +123,7 @@ class IBWrapper(EWrapper):
 
     def nextValidId(self, orderId):
         self.next_ValidId = orderId
-        
+
     def deltaNeutralValidation(self, reqId, underComp):
         pass
 
@@ -141,33 +141,33 @@ class IBWrapper(EWrapper):
         tick_Size = self.tick_Size
         tick_Size.append((tickerId, field, size))
 
-    def tickOptionComputation(self, tickerId, field, impliedVol, delta, 
-                              optPrice, pvDividend, gamma, vega, theta, 
+    def tickOptionComputation(self, tickerId, field, impliedVol, delta,
+                              optPrice, pvDividend, gamma, vega, theta,
                               undPrice):
         tick_OptionComputation = self.tick_OptionComputation
-        tick_OptionComputation.append((tickerId, field, impliedVol, delta, 
-                                       optPrice, pvDividend, gamma, vega, 
+        tick_OptionComputation.append((tickerId, field, impliedVol, delta,
+                                       optPrice, pvDividend, gamma, vega,
                                        theta, undPrice))
 
     def tickGeneric(self, tickerId, tickType, value):
         tick_Generic = self.tick_Generic
         tick_Generic.append((tickerId, tickType, value))
-       
+
     def tickString(self, tickerId, field, value):
         tick_String = self.tick_String
         tick_String.append((tickerId, field, value))
-        
-    def tickEFP(self, tickerId, tickType, basisPoints, formattedBasisPoints, 
-                impliedFuture, holdDays, futureExpiry, dividendImpact, 
+
+    def tickEFP(self, tickerId, tickType, basisPoints, formattedBasisPoints,
+                impliedFuture, holdDays, futureExpiry, dividendImpact,
                 dividendsToExpiry):
         tick_EFP = self.tick_EFP
-        tick_EFP.append((tickerId, tickType, basisPoints, formattedBasisPoints, 
-                         impliedFuture, holdDays, futureExpiry, dividendImpact, 
+        tick_EFP.append((tickerId, tickType, basisPoints, formattedBasisPoints,
+                         impliedFuture, holdDays, futureExpiry, dividendImpact,
                          dividendsToExpiry))
 
     def tickSnapshotEnd(self, reqId):
-        self.tickSnapshotEnd_reqId = reqId        
-        setattr(self, 'tickSnapshotEnd_flag', True)        
+        self.tickSnapshotEnd_reqId = reqId
+        setattr(self, 'tickSnapshotEnd_flag', True)
 
     def marketDataType(self, reqId, marketDataType):
         setattr(self, 'market_DataType', marketDataType)
@@ -203,7 +203,7 @@ class IBWrapper(EWrapper):
         pass'''
 
     def connectionClosed(self):
-        self.connection_Closed = True        
+        self.connection_Closed = True
 
 
 
@@ -214,16 +214,16 @@ class IBWrapper(EWrapper):
 
 
 
-    # Executions ###############################################################        
+    # Executions ###############################################################
     def execDetails(self, reqId, contract, execution):
         self.exec_Details_reqId = reqId
         self.exec_Details_contract = contract
         self.exec_Details_execution = execution
 
     def execDetailsEnd(self, reqId):
-        self.exec_DetailsEnd_reqId = reqId        
+        self.exec_DetailsEnd_reqId = reqId
         setattr(self, "exec_DetailsEnd_flag", True)
-        
+
     def commissionReport(self, commissionReport):
         self.commission_Report = commissionReport
 
@@ -235,7 +235,7 @@ class IBWrapper(EWrapper):
 
 
 
-    # Contract #################################################################        
+    # Contract #################################################################
     def contractDetails(self, reqId, contractDetails):
         self.contract_Details_reqId = reqId
         self.contract_Details = contractDetails
@@ -260,17 +260,17 @@ class IBWrapper(EWrapper):
     def updateMktDepth(self, tickerId, position, operation, side, price, size):
         update_MktDepth = self.update_MktDepth
         update_MktDepth.append((tickerId, position, operation, side, price, size))
-        #df = pd.DataFrame(self.update_MktDepth, columns = ["tickerId", "position", 
-        #                                                   "operation", "side", 
+        #df = pd.DataFrame(self.update_MktDepth, columns = ["tickerId", "position",
+        #                                                   "operation", "side",
         #                                                   "price", "size"])
-        
-    def updateMktDepthL2(self, tickerId, position, marketMaker, operation, 
+
+    def updateMktDepthL2(self, tickerId, position, marketMaker, operation,
                          side, price, size):
-        # I don't get any of this so I can't test it. Following are just place holders. 
+        # I don't get any of this so I can't test it. Following are just place holders.
         print("blah blah. You have L2 data!!!")
         update_MktDepthL2 = self.update_MktDepthL2
-        update_MktDepthL2.append((tickerId, position, operation, side, 
-                                  price, size))  
+        update_MktDepthL2.append((tickerId, position, operation, side,
+                                  price, size))
 
 
 
@@ -282,7 +282,7 @@ class IBWrapper(EWrapper):
 
     # News Bulletin ############################################################
     def updateNewsBulletin(self, msgId, msgType, message, origExchange):
-        # During the time I test this, I don't get anything. Can't verify. Sorry. 
+        # During the time I test this, I don't get anything. Can't verify. Sorry.
         print("You get News!!!")
         self.update_NewsBulletin_msgId = msgId
         self.update_NewsBulletin_msgType = msgType
@@ -314,14 +314,14 @@ class IBWrapper(EWrapper):
 
 
     # Historical Data  #########################################################
-    def historicalData(self, reqId, date, open, high, low, close, volume, 
+    def historicalData(self, reqId, date, open, high, low, close, volume,
                        count, WAP, hasGaps):
         historical_Data = self.historical_Data
-        historical_Data.append((reqId, date, open, high, low, close, volume, 
-                       count, WAP, hasGaps))      
-        #df = pd.DataFrame(self.historical_Data, columns = ["reqId", "date", "open", 
-        #                                                   "high", "low", "close", 
-        #                                                   "volume", "count", "WAP", 
+        historical_Data.append((reqId, date, open, high, low, close, volume,
+                       count, WAP, hasGaps))
+        #df = pd.DataFrame(self.historical_Data, columns = ["reqId", "date", "open",
+        #                                                   "high", "low", "close",
+        #                                                   "volume", "count", "WAP",
         #                                                   "hasGaps"])
 
 
@@ -334,11 +334,11 @@ class IBWrapper(EWrapper):
     # Market Scanners  #########################################################
     def scannerParameters(self, xml):
         self.scanner_Parameters = xml
-        
-    def scannerData(self, reqId, rank, contractDetails, distance, benchmark, 
+
+    def scannerData(self, reqId, rank, contractDetails, distance, benchmark,
                     projetion, legsStr):
         scanner_Data = self.scanner_Data
-        scanner_Data.append((reqId, rank, contractDetails, distance, benchmark, 
+        scanner_Data.append((reqId, rank, contractDetails, distance, benchmark,
                     projetion, legsStr))
 
     def scannerDataEnd(self, reqId):
@@ -355,13 +355,13 @@ class IBWrapper(EWrapper):
 
 
     # Real Tume Bars ###########################################################
-    def realtimeBar(self, reqId, time, open, high, low, close, volume, 
+    def realtimeBar(self, reqId, time, open, high, low, close, volume,
                     wap, count):
         real_timeBar = self.real_timeBar
-        real_timeBar.append((reqId, time, open, high, low, close, volume, 
+        real_timeBar.append((reqId, time, open, high, low, close, volume,
                              wap, count))
-        #df = pd.DataFrame(self.real_timeBar, columns = ["reqId", "time", "open", "high", 
-        #                                                "low", "close", "volume", "wap", 
+        #df = pd.DataFrame(self.real_timeBar, columns = ["reqId", "time", "open", "high",
+        #                                                "low", "close", "volume", "wap",
         #                                                "count"])
 
 
@@ -377,16 +377,16 @@ class IBWrapper(EWrapper):
         print("Getting Fundamental Data Feed Through")
         self.fundamental_Data_reqId = reqId
         self.fundamental_Data_data = data
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    # Display Groups #########################################################       
+
+
+
+
+
+
+
+
+
+    # Display Groups #########################################################
     def displayGroupList(self, reqId, groups):
         pass
 
@@ -394,38 +394,6 @@ class IBWrapper(EWrapper):
         pass
 
 
-
-
-
-        
-
-
-
-                          
-
-
-
-
-
-       
-
-
-
-
-    
-
-
-
-
-        
-        
-        
-        
-        
-
-    
-    
-    
 # Create Contract
 class contract():
     def create_contract(self, symbol, secType, exchange, currency,
@@ -442,7 +410,7 @@ class contract():
         contract.m_multiplier = multiplier
         contract.m_tradingClass = tradingClass
         return contract
-        
+
     def create_order(self, account, orderType, totalQuantity, action):
         order = Order()
         order.m_account = account
@@ -450,7 +418,7 @@ class contract():
         order.m_totalQuantity = totalQuantity
         order.m_action = action
         return order
-    
+
     def exec_filter(self, client_id, accountName, contract):
         filt = ExecutionFilter()
         filt.m_clientId = client_id
@@ -459,24 +427,9 @@ class contract():
         filt.m_symbol = contract.m_symbol
         filt.m_secType = contract.m_secType
         filt.m_exchange = contract.m_exchange
-        return filt    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        return filt
+
+
 '''
 openOrder contains the following fields:
         self.tmp = [orderId, contract.m_comboLegs,
@@ -596,4 +549,4 @@ openOrder contains the following fields:
                     orderState.m_minCommission,
                     orderState.m_status,
                     orderState.m_warningText]
-'''    
+'''

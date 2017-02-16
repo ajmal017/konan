@@ -29,7 +29,12 @@ class Position(object):
 
         self._instrument = instrument
         self._ticker = ticker
-        self._trade_type = trade_type
+        if trade_type == 'BUY':
+            self._trade_type = 1
+        elif trade_type == 'SELL':
+            self._trade_type == -1
+
+
         self._amount_units = amount_units
         self._amount_wealth = amount_wealth
 
@@ -38,8 +43,11 @@ class Position(object):
 
         self._time_of_trade = time_of_trade
         self._date_entry = self.time_of_trade.date()
-        self._date_expiry = date_expiry
-        self._age = dt.date.today() - self.date_entry
+        self._date_expiry = date_expiry    # date_expiry should be an integer.
+                                          # Expiry is expressed in terms of number of holding days
+
+        self._age = dt.date.today() - self.date_entry  # this will use calendar days.
+                                                      # Need a version that is in terms of trading days
 
         self._PL_today = 0.0
         self._PL_total = 0.0
