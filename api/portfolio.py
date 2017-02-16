@@ -15,6 +15,7 @@ class Portfolio(object):
     """
     CLASS CONSTRUCTOR
     """
+    
     def __init__(self, positions = pd.DataFrame(index = 'ID_position',
                                         columns = ['instrument','ticker',
                                         'trade_type','amount_units',
@@ -24,14 +25,18 @@ class Portfolio(object):
                                         'time_of_trade', 'date_entry',
                                         'date_expiry', 'age', 'PL_today',
                                         'PL_total'])):
-
+    #def __init__(self):
+        
         self._positions = positions
+        
+        self.positionsDF = pd.DataFrame() # { ID: position object}
 
         self._strategy_PL = 0.0
-        self._account_PL = {'accountID': 0.0} #OR pd.DataFrame()
+        self._account_PL = {'accountID': 0.0} # OR pd.DataFrame()   # should be pandas series
+                                               # PL can be derived from NAV           
 
         self._strategy_NAV = 0.0
-        self._account_NAV = {'accountID': 0.0} #OR pd.DataFrame()
+        self._account_NAV = {'accountID': 0.0} #OR pd.DataFrame()  # should be pandas series
 
     """
     CLASS PROPERTIES
@@ -94,20 +99,29 @@ class Portfolio(object):
     """
     CLASS PUBLIC METHODS
     """
+    def addPositions(self, positions):
+        self.positionsDF = self.positionsDF.append(positions)
+     
+     
     def updatePositions(self, positions):
         pass
+
 
     def checkPositions(self, tickers = [''], all = False):
         return pd.DataFrame()
 
+
     def updateStrategyPL(self):
         pass
+
 
     def updateAccountPL(self, accounts = [''], all = False):
         return pd.DataFrame()
 
+
     def updateStrategyNAV(self):
         pass
+
 
     def updateAccountNAV(self, accounts = [''], all = False):
         return pd.DataFrame()
