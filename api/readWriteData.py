@@ -144,10 +144,10 @@ xls_keys = ['SPY','MDY']
 sample_lines = 10000
 
 #global access_token
-access_token_path = '/Users/jsrhu/Code/customPackages/proprietary/QTS/assets/keys/dropbox_api.txt'
-with open(access_token_path,'rb') as t:
-    global access_token
-    access_token = t.read()
+#access_token_path = '/Users/jsrhu/Code/customPackages/proprietary/QTS/assets/keys/dropbox_api.txt'
+#with open(access_token_path,'rb') as t:
+#    global access_token
+#    access_token = t.read()
 #access_token = 'r9-vzHrIPPAAAAAAAAANj9Rdt_OIBEEBgiFhTdvI6UZ4jiFQMSZp0ABd0HHS5j3c'
 
 def readToDF(path_data = '', read_full = True, n_lines = sample_lines):

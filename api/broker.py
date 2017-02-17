@@ -224,8 +224,7 @@ class IBBroker(Broker):
 
     def createOrder():
         pass
-
-    #TODO:
+    
     def make_order(action,quantity, price = None):
         if price is not None:
             order = Order()
@@ -240,7 +239,7 @@ class IBBroker(Broker):
             order.m_action = action
         return order
 
-    #TODO:
+
     def create_order(self, account, orderType, totalQuantity, action):
         order = Order()
         order.m_account = account
@@ -251,13 +250,19 @@ class IBBroker(Broker):
 
     def prepareOrder(position = position.Position()):
         pass
+    
+    
+    #tws.placeOrder(order_id, contract_info, order_info)
+
+    #tws.cancelOrder(order_id)
+
 
 class DataBroker(Broker):
     """docstring for DataBroker."""
     def __init__(self):
         super(DataBroker, self).__init__()
 
-    def getLocalData(path = data.Repository()):
+    def getLocalData(path = '' ): #data.Repository()):
         return None
 
 class IBDataBroker(IBBroker, DataBroker):
@@ -345,10 +350,11 @@ class IBDataBroker(IBBroker, DataBroker):
                         ['Request_ID','Account','Tag','Value','Curency'])
 
     def getMarketData(self, type_data = '', time_data = dt.datetime.now()):
-        dict_data_type = {'OPEN':_getMarketOpenData,
-                            'CLOSE':_getMarketCloseData,
-                            'HI':_getMarketHighData, 'LO':_getMarketLowData,
-                            'TIME':_getMarketTimeData}
+        dict_data_type = {'OPEN':self._getMarketOpenData,
+                            'CLOSE':self._getMarketCloseData,
+                            'HI':self._getMarketHighData, 
+                            'LO':self._getMarketLowData,
+                            'TIME':self._getMarketTimeData}
         if type_data not in dict_data_type:
             raise ValueError("Market data type is not valid")
 
@@ -392,3 +398,6 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
     """
     CLASS PUBLIC METHODS
     """
+    
+    def placeOrder(self, order_id, contract = None, order = None):
+        self.tws.placeOrder(order_id, contract, order)

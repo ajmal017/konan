@@ -115,6 +115,7 @@ order_info = contract.create_order(accountName, "MKT", 100, "BUY")
 
 
 tws.placeOrder(order_id, contract_info, order_info)
+
 tws.cancelOrder(order_id)
 
 '''

@@ -31,8 +31,9 @@ import operator as op
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+import traceback
 
-import lib.readWriteData as rwd
+import readWriteData as rwd
 
 class Repository(object):
     def __init__(self, dir_root = '/', project = 'test/', data_file = 'test.txt'):
@@ -332,7 +333,7 @@ class Filter(object):
             df = function(data,inplace=True)
         return df
 
-class HistoricalFilter(dataFilter):
+class HistoricalFilter(Filter):
     """
     Historical Filter for Backtest sub-system
     """
@@ -348,15 +349,15 @@ class HistoricalFilter(dataFilter):
         Return:
         None
         """
-        base = dataFilter(filter_lifespan = filter_lifespan, filter_update_period = filter_update_period, hist_data_sources = [])
+        base = Filter(filter_lifespan = filter_lifespan, filter_update_period = filter_update_period, hist_data_sources = [])
         self._lifespan = base.lifespan
         self._update_period = base.update_period
         self._hist_data_sources = base.hist_data_sources
 
     def spawnLiveFilter(self):
-        return liveFilter(filter_lifespan = self.lifespan, filter_update_period = self.filter_update_period)
+        return LiveFilter(filter_lifespan = self.lifespan, filter_update_period = self.filter_update_period)
 
-class LiveFilter(dataFilter):
+class LiveFilter(Filter):
     """
     Live Filter for Live trading sub-system
     """
@@ -372,7 +373,7 @@ class LiveFilter(dataFilter):
         Return:
         None
         """
-        base = dataFilter(filter_lifespan = filter_lifespan, filter_update_period = filter_update_period, live_data_sources = [])
+        base = Filter(filter_lifespan = filter_lifespan, filter_update_period = filter_update_period, live_data_sources = [])
         self._lifespan = base.lifespan
         self._update_period = base.update_period
         self._live_data_sources = base.live_data_sources

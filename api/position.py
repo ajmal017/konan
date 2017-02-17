@@ -11,8 +11,6 @@ import numbers
 import datetime as dt
 import pandas as pd
 
-import broker as br
-
 class Position(object):
     """docstring for Position."""
 
