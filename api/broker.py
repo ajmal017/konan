@@ -1,7 +1,7 @@
 """
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-api.broker.py
+api.Broker.py
 Created on 2017-02-14T16:36:00Z
 @author:Joshua Hu
 """
@@ -31,11 +31,11 @@ from ib.ext.Order import Order
 import position
 
 class Broker(object):
-    """docstring for broker."""
+    """docstring for Broker."""
     def __init__(self):
-        super(broker, self).__init__()
+        super(Broker, self).__init__()
 
-class IBBroker(broker):
+class IBBroker(Broker):
     """docstring for IBBroker."""
 
     """
@@ -224,6 +224,7 @@ class IBBroker(broker):
     def createOrder():
         pass
 
+    #TODO:
     def make_order(action,quantity, price = None):
         if price is not None:
             order = Order()
@@ -238,6 +239,7 @@ class IBBroker(broker):
             order.m_action = action
         return order
 
+    #TODO:
     def create_order(self, account, orderType, totalQuantity, action):
         order = Order()
         order.m_account = account
@@ -249,9 +251,7 @@ class IBBroker(broker):
     def prepareOrder(position = position.Position()):
         pass
 
-
-
-class DataBroker(broker):
+class DataBroker(Broker):
     """docstring for DataBroker."""
     def __init__(self):
         super(DataBroker, self).__init__()
@@ -375,7 +375,7 @@ class IBDataBroker(IBBroker, DataBroker):
         return None
 
 
-class ExecutionBroker(broker):
+class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
     def __init__(self):
         super(ExecutionBroker, self).__init__()
