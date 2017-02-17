@@ -19,7 +19,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
-from IBWrapper import IBWrapper, contract
+from IBWrapper import IBWrapper
 from ib.ext.EClientSocket import EClientSocket
 from ib.ext.ScannerSubscription import ScannerSubscription
 
@@ -199,9 +199,12 @@ class IBDataBroker(IBBroker, DataBroker):
 
         return dict_data_type[type_data](time)
 
-    def _getMarketOpenData(time = dt.datetime.now()):
-        order_id = self.nextOrderId()
-
+    def _getMarketOpenData(time = dt.datetime.now(), contract = Contract()):
+        # external dictionary or association that allows for contracts to be associated with a tickerId
+        self.tws.reqHistoricalData(tickerId = 1, contract = contract,
+                                    endDateTime = '', durationStr = '',
+                                    barSizeSetting = '', whatToShow = 'BID',
+                                    useRTH = 0, formatDate = 1)
         return None
 
     def _getMarketCloseData(time = dt.datetime.now()):
