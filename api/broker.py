@@ -137,20 +137,88 @@ class IBBroker(broker):
     def nextOrderId(self):
         return self.tws.reqIds(1)
 
-    def createContract(self, symbol, secType, exchange, currency, right = None,
-                        strike = None, expiry = None, multiplier = None,
-                        tradingClass = None):
-
+    def createContract(self, contract_id = 1, ticker = '', instrument_type = '',
+                        last_trade_date = 'YYMMDD', expiry = '', strike_price = 0.0,
+                        right = '', multiplier = '', exchange = '',
+                        currency = '', primary_exchange_ticker = '',
+                        primary_exchange = '', trading_class = '',
+                        include_expired = False, secIdType = '', secId = '',
+                        combo_legs_description = '', combo_legs = [],
+                        under_comp = None):
         contract = Contract()
-        contract.m_symbol = symbol
-        contract.m_secType = secType
-        contract.m_exchange = exchange
-        contract.m_currency = currency
-        contract.m_right = right
+
+        #The unique IB contract identifier.
+        contract.m_conId = contract_id
+
+        #The underlying's asset symbol.
+        contract.m_symbol = tickerId
+
+        #The security's type: STK - stock (or ETF) OPT - option FUT - future
+        #IND - index FOP - futures option CASH - forex pair BAG - combo
+        #WAR - warrant BOND- bond CMDTY- commodity NEWS- news FUND- mutual fund.
+        contract.m_secType = instrument_type
+
+        #The contract's last trading day or contract month
+        #(for Options and Futures).
+        #Strings with format YYYYMM will be interpreted as the Contract Month
+        #whereas YYYYMMDD will be interpreted as Last Trading Day.
+        contract.m_lastTradeDateOrContractMonth = last_trade_date
+        contract.m_expiry = expiry # is this the same as last_trade_date ?
+
+        #The option's strike price.
         contract.m_strike = strike
-        contract.m_expiry = expiry
+
+        #Either Put or Call (i.e. Options). Valid values are P, PUT, C, CALL.
+        contract.m_right = right
+
+        #The instrument's multiplier (i.e. options, futures).
         contract.m_multiplier = multiplier
-        contract.m_tradingClass = tradingClass
+
+        #The destination exchange.
+        contract.m_exchange = exchange
+
+        #The underlying's cuurrency.
+        contract.m_currency = currency
+
+        #The contract's symbol within its primary exchange.
+        contract.m_localSymbol = primary_exchange_ticker
+
+        #The contract's primary exchange.
+        contract.m_primaryExch = primary_exchange
+
+        #The trading class name for this contract.
+        #Available in TWS contract description window as well.
+        #For example, GBL Dec '13 future's trading class is "FGBL".
+        contract.m_tradingClass = trading_class
+
+        #If set to true, contract details requests and historical data queries
+        #can be performed pertaining to expired contracts.
+        #Note: Historical data queries on expired contracts are limited to
+        #the last year of the contracts life, and are initially only supported
+        #for expired futures contracts.
+        contract.m_includeExpired = include_expired
+
+        #Security's identifier when querying contract's details
+        #or placing orders SIN - Example: Apple: US0378331005 CUSIP
+        #- Example: Apple: 037833100 SEDOL - Consists of 6-AN + check digit.
+        #Example: BAE: 0263494 RIC - Consists of exchange-independent RIC Root
+        #and a suffix identifying the exchange.
+        #Example: AAPL.O for Apple on NASDAQ.
+        contract.m_secIdType = secIdType
+
+        #Identifier of the security type.
+        contract.m_secId = secId
+
+        #Description of the combo legs.
+        contract.m_comboLegsDescription = combo_legs_description
+
+        #The legs of a combined contract definition.
+        contract.m_comboLegs = combo_legs
+
+        #Delta and underlying price for Delta-Neutral combo orders.
+        #Underlying (STK or FUT), delta and underlying price
+        #goes into this attribute.
+        contract.m_underComp = under_comp
         return contract
 
     def createOrder():
@@ -168,6 +236,14 @@ class IBBroker(broker):
             order.m_orderType = 'MKT'
             order.m_totalQuantity = quantity
             order.m_action = action
+        return order
+
+    def create_order(self, account, orderType, totalQuantity, action):
+        order = Order()
+        order.m_account = account
+        order.m_orderType = orderType
+        order.m_totalQuantity = totalQuantity
+        order.m_action = action
         return order
 
     def prepareOrder(position = position.Position()):
@@ -189,6 +265,84 @@ class IBDataBroker(IBBroker, DataBroker):
                     client_id = 100):
         super(IBDataBroker, self).__init__(account_name, host, port, client_id)
 
+        #read state from file or call from IB
+        #keep trying to create a valid id?
+        self._current_request_id = 1
+
+    def current_request_id():
+        doc = "The current_request_id property."
+        def fget(self):
+            return self._current_request_id
+        def fset(self, value):
+            self._current_request_id = value
+        def fdel(self):
+            del self._current_request_id
+        return locals()
+    current_request_id = property(**current_request_id())
+
+    def getAccountInformation(self, all_accounts = True, attributes = ','):
+        """
+        attributes values:
+        AccountType — Identifies the IB account structure
+        NetLiquidation — The basis for determining the price of the assets in
+            your account. Total cash value + stock value + options value + bond value
+        TotalCashValue — Total cash balance recognized at the time of trade
+            + futures PNL
+        SettledCash — Cash recognized at the time of settlement
+            - purchases at the time of trade - commissions - taxes - fees
+        AccruedCash — Total accrued cash value of stock, commodities
+            and securities
+        BuyingPower — Buying power serves as a measurement of the dollar value
+            of securities that one may purchase in a securities account
+            without depositing additional funds
+        EquityWithLoanValue — Forms the basis for determining whether a client
+            has the necessary assets to either initiate
+            or maintain security positions. Cash + stocks + bonds + mutual funds
+        PreviousEquityWithLoanValue — Marginable Equity with Loan value
+            as of 16:00 ET the previous day
+        GrossPositionValue — The sum of the absolute value
+            of all stock and equity option positions
+        RegTEquity — Regulation T equity for universal account
+        RegTMargin — Regulation T margin for universal account
+        SMA — Special Memorandum Account: Line of credit created
+            when the market value of securities in a Regulation T account
+            increase in value
+        InitMarginReq — Initial Margin requirement of whole portfolio
+        MaintMarginReq — Maintenance Margin requirement of whole portfolio
+        AvailableFunds — This value tells what you have available for trading
+        ExcessLiquidity — This value shows your margin cushion,
+            before liquidation
+        Cushion — Excess liquidity as a percentage of net liquidation value
+        FullInitMarginReq — Initial Margin of whole portfolio
+            with no discounts or intraday credits
+        FullMaintMarginReq — Maintenance Margin of whole portfolio
+            with no discounts or intraday credits
+        FullAvailableFunds — Available funds of whole portfolio
+            with no discounts or intraday credits
+        FullExcessLiquidity — Excess liquidity of whole portfolio
+            with no discounts or intraday credits
+        LookAheadNextChange — Time when look-ahead values take effect
+        LookAheadInitMarginReq — Initial Margin requirement of whole portfolio
+            as of next period's margin change
+        LookAheadMaintMarginReq — Maintenance Margin requirement
+            of whole portfolio as of next period's margin change
+        LookAheadAvailableFunds — This value reflects your available funds
+            at the next margin change
+        LookAheadExcessLiquidity — This value reflects your excess liquidity
+            at the next margin change
+        HighestSeverity — A measure of how close the account is to liquidation
+        DayTradesRemaining — The Number of Open/Close trades a user
+            could put on before Pattern Day Trading is detected.
+            A value of "-1" means that the user can put on unlimited day trades.
+        Leverage — GrossPositionValue / NetLiquidation
+        """
+
+        self.tws.reqAccountSummary(reqId = self.current_request_id,
+                                    group = all_accounts, tags = attributes)
+        return pd.DataFrame(callback.account_Summary,
+                        columns =
+                        ['Request_ID','Account','Tag','Value','Curency'])
+
     def getMarketData(type_data = '', time = dt.datetime.now()):
         dict_data_type = {'OPEN':_getMarketOpenData,
                             'CLOSE':_getMarketCloseData,
@@ -200,7 +354,8 @@ class IBDataBroker(IBBroker, DataBroker):
         return dict_data_type[type_data](time)
 
     def _getMarketOpenData(time = dt.datetime.now(), contract = Contract()):
-        # external dictionary or association that allows for contracts to be associated with a tickerId
+        # external dictionary or association that allows for contracts
+        # to be associated with a tickerId
         self.tws.reqHistoricalData(tickerId = 1, contract = contract,
                                     endDateTime = '', durationStr = '',
                                     barSizeSetting = '', whatToShow = 'BID',
