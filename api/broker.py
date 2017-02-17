@@ -344,7 +344,7 @@ class IBDataBroker(IBBroker, DataBroker):
                         columns =
                         ['Request_ID','Account','Tag','Value','Curency'])
 
-    def getMarketData(self, type_data = '', time = dt.datetime.now()):
+    def getMarketData(self, type_data = '', time_data = dt.datetime.now()):
         dict_data_type = {'OPEN':_getMarketOpenData,
                             'CLOSE':_getMarketCloseData,
                             'HI':_getMarketHighData, 'LO':_getMarketLowData,
@@ -352,9 +352,9 @@ class IBDataBroker(IBBroker, DataBroker):
         if type_data not in dict_data_type:
             raise ValueError("Market data type is not valid")
 
-        return dict_data_type[type_data](time)
+        return dict_data_type[type_data](time_data)
 
-    def _getMarketOpenData(self, time = dt.datetime.now(), contract = Contract()):
+    def _getMarketOpenData(self, time_data = dt.datetime.now(), contract = Contract()):
         # external dictionary or association that allows for contracts
         # to be associated with a tickerId
         self.tws.reqHistoricalData(tickerId = 1, contract = contract,
@@ -363,16 +363,16 @@ class IBDataBroker(IBBroker, DataBroker):
                                     useRTH = 0, formatDate = 1)
         return None
 
-    def _getMarketCloseData(self, time = dt.datetime.now()):
+    def _getMarketCloseData(self, time_data = dt.datetime.now()):
         return None
 
-    def _getMarketHighData(self, time = dt.datetime.now()):
+    def _getMarketHighData(self, time_data = dt.datetime.now()):
         return None
 
-    def _getMarketLowData(self, time = dt.datetime.now()):
+    def _getMarketLowData(self, time_data = dt.datetime.now()):
         return None
 
-    def _getMarketTimeData(self, time = dt.datetime.now()):
+    def _getMarketTimeData(self, time_data = dt.datetime.now()):
         return None
 
 
