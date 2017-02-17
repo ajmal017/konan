@@ -28,6 +28,7 @@ from ib.ext.ExecutionFilter import ExecutionFilter
 from ib.ext.Order import Order
 
 # internal/custom imports
+import data
 import position
 
 class Broker(object):
@@ -151,7 +152,7 @@ class IBBroker(Broker):
         contract.m_conId = contract_id
 
         #The underlying's asset symbol.
-        contract.m_symbol = tickerId
+        contract.m_symbol = ticker
 
         #The security's type: STK - stock (or ETF) OPT - option FUT - future
         #IND - index FOP - futures option CASH - forex pair BAG - combo
@@ -166,7 +167,7 @@ class IBBroker(Broker):
         contract.m_expiry = expiry # is this the same as last_trade_date ?
 
         #The option's strike price.
-        contract.m_strike = strike
+        contract.m_strike = strike_price
 
         #Either Put or Call (i.e. Options). Valid values are P, PUT, C, CALL.
         contract.m_right = right
@@ -339,11 +340,11 @@ class IBDataBroker(IBBroker, DataBroker):
 
         self.tws.reqAccountSummary(reqId = self.current_request_id,
                                     group = all_accounts, tags = attributes)
-        return pd.DataFrame(callback.account_Summary,
+        return pd.DataFrame(self.callback.account_Summary,
                         columns =
                         ['Request_ID','Account','Tag','Value','Curency'])
 
-    def getMarketData(type_data = '', time = dt.datetime.now()):
+    def getMarketData(self, type_data = '', time = dt.datetime.now()):
         dict_data_type = {'OPEN':_getMarketOpenData,
                             'CLOSE':_getMarketCloseData,
                             'HI':_getMarketHighData, 'LO':_getMarketLowData,
@@ -353,7 +354,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
         return dict_data_type[type_data](time)
 
-    def _getMarketOpenData(time = dt.datetime.now(), contract = Contract()):
+    def _getMarketOpenData(self, time = dt.datetime.now(), contract = Contract()):
         # external dictionary or association that allows for contracts
         # to be associated with a tickerId
         self.tws.reqHistoricalData(tickerId = 1, contract = contract,
@@ -362,16 +363,16 @@ class IBDataBroker(IBBroker, DataBroker):
                                     useRTH = 0, formatDate = 1)
         return None
 
-    def _getMarketCloseData(time = dt.datetime.now()):
+    def _getMarketCloseData(self, time = dt.datetime.now()):
         return None
 
-    def _getMarketHighData(time = dt.datetime.now()):
+    def _getMarketHighData(self, time = dt.datetime.now()):
         return None
 
-    def _getMarketLowData(time = dt.datetime.now()):
+    def _getMarketLowData(self, time = dt.datetime.now()):
         return None
 
-    def _getMarketTimeData(time = dt.datetime.now()):
+    def _getMarketTimeData(self, time = dt.datetime.now()):
         return None
 
 
