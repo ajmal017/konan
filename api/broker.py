@@ -31,6 +31,29 @@ from ib.ext.Order import Order
 import data
 import position
 
+class BrokerConnection(object):
+    """docstring for BrokerConnection."""
+    def __init__(self):
+        super(BrokerConnection, self).__init__()
+        #self.arg = arg
+
+class IBBrokerConnection(BrokerConnection):
+    """docstring for IBBrokerConnection."""
+    def __init__(self, callback = IBWrapper()):
+        super(IBBrokerConnection, self).__init__()
+        self._interface = EClientSocket(callback)
+
+    def interface():
+        doc = "The interface property."
+        def fget(self):
+            return self._interface
+        def fset(self, value):
+            self._interface = value
+        def fdel(self):
+            del self._interface
+        return locals()
+    interface = property(**interface())
+
 class Broker(object):
     """docstring for Broker."""
     def __init__(self):
@@ -42,19 +65,30 @@ class IBBroker(Broker):
     """
     CLASS CONSTRUCTOR
     """
-    def __init__(self, account_name = 'DU603835', host = '', port = 7497,
+    def __init__(self, account_name = 'DU603835',
+                    connection = IBBrokerConnection(), host = '', port = 7497,
                     client_id = 100):
         super(IBBroker, self).__init__()
         self._account_name = account_name
+
         self._callback = IBWrapper()
-        # one callback or more? i.e. reset callback vs new instace
-        self._tws = EClientSocket(self.callback)
+        self.callback.initiate_variables()
+
+        self._connection = IBBrokerConnection(self.callback)
+
+        self._tws = self.connection.interface
+
         self._host = host
         self._port = port
         self._client_id = client_id
 
-        self.tws.eConnect(self.host, self.port, self.client_id)
-        # may have to connect repeatedly
+        #self.connect()
+
+        #read state from file or call from IB
+        #store as dictionary or DF?
+        #keep trying to create a valid id?
+        #apparently not needed
+        #self._current_contract_id = 1
 
     """
     CLASS PROPERTIES
@@ -80,6 +114,17 @@ class IBBroker(Broker):
             del self._callback
         return locals()
     callback = property(**callback())
+
+    def connection():
+        doc = "The connection property."
+        def fget(self):
+            return self._connection
+        def fset(self, value):
+            self._connection = value
+        def fdel(self):
+            del self._connection
+        return locals()
+    connection = property(**connection())
 
     def tws():
         doc = "The tws property."
@@ -126,30 +171,46 @@ class IBBroker(Broker):
     client_id = property(**client_id())
 
     """
+   def current_contract_id():
+        doc = "The current_contract_id property."
+        def fget(self):
+            return self._current_contract_id
+        def fset(self, value):
+            self._current_contract_id = value
+        def fdel(self):
+            del self._current_contract_id
+        return locals()
+    current_contract_id = property(**current_contract_id())
+    """
+    """
     CLASS PRIVATE METHODS
     """
-    #can the connect method be encapsulated?
-    def connect(self):
-        pass
 
     """
     CLASS PUBLIC METHODS
     """
+    def connect(self):
+        self.tws.eConnect(self.host, self.port, self.client_id)
+
+    def disconnect(self):
+        self.tws.eDisconnect()
+
     def nextOrderId(self):
         return self.tws.reqIds(1)
 
-    def createContract(self, contract_id = 1, ticker = '', instrument_type = '',
-                        last_trade_date = 'YYMMDD', expiry = '', strike_price = 0.0,
-                        right = '', multiplier = '', exchange = '',
-                        currency = '', primary_exchange_ticker = '',
-                        primary_exchange = '', trading_class = '',
-                        include_expired = False, secIdType = '', secId = '',
-                        combo_legs_description = '', combo_legs = [],
+    def createContract(self, ticker, instrument_type,
+                        exchange = 'SMART', currency = 'USD',
+                        last_trade_date = None, expiry = None,
+                        strike_price = None, right = None, multiplier = None,
+                        primary_exchange_ticker = None, primary_exchange = None,
+                        trading_class = None, include_expired = None,
+                        secIdType = None, secId = None,
+                        combo_legs_description = None, combo_legs = None,
                         under_comp = None):
         contract = Contract()
 
         #The unique IB contract identifier.
-        contract.m_conId = contract_id
+        #contract.m_conId = contract_id
 
         #The underlying's asset symbol.
         contract.m_symbol = ticker
@@ -159,28 +220,13 @@ class IBBroker(Broker):
         #WAR - warrant BOND- bond CMDTY- commodity NEWS- news FUND- mutual fund.
         contract.m_secType = instrument_type
 
-        #The contract's last trading day or contract month
-        #(for Options and Futures).
-        #Strings with format YYYYMM will be interpreted as the Contract Month
-        #whereas YYYYMMDD will be interpreted as Last Trading Day.
-        contract.m_lastTradeDateOrContractMonth = last_trade_date
-        contract.m_expiry = expiry # is this the same as last_trade_date ?
-
-        #The option's strike price.
-        contract.m_strike = strike_price
-
-        #Either Put or Call (i.e. Options). Valid values are P, PUT, C, CALL.
-        contract.m_right = right
-
-        #The instrument's multiplier (i.e. options, futures).
-        contract.m_multiplier = multiplier
-
         #The destination exchange.
         contract.m_exchange = exchange
 
         #The underlying's cuurrency.
         contract.m_currency = currency
 
+        """
         #The contract's symbol within its primary exchange.
         contract.m_localSymbol = primary_exchange_ticker
 
@@ -220,42 +266,95 @@ class IBBroker(Broker):
         #Underlying (STK or FUT), delta and underlying price
         #goes into this attribute.
         contract.m_underComp = under_comp
+        """
+
+        dict_instrument_type = {'STK':self._createStockContract,
+                                'OPT':self._createOptionContract,
+                                'FUT':self._createFutureContract,
+                                'IND':self._createIndexContract,
+                                'CASH':self._createCashContract,
+                                'BAG':self._createCombinationContract,
+                                'WAR':self._createWarrantContract,
+                                'BOND':self._createBondContract,
+                                'CMDTY':self._createCommodityContract,
+                                'NEWS':self._createNewsContract,
+                                'FUND':self._createMutualFundContract}
+
+        return dict_instrument_type[instrument_type](contract = contract)
+
+    def _createStockContract(self, contract = Contract()):
         return contract
 
-    def createOrder():
-        pass
-    
-    def make_order(action,quantity, price = None):
-        if price is not None:
+    def _createOptionContract(self, contract = Contract()):
+        #The contract's last trading day or contract month
+        #(for Options and Futures).
+        #Strings with format YYYYMM will be interpreted as the Contract Month
+        #whereas YYYYMMDD will be interpreted as Last Trading Day.
+        contract.m_lastTradeDateOrContractMonth = last_trade_date
+        contract.m_expiry = expiry # is this the same as last_trade_date ?
+
+        #The option's strike price.
+        contract.m_strike = strike_price
+
+        #Either Put or Call (i.e. Options). Valid values are P, PUT, C, CALL.
+        contract.m_right = right
+
+        #The instrument's multiplier (i.e. options, futures).
+        contract.m_multiplier = multiplier
+        return contract
+
+    def _createFutureContract(self, contract = Contract()):
+        #The contract's last trading day or contract month
+        #(for Options and Futures).
+        #Strings with format YYYYMM will be interpreted as the Contract Month
+        #whereas YYYYMMDD will be interpreted as Last Trading Day.
+        contract.m_lastTradeDateOrContractMonth = last_trade_date
+        contract.m_expiry = expiry # is this the same as last_trade_date ?
+
+        #The instrument's multiplier (i.e. options, futures).
+        contract.m_multiplier = multiplier
+        return contract
+
+    def _createIndexContract(self, contract = Contract()):
+        return contract
+
+    def _createCashContract(self, contract = Contract()):
+        return contract
+
+    def _createCombinationContract(self, contract = Contract()):
+        return contract
+
+    def _createWarrantContract(self, contract = Contract()):
+        return contract
+
+    def _createBondContract(self, contract = Contract()):
+        return contract
+
+    def _createCommodityContract(self, contract = Contract()):
+        return contract
+
+    def _createNewsContract(self, contract = Contract()):
+        return contract
+
+    def _createMutualFundContract(self, contract = Contract()):
+        return contract
+
+    def createOrder(trade_type, amount_units, price_per_unit = None):
+        if price_per_unit is not None:
             order = Order()
             order.m_orderType = 'LMT'
-            order.m_totalQuantity = quantity
-            order.m_action = action
-            order.m_lmtPrice = price
+            order.m_totalQuantity = amount_units
+            order.m_action = trade_type
+            order.m_lmtPrice = price_per_unit
         else:
             order = Order()
             order.m_orderType = 'MKT'
-            order.m_totalQuantity = quantity
-            order.m_action = action
+            order.m_totalQuantity = amount_units
+            order.m_action = trade_type
         return order
 
-
-    def create_order(self, account, orderType, totalQuantity, action):
-        order = Order()
-        order.m_account = account
-        order.m_orderType = orderType
-        order.m_totalQuantity = totalQuantity
-        order.m_action = action
-        return order
-
-    def prepareOrder(position = position.Position()):
-        pass
-    
-    
-    #tws.placeOrder(order_id, contract_info, order_info)
-
-    #tws.cancelOrder(order_id)
-
+    def preparePosition(position = position.Position()):
+        return None
 
 class DataBroker(Broker):
     """docstring for DataBroker."""
@@ -269,9 +368,12 @@ class IBDataBroker(IBBroker, DataBroker):
     """docstring for IBDataBroker."""
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100):
-        super(IBDataBroker, self).__init__(account_name, host, port, client_id)
+        super(IBDataBroker, self).__init__(account_name = account_name,
+                                            host = host, port = port,
+                                            client_id = client_id)
 
         #read state from file or call from IB
+        #store as dictionary or DF?
         #keep trying to create a valid id?
         self._current_request_id = 1
 
@@ -343,44 +445,85 @@ class IBDataBroker(IBBroker, DataBroker):
         Leverage - GrossPositionValue / NetLiquidation
         """
 
+        if all_accounts:
+            group = "All"
         self.tws.reqAccountSummary(reqId = self.current_request_id,
-                                    group = all_accounts, tags = attributes)
+                                    group = group, tags = attributes)
         return pd.DataFrame(self.callback.account_Summary,
                         columns =
                         ['Request_ID','Account','Tag','Value','Curency'])
 
-    def getMarketData(self, type_data = '', time_data = dt.datetime.now()):
-        dict_data_type = {'OPEN':self._getMarketOpenData,
-                            'CLOSE':self._getMarketCloseData,
-                            'HI':self._getMarketHighData, 
-                            'LO':self._getMarketLowData,
-                            'TIME':self._getMarketTimeData}
+    def getHistoricalMarketData(self, ticker_id, type_data = '',
+                        contract = Contract(),
+                        time_start = dt.datetime.now(),
+                        time_end = dt.datetime.now(), resolution = '1 min'):
+        dict_data_type = {'OPEN':self._getHistoricalMarketOpenData,
+                            'CLOSE':self._getHistoricalMarketCloseData,
+                            'HI':self._getHistoricalMarketHighData,
+                            'LO':self._getHistoricalMarketLowData,
+                            'TIME':self._getHistoricalMarketTimeData}
         if type_data not in dict_data_type:
             raise ValueError("Market data type is not valid")
 
-        return dict_data_type[type_data](time_data)
+        return dict_data_type[type_data](ticker_id = ticker_id,
+                                        contract = contract,
+                                        time_start = time_start,
+                                        time_end = time_end)
 
-    def _getMarketOpenData(self, time_data = dt.datetime.now(), contract = Contract()):
+    def _getHistoricalMarketOpenData(self,
+                            ticker_id, contract = Contract(),
+                            time_start = dt.datetime.now(),
+                            time_end = dt.datetime.now()):
+        duration = str((time_end - time_start).seconds)+' S'
+        print(duration)
         # external dictionary or association that allows for contracts
         # to be associated with a tickerId
-        self.tws.reqHistoricalData(tickerId = 1, contract = contract,
-                                    endDateTime = '', durationStr = '',
-                                    barSizeSetting = '', whatToShow = 'BID',
+        #dict_ticker_id = {'AAPL':1}
+        #ticker_id = self.dict_ticker_id[contract.m_symbol]
+        self.tws.reqHistoricalData(tickerId = ticker_id, contract = contract,
+                                    endDateTime = time_end.strftime("%Y%m%d %H:%M:%S"),
+                                    durationStr = duration,
+                                    barSizeSetting = '1 min', whatToShow = 'BID',
                                     useRTH = 0, formatDate = 1)
+
+        time.sleep(1)
+
+        data= pd.DataFrame(self.callback.historical_Data, columns = ["reqId",
+                                                                "date", "open",
+                                                                "high", "low",
+                                                                "close",
+                                                                "volume",
+                                                                "count", "WAP",
+                                                                "hasGaps"])
+        return data.iloc[0:1]
+
+    def _getHistoricalMarketCloseData(self,
+                            ticker_id, contract = Contract(),
+                            time_start = dt.datetime.now(),
+                            time_end = dt.datetime.now()):
+        return data.iloc[-2:-1]
+
+    def _getHistoricalMarketHighData(self,
+                            ticker_id, contract = Contract(),
+                            time_start = dt.datetime.now(),
+                            time_end = dt.datetime.now()):
         return None
 
-    def _getMarketCloseData(self, time_data = dt.datetime.now()):
+    def _getHistoricalMarketLowData(self,
+                            ticker_id, contract = Contract(),
+                            time_start = dt.datetime.now(),
+                            time_end = dt.datetime.now()):
         return None
 
-    def _getMarketHighData(self, time_data = dt.datetime.now()):
+    def _getHistoricalMarketTimeData(self,
+                            ticker_id, contract = Contract(),
+                            time_start = dt.datetime.now(),
+                            time_end = dt.datetime.now()):
         return None
 
-    def _getMarketLowData(self, time_data = dt.datetime.now()):
-        return None
-
-    def _getMarketTimeData(self, time_data = dt.datetime.now()):
-        return None
-
+    def getLiveMarketData(self):
+        self.tws.reqMktData()
+        return self.callback.tick_Price
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
@@ -389,8 +532,11 @@ class ExecutionBroker(Broker):
 
 class IBExecutionBroker(IBBroker, ExecutionBroker):
     """docstring for IBExecutionBroker."""
-    def __init__(self):
-        super(IBExecutionBroker, self).__init__()
+    def __init__(self, account_name = 'DU603835', host = '', port = 7497,
+                    client_id = 100):
+        super(IBExecutionBroker, self).__init__(account_name = account_name,
+                                                host = host, port = port,
+                                                client_id = client_id)
     """
     CLASS PRIVATE METHODS
     """
@@ -398,6 +544,9 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
     """
     CLASS PUBLIC METHODS
     """
-    
-    def placeOrder(self, order_id, contract = None, order = None):
+
+    def placeOrder(self, order_id, contract, order):
         self.tws.placeOrder(order_id, contract, order)
+
+    def cancelOrder(self, order_id):
+        self.tws.cancelOrder(order_id)
