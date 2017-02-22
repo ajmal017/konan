@@ -97,13 +97,13 @@ def checkPath(path = '', is_file = True):
     """
     if is_file:
         if not os.path.isfile(str(path)):
-            print 'File not found: check the file path'
+            print 'File not found: check the path'
             return False
         else:
             return True
     elif not is_file:
         if not os.path.isdir(path):
-            print "Directory not found: check the file path"
+            print "Directory not found: check the path"
             return False
         else:
             return True

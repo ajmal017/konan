@@ -34,31 +34,18 @@ from tqdm import tqdm
 import traceback
 
 import readWriteData as rwd
+import directory as dr
 
 class Repository(object):
-    def __init__(self, dir_root = '/', project = 'test/', data_file = 'test.txt'):
-        self._root = dir_root #find users Dropbox folder
+    def __init__(self, path_root = '', project = '', data_file = ''):
+        self._root = path_root #find users Dropbox folder
+
         self._projects = os.listdir(self.root)
         self._current_project = self.selectProject(project = project)
+
         self._current_file = data_file
 
-    def selectProject(self, project = ''):
-        if project not in self.projects:
-            try:
-                os.mkdir(self.root + project) # try for mkdirs
-            except:
-                print(traceback.format_exc()+'\n')
-                return ''
-        return project
-
-    def checkData(self, path = ''):
-        if not os.path.exists(path):
-            # decide which to use
-            return False
-            '''raise IOError('The file: ' + path +
-                        ' does not exist or could not be found.')'''
-        else:
-            return True
+        self._special_files = {}
 
     def root():
         doc = "The root property."
@@ -110,7 +97,7 @@ class Repository(object):
     def project_path():
         doc = "The project_path property."
         def fget(self):
-            return self._root + self._current_project
+            return self.root + self.current_project
         return locals()
     project_path = property(**project_path())
 
@@ -121,8 +108,75 @@ class Repository(object):
         return locals()
     file_path = property(**file_path())
 
-    def listProjects(self):
-        return self.projects()
+    def special_files():
+        doc = "The special_files property."
+        def fget(self):
+            return self._special_files
+        def fset(self, value):
+            self._special_files = value
+        def fdel(self):
+            del self._special_files
+        return locals()
+    special_files = property(**special_files())
+
+    def selectProject(self, project = ''):
+        if dr.checkPath(path = self.root+project, is_file = False) and project in self.projects:
+            return project
+        else:
+            print("Error retrieving project.\nCheck the path.")
+            return ''
+
+    def markSpecialFile(self, key = '', path_file = ''):
+        self.special_files[key] = path_file
+
+    class Path(object):
+        """docstring for Path."""
+        def __init__(self, name = '', extension = '/', children = []):
+            super(Path, self).__init__()
+            self._name = name
+            self._extension = extension
+            self._children = children
+
+        def __repr__(self):
+            return self.name + self.extension
+
+        def name():
+            doc = "The name property."
+            def fget(self):
+                return self._name
+            def fset(self, value):
+                self._name = value
+            def fdel(self):
+                del self._name
+            return locals()
+        name = property(**name())
+
+        def extension():
+            doc = "The extension property."
+            def fget(self):
+                return self._extension
+            def fset(self, value):
+                self._extension = value
+            def fdel(self):
+                del self._extension
+            return locals()
+        extension = property(**extension())
+
+        def children():
+            doc = "The children property."
+            def fget(self):
+                return self._children
+            def fset(self, value):
+                self._children = value
+            def fdel(self):
+                del self._children
+            return locals()
+        children = property(**children())
+
+        def add_child(self, node):
+            assert isinstance(node, Tree)
+            self.children.append(node)
+
 
 class Filter(object):
     """

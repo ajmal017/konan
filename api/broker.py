@@ -358,10 +358,15 @@ class IBBroker(Broker):
 
 class DataBroker(Broker):
     """docstring for DataBroker."""
-    def __init__(self):
+    def __init__(self, path_root_data = '', project = '', data_file = ''):
         super(DataBroker, self).__init__()
 
-    def getLocalData(path = '' ): #data.Repository()):
+        self._data_repository = data.Repository(root = path_root_data,
+                                                project = project,
+                                                data_file = data_file)
+        self._path_root_data = path_root_data
+
+    def getLocalData(self, root): #data.Repository()):
         return None
 
 class IBDataBroker(IBBroker, DataBroker):
