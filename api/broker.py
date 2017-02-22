@@ -67,7 +67,7 @@ class IBBroker(Broker):
     """
     def __init__(self, account_name = 'DU603835',
                     connection = IBBrokerConnection(), host = '', port = 7497,
-                    client_id = 100):
+                    client_id = 100, **kw):
         super(IBBroker, self).__init__()
         self._account_name = account_name
 
@@ -358,7 +358,7 @@ class IBBroker(Broker):
 
 class DataBroker(Broker):
     """docstring for DataBroker."""
-    def __init__(self, path_root = '/', project = '', data_file = ''):
+    def __init__(self, path_root = '/', project = '', data_file = '', **kw):
         super(DataBroker, self).__init__()
 
         self._data_repository = data.Repository(path_root = path_root,
@@ -533,7 +533,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
-    def __init__(self):
+    def __init__(self, **kw):
         super(ExecutionBroker, self).__init__()
 
 class IBExecutionBroker(IBBroker, ExecutionBroker):
