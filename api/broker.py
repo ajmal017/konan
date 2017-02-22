@@ -480,7 +480,7 @@ class IBDataBroker(IBBroker, DataBroker):
                             ticker_id, contract = Contract(),
                             time_start = dt.datetime.now(),
                             time_end = dt.datetime.now()):
-        duration = str((time_end - time_start).seconds)+' S'
+        duration = str(int((time_end - time_start).total_seconds()))+' S'
         print(duration)
         # external dictionary or association that allows for contracts
         # to be associated with a tickerId
@@ -501,35 +501,66 @@ class IBDataBroker(IBBroker, DataBroker):
                                                                 "volume",
                                                                 "count", "WAP",
                                                                 "hasGaps"])
+        self._resetCallbackAttribute(attribute = 'historical_Data')
         return data.iloc[0:1]
 
     def _getHistoricalMarketCloseData(self,
                             ticker_id, contract = Contract(),
                             time_start = dt.datetime.now(),
                             time_end = dt.datetime.now()):
+
+        self._resetCallbackAttribute(attribute = 'historical_Data')
         return data.iloc[-2:-1]
 
     def _getHistoricalMarketHighData(self,
                             ticker_id, contract = Contract(),
                             time_start = dt.datetime.now(),
                             time_end = dt.datetime.now()):
+
+        self._resetCallbackAttribute(attribute = 'historical_Data')
         return None
 
     def _getHistoricalMarketLowData(self,
                             ticker_id, contract = Contract(),
                             time_start = dt.datetime.now(),
                             time_end = dt.datetime.now()):
+
+        self._resetCallbackAttribute(attribute = 'historical_Data')
         return None
 
     def _getHistoricalMarketTimeData(self,
                             ticker_id, contract = Contract(),
                             time_start = dt.datetime.now(),
                             time_end = dt.datetime.now()):
+
+        self._resetCallbackAttribute(attribute = 'historical_Data')
         return None
 
     def getLiveMarketData(self):
         self.tws.reqMktData()
         return self.callback.tick_Price
+
+    def _resetCallbackAttribute(self, attribute = ''):
+        if attribute in ('accountDownloadEnd_flag', 'account_SummaryEnd_flag',
+                            'positionEnd_flag', 'tickSnapshotEnd_flag',
+                            'connection_Closed', 'exec_DetailsEnd_flag',
+                            'contract_Details_flag', 'historical_DataEnd_flag',
+                            'scanner_Data_End_flag'):
+            setattr(self.callback, attribute, False)
+
+        if attribute in ('open_OrderEnd_flag'):
+            setattr(self.callback, attribute, True)
+
+        if attribute in ('update_AccountValue', 'update_Portfolio',
+                            'account_Summary', 'update_Position',
+                            'order_Status', 'open_Order', 'tick_Price',
+                            'tick_Size', 'tick_OptionComputation',
+                            'tick_Generic', 'tick_String', 'tick_EFP',
+                            'tickSnapshotEnd_reqId', 'exec_Details_reqId',
+                            'exec_Details_contract', 'exec_Details_execution',
+                            'update_MktDepth', 'update_MktDepthL2',
+                            'historical_Data', 'scanner_Data', 'real_timeBar'):
+            setattr(self.callback, attribute, [])
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
