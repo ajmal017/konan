@@ -364,7 +364,7 @@ class DataBroker(Broker):
         self._data_repository = data.Repository(path_root = path_root,
                                                 project = project,
                                                 data_file = data_file)
-        self._path_root_data = path_root_data
+        self._path_root = path_root
 
     def getLocalData(self, root): #data.Repository()):
         return None
