@@ -358,10 +358,10 @@ class IBBroker(Broker):
 
 class DataBroker(Broker):
     """docstring for DataBroker."""
-    def __init__(self, path_root_data = '', project = '', data_file = ''):
+    def __init__(self, path_root = '/', project = '', data_file = ''):
         super(DataBroker, self).__init__()
 
-        self._data_repository = data.Repository(path_root = path_root_data,
+        self._data_repository = data.Repository(path_root = path_root,
                                                 project = project,
                                                 data_file = data_file)
         self._path_root_data = path_root_data
@@ -372,10 +372,11 @@ class DataBroker(Broker):
 class IBDataBroker(IBBroker, DataBroker):
     """docstring for IBDataBroker."""
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
-                    client_id = 100):
+                    client_id = 100, path_root = '/'):
         super(IBDataBroker, self).__init__(account_name = account_name,
                                             host = host, port = port,
-                                            client_id = client_id)
+                                            client_id = client_id,
+                                            path_root = path_root)
 
         #read state from file or call from IB
         #store as dictionary or DF?
