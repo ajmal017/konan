@@ -129,53 +129,6 @@ class Repository(object):
     def markSpecialFile(self, key = '', path_file = ''):
         self.special_files[key] = path_file
 
-    class Path(object):
-        """docstring for Path."""
-        def __init__(self, name = '', extension = '/', children = []):
-            super(Path, self).__init__()
-            self._name = name
-            self._extension = extension
-            self._children = children
-
-        def __repr__(self):
-            return self.name + self.extension
-
-        def name():
-            doc = "The name property."
-            def fget(self):
-                return self._name
-            def fset(self, value):
-                self._name = value
-            def fdel(self):
-                del self._name
-            return locals()
-        name = property(**name())
-
-        def extension():
-            doc = "The extension property."
-            def fget(self):
-                return self._extension
-            def fset(self, value):
-                self._extension = value
-            def fdel(self):
-                del self._extension
-            return locals()
-        extension = property(**extension())
-
-        def children():
-            doc = "The children property."
-            def fget(self):
-                return self._children
-            def fset(self, value):
-                self._children = value
-            def fdel(self):
-                del self._children
-            return locals()
-        children = property(**children())
-
-        def add_child(self, node):
-            assert isinstance(node, Tree)
-            self.children.append(node)
 
 
 class Filter(object):
