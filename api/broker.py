@@ -13,6 +13,7 @@ import sys
 import traceback
 import time
 import datetime as dt
+import dateutil as du
 
 # third party imports
 import pandas as pd
@@ -81,14 +82,6 @@ class IBBroker(Broker):
         self._host = host
         self._port = port
         self._client_id = client_id
-
-        #self.connect()
-
-        #read state from file or call from IB
-        #store as dictionary or DF?
-        #keep trying to create a valid id?
-        #apparently not needed
-        #self._current_contract_id = 1
 
     """
     CLASS PROPERTIES
@@ -170,18 +163,6 @@ class IBBroker(Broker):
         return locals()
     client_id = property(**client_id())
 
-    """
-   def current_contract_id():
-        doc = "The current_contract_id property."
-        def fget(self):
-            return self._current_contract_id
-        def fset(self, value):
-            self._current_contract_id = value
-        def fdel(self):
-            del self._current_contract_id
-        return locals()
-    current_contract_id = property(**current_contract_id())
-    """
     """
     CLASS PRIVATE METHODS
     """
@@ -354,6 +335,7 @@ class IBBroker(Broker):
         return order
 
     def preparePosition(position = position.Position()):
+        """Unpack position object into order and contracts"""
         return None
 
 class DataBroker(Broker):
@@ -383,6 +365,9 @@ class IBDataBroker(IBBroker, DataBroker):
         #keep trying to create a valid id?
         self._current_request_id = 1
 
+        self._tickers = {}
+        self._current_ticker_id = 1
+
     def current_request_id():
         doc = "The current_request_id property."
         def fget(self):
@@ -393,6 +378,45 @@ class IBDataBroker(IBBroker, DataBroker):
             del self._current_request_id
         return locals()
     current_request_id = property(**current_request_id())
+
+    def tickers():
+        doc = "The tickers property."
+        def fget(self):
+            return self._tickers
+        def fset(self, value):
+            print('add to dictionary')#self._tickers = value
+        def fdel(self):
+            del self._tickers
+        return locals()
+    tickers = property(**tickers())
+
+    def current_ticker_id():
+        doc = "The current_ticker_id property."
+        def fget(self):
+            return self._current_ticker_id
+        def fset(self, value):
+            self._current_ticker_id = value
+        def fdel(self):
+            del self._current_ticker_id
+        return locals()
+    current_ticker_id = property(**current_ticker_id())
+
+    def _incrementTickerID(self):
+        self.current_ticker_id +=1
+
+    def _addTicker(self, ticker = ''):
+        if ticker in self.tickers:
+            ticker_id = self.tickers[ticker]
+        else:
+            ticker_id = self.current_ticker_id
+            self.tickers[ticker] = ticker_id
+            self._incrementTickerID()
+        return ticker_id
+
+    def _isInTradingHours(self, yes = True):
+        if yes:
+            return 1
+        return 0
 
     def getAccountInformation(self, all_accounts = True, attributes = ','):
         """
@@ -459,86 +483,101 @@ class IBDataBroker(IBBroker, DataBroker):
                         columns =
                         ['Request_ID','Account','Tag','Value','Curency'])
 
-    def getHistoricalMarketData(self, ticker_id, type_data = '',
-                        contract = Contract(),
-                        time_start = dt.datetime.now(),
-                        time_end = dt.datetime.now(), resolution = '1 min'):
-        dict_data_type = {'OPEN':self._getHistoricalMarketOpenData,
-                            'CLOSE':self._getHistoricalMarketCloseData,
-                            'HI':self._getHistoricalMarketHighData,
-                            'LO':self._getHistoricalMarketLowData,
-                            'TIME':self._getHistoricalMarketTimeData}
-        if type_data not in dict_data_type:
-            raise ValueError("Market data type is not valid")
+    def getDataAtTime(self, type_data = 'BID_ASK', contract = Contract(),
+                        type_time = '', data_time = dt.datetime.now(),
+                        in_trading_hours = True,
+                        duration = '60 S', bar_size = '1 min'):
+        """
+        REQUIRED PARAMETERS:
+        contract
 
-        return dict_data_type[type_data](ticker_id = ticker_id,
-                                        contract = contract,
-                                        time_start = time_start,
-                                        time_end = time_end)
+        type_data:
+        TRADES
+        MIDPOINT
+        BID
+        ASK
+        BID_ASK
+        HISTORICAL_VOLATILITY
+        OPTION_IMPLIED_VOLATILITY
+        REBATE_RATE	Starting rebate rate
+        FEE_RATE
+        """
 
-    def _getHistoricalMarketOpenData(self,
-                            ticker_id, contract = Contract(),
-                            time_start = dt.datetime.now(),
-                            time_end = dt.datetime.now()):
-        duration = str(int((time_end - time_start).total_seconds()))+' S'
-        print(duration)
-        # external dictionary or association that allows for contracts
-        # to be associated with a tickerId
-        #dict_ticker_id = {'AAPL':1}
-        #ticker_id = self.dict_ticker_id[contract.m_symbol]
-        self.tws.reqHistoricalData(tickerId = ticker_id, contract = contract,
-                                    endDateTime = time_end.strftime("%Y%m%d %H:%M:%S"),
-                                    durationStr = duration,
-                                    barSizeSetting = '1 min', whatToShow = 'BID',
-                                    useRTH = 0, formatDate = 1)
+        self._resetCallbackAttribute('historical_Data')
+
+        ticker_id = self._addTicker(ticker = contract.m_symbol)
+
+        if type_time == 'OPEN':
+            data_time = dt.datetime(year = data_time.year,
+                                    month = data_time.month,
+                                    day = data_time.day,
+                                    hour = 9, minute = 30)
+        if type_time == 'CLOSE':
+            data_time = dt.datetime(year = data_time.year,
+                                    month = data_time.month,
+                                    day = data_time.day,
+                                    hour = 16)
+
+        trading_hours = self._isInTradingHours(in_trading_hours)
+
+        #could modularize
+        self.tws.reqHistoricalData( tickerId = ticker_id,
+                                 contract = contract,
+                                 endDateTime = (data_time + dt.timedelta(seconds=1)).strftime('%Y%m%d %H:%M:%S'),
+                                 durationStr = duration,
+                                 barSizeSetting = bar_size, whatToShow = type_data,
+                                 useRTH = trading_hours, formatDate = 1)
 
         time.sleep(1)
+        #end modularize
 
-        data= pd.DataFrame(self.callback.historical_Data, columns = ["reqId",
-                                                                "date", "open",
-                                                                "high", "low",
-                                                                "close",
-                                                                "volume",
-                                                                "count", "WAP",
-                                                                "hasGaps"])
-        self._resetCallbackAttribute(attribute = 'historical_Data')
-        return data.iloc[0:1]
+        #could modularize
+        data = pd.DataFrame(self.callback.historical_Data, columns = ["reqId",
+                                                                        "date", "open",
+                                                                        "high", "low",
+                                                                        "close",
+                                                                        "volume",
+                                                                        "count", "WAP",
+                                                                        "hasGaps"])
 
-    def _getHistoricalMarketCloseData(self,
-                            ticker_id, contract = Contract(),
-                            time_start = dt.datetime.now(),
-                            time_end = dt.datetime.now()):
+        data.drop(data.index[-1], inplace=True)
+        data['date'] = data['date'].apply(du.parser.parse)
+        data.set_index('date', inplace=True)
+        #end modularize
 
-        self._resetCallbackAttribute(attribute = 'historical_Data')
-        return data.iloc[-2:-1]
+        self._resetCallbackAttribute('historical_Data')
 
-    def _getHistoricalMarketHighData(self,
-                            ticker_id, contract = Contract(),
-                            time_start = dt.datetime.now(),
-                            time_end = dt.datetime.now()):
+        #%Y%m%d %H:%M:%S
 
-        self._resetCallbackAttribute(attribute = 'historical_Data')
-        return None
+        #could modularize
+        if bar_size.endswith('sec') or bar_size.endswith('secs'):
+            index_search_format = '%Y%m%d %H:%M:%S'
+        if bar_size.endswith('min') or bar_size.endswith('mins'):
+            index_search_format = '%Y%m%d %H:%M:00'
+        if bar_size.endswith('hour') or bar_size.endswith('hours'):
+            index_search_format = '%Y%m%d %H:00:00'
 
-    def _getHistoricalMarketLowData(self,
-                            ticker_id, contract = Contract(),
-                            time_start = dt.datetime.now(),
-                            time_end = dt.datetime.now()):
+        #CHECK THE FOLLOWING FOR APPROPRIATE INDEX FORMATS
+        if bar_size.endswith('day'):
+            index_search_format = '%Y%m%d 00:00:00'
+        if bar_size.endswith('week'):
+            index_search_format = '%Y%m%d 00:00:00'
+        if bar_size.endswith('month'):
+            index_search_format = '%Y%m%d 00:00:00'
 
-        self._resetCallbackAttribute(attribute = 'historical_Data')
-        return None
+        #print(data) #TODO:REMOVE
 
-    def _getHistoricalMarketTimeData(self,
-                            ticker_id, contract = Contract(),
-                            time_start = dt.datetime.now(),
-                            time_end = dt.datetime.now()):
+        return data.loc[data_time.strftime(index_search_format)] #format must be same as bar_size
+        #end modularize
 
-        self._resetCallbackAttribute(attribute = 'historical_Data')
-        return None
+    def getDataInRange(self):
+        return pd.DataFrame()
 
+    """
     def getLiveMarketData(self):
         self.tws.reqMktData()
         return self.callback.tick_Price
+    """
 
     def _resetCallbackAttribute(self, attribute = ''):
         if attribute in ('accountDownloadEnd_flag', 'account_SummaryEnd_flag',
