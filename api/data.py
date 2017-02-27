@@ -46,6 +46,7 @@ class Repository(object):
         self._current_file = data_file
 
         self._special_files = {}
+        self._special_directories = {}
 
     def root():
         doc = "The root property."
@@ -119,9 +120,23 @@ class Repository(object):
         return locals()
     special_files = property(**special_files())
 
+    def special_directories():
+        doc = "The special_directories property."
+        def fget(self):
+            return self._special_directories
+        def fset(self, value):
+            self._special_directories = value
+        def fdel(self):
+            del self._special_directories
+        return locals()
+    special_directories = property(**special_directories())
+
     def selectProject(self, project = ''):
         if dr.checkPath(path = self.root+project, is_file = False) and project in self.projects:
             return project
+        elif project == '':
+            print("No project selected.\nEnter a valid project.")
+            return ''
         else:
             print("Error retrieving project.\nCheck the path.")
             return ''
@@ -129,7 +144,8 @@ class Repository(object):
     def markSpecialFile(self, key = '', path_file = ''):
         self.special_files[key] = path_file
 
-
+    def markSpecialDirectory(self, key = '', path_directory = ''):
+        self.special_directories[key] = path_directory
 
 class Filter(object):
     """
