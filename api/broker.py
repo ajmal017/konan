@@ -14,6 +14,8 @@ import traceback
 import time
 import datetime as dt
 import dateutil as du
+import glob
+import fnmatch
 
 # third party imports
 import pandas as pd
@@ -34,12 +36,20 @@ import position
 
 class BrokerConnection(object):
     """docstring for BrokerConnection."""
+
+    """
+    CLASS CONSTRUCTOR
+    """
     def __init__(self):
         super(BrokerConnection, self).__init__()
         #self.arg = arg
 
 class IBBrokerConnection(BrokerConnection):
     """docstring for IBBrokerConnection."""
+
+    """
+    CLASS CONSTRUCTOR
+    """
     def __init__(self, callback = IBWrapper()):
         super(IBBrokerConnection, self).__init__()
         self._interface = EClientSocket(callback)
@@ -57,6 +67,10 @@ class IBBrokerConnection(BrokerConnection):
 
 class Broker(object):
     """docstring for Broker."""
+
+    """
+    CLASS CONSTRUCTOR
+    """
     def __init__(self):
         super(Broker, self).__init__()
 
@@ -340,6 +354,10 @@ class IBBroker(Broker):
 
 class DataBroker(Broker):
     """docstring for DataBroker."""
+
+    """
+    CLASS CONSTRUCTOR
+    """
     def __init__(self, path_root = '/', project = '', data_file = '', **kw):
         super(DataBroker, self).__init__()
 
@@ -348,11 +366,42 @@ class DataBroker(Broker):
                                                 data_file = data_file)
         self._path_root = path_root
 
-    def getLocalData(self, root): #data.Repository()):
-        return None
+    def data_repository():
+        doc = "The data_repository property."
+        def fget(self):
+            return self._data_repository
+        def fset(self, value):
+            self._data_repository = value
+        def fdel(self):
+            del self._data_repository
+        return locals()
+    data_repository = property(**data_repository())
+
+    def path_root():
+        doc = "The path_root property."
+        def fget(self):
+            return self._path_root
+        def fset(self, value):
+            self._path_root = value
+        def fdel(self):
+            del self._path_root
+        return locals()
+    path_root = property(**path_root())
+
+    def getLocalData(self, type_data = '', path_data = '', file_name = ''): #data.Repository()):
+        files = glob.iglob(path_data + '*.' + type_data)
+        while True:
+            f = files.next()
+            if fnmatch.fnmatch(f, '*' + file_name + '.' + type_data):
+                return f
+        return ''
 
 class IBDataBroker(IBBroker, DataBroker):
     """docstring for IBDataBroker."""
+
+    """
+    CLASS CONSTRUCTOR
+    """
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, path_root = '/'):
         super(IBDataBroker, self).__init__(account_name = account_name,
@@ -480,8 +529,8 @@ class IBDataBroker(IBBroker, DataBroker):
         self.tws.reqAccountSummary(reqId = self.current_request_id,
                                     group = group, tags = attributes)
         return pd.DataFrame(self.callback.account_Summary,
-                        columns =
-                        ['Request_ID','Account','Tag','Value','Curency'])
+                        columns = ['Request_ID', 'Account', 'Tag', 'Value',
+                                    'Curency'])
 
     def getDataAtTime(self, type_data = 'BID_ASK', contract = Contract(),
                         type_time = '', data_time = dt.datetime.now(),
@@ -601,13 +650,28 @@ class IBDataBroker(IBBroker, DataBroker):
                             'historical_Data', 'scanner_Data', 'real_timeBar'):
             setattr(self.callback, attribute, [])
 
+    def getPositions(self):
+        self.tws.reqPositions()
+        data = pd.DataFrame(self.callback.update_Position,
+                            columns = ['Account', 'Something, maybe server time',
+                                        'Currency?', 'Exchange?'])
+        return data
+
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
+
+    """
+    CLASS CONSTRUCTOR
+    """
     def __init__(self, **kw):
         super(ExecutionBroker, self).__init__()
 
 class IBExecutionBroker(IBBroker, ExecutionBroker):
     """docstring for IBExecutionBroker."""
+
+    """
+    CLASS CONSTRUCTOR
+    """
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100):
         super(IBExecutionBroker, self).__init__(account_name = account_name,
