@@ -1,5 +1,9 @@
 from __future__ import print_function
 
+import datetime as dt
+
+import glob
+
 class Path(object):
     """docstring for Path."""
     def __init__(self, name = '', extension = '', children = []):
@@ -97,14 +101,22 @@ class Path(object):
         else:
             search_file = path_name + '/'
 
-        print('path_base',path_base)
-        print('full_name',self.full_name)
-        print('search_file',search_file)
-        print()
-
         if self.full_name == search_file:
-            return path_base + self.name # + PARENTS
+            path_file = path_base + self.full_name
+            print(path_file)
+            return path_file# + PARENTS
 
+        # loop structure needs to change for recursion
         for child in self.children:
-            child.findPath(path_base = self.name, path_name = path_name,
+
+            child.findPath(path_base = self.full_name, path_name = path_name,
                             path_extension = path_extension)
+
+c = []
+for i in xrange(3):
+    c.append(Path(name='foo'+str(i), extension='bar'))
+
+p = Path('foo',children = c)
+l = p.findPath(path_name='foo2', path_extension='bar')
+
+glob.iglob('/')
