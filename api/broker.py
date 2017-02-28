@@ -651,6 +651,7 @@ class IBDataBroker(IBBroker, DataBroker):
         #end modularize
 
     def getDataInRange(self):
+        # EXTEND USING getDataAtTime()
         return pd.DataFrame()
 
     """
@@ -681,11 +682,22 @@ class IBDataBroker(IBBroker, DataBroker):
                             'historical_Data', 'scanner_Data', 'real_timeBar'):
             setattr(self.callback, attribute, [])
 
+        else:
+            print("Attribute not found.")
+
     def getPositions(self):
         self.tws.reqPositions()
+
+        time.sleep(1)
+
         data = pd.DataFrame(self.callback.update_Position,
-                            columns = ['Account', 'Something, maybe server time',
-                                        'Currency?', 'Exchange?'])
+                            columns = ['Account Name', 'Contract Id',
+                                        'Currency', 'Exchange', 'Expiry',
+                                        'Include Expired', 'Local Symbol',
+                                        'Multiplier', 'Right',
+                                        'Financial Instrument', 'Strike Price',
+                                        'Symbol', 'Trading Class',
+                                        'Number of Units', 'Average Unit Price'])
         return data
 
 class ExecutionBroker(Broker):
