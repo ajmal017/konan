@@ -27,33 +27,58 @@ from ib.ext.EClientSocket import EClientSocket
 from ib.ext.ScannerSubscription import ScannerSubscription
 
 from ib.ext.Contract import Contract
-from ib.ext.ExecutionFilter import ExecutionFilter
 from ib.ext.Order import Order
+from ib.ext.ExecutionFilter import ExecutionFilter
 
 # internal/custom imports
 import data
 import position
 
 class BrokerConnection(object):
-    """docstring for BrokerConnection."""
+    """
+    Connection resource to be shared by brokers in a sytem's public environment
+    without disrupting properties of the connection.
+    E.g. connection status, object representation.
+    """
 
     """
     CLASS CONSTRUCTOR
     """
     def __init__(self):
+        """
+        Basic BrokerConnection constructor
+        """
         super(BrokerConnection, self).__init__()
-        #self.arg = arg
 
 class IBBrokerConnection(BrokerConnection):
-    """docstring for IBBrokerConnection."""
+    """
+    Connection interface implementing the Interactive Brokers (IB)
+    EClientSocket API behaviours. Allows the EClientSocket object to be shared.
+    """
 
     """
     CLASS CONSTRUCTOR
     """
     def __init__(self, callback = IBWrapper()):
+        """
+        IBBrokerConnection constructor.
+        Initializes object properties.
+
+        SIGNATURE:
+        callback - IBWrapper()
+            Implementation of an abstract class in the Interactive Brokers (IB)
+            API which stores the results of API calls
+        """
         super(IBBrokerConnection, self).__init__()
         self._interface = EClientSocket(callback)
 
+    """
+    CLASS PROPERTIES
+
+    interface:
+        EClientSocket object that takes in the implemented IBWrapper class in which
+        API calls are stored
+    """
     def interface():
         doc = "The interface property."
         def fget(self):
@@ -72,10 +97,14 @@ class Broker(object):
     CLASS CONSTRUCTOR
     """
     def __init__(self):
+        """
+        """
         super(Broker, self).__init__()
 
 class IBBroker(Broker):
-    """docstring for IBBroker."""
+    """
+    docstring for IBBroker.
+    """
 
     """
     CLASS CONSTRUCTOR
@@ -91,7 +120,7 @@ class IBBroker(Broker):
 
         self._connection = IBBrokerConnection(self.callback)
 
-        self._tws = self.connection.interface
+        self._tws = self.connection.interface #could just assign to _connection
 
         self._host = host
         self._port = port
@@ -191,7 +220,8 @@ class IBBroker(Broker):
         self.tws.eDisconnect()
 
     def nextOrderId(self):
-        return self.tws.reqIds(1)
+        self.tws.reqIds(1)
+        return self.callback.next_ValidId
 
     def createContract(self, ticker, instrument_type,
                         exchange = 'SMART', currency = 'USD',
@@ -334,19 +364,20 @@ class IBBroker(Broker):
     def _createMutualFundContract(self, contract = Contract()):
         return contract
 
-    def createOrder(trade_type, amount_units, price_per_unit = None):
-        if price_per_unit is not None:
+    def createOrder(self, trade_type, amount_units, price_per_unit = 0.0, order_specification = ''):
+        if order_specification == 'LIMIT':
             order = Order()
             order.m_orderType = 'LMT'
             order.m_totalQuantity = amount_units
             order.m_action = trade_type
             order.m_lmtPrice = price_per_unit
-        else:
+            return order
+        elif order_specification == 'MARKET':
             order = Order()
             order.m_orderType = 'MKT'
             order.m_totalQuantity = amount_units
             order.m_action = trade_type
-        return order
+            return order
 
     def preparePosition(position = position.Position()):
         """Unpack position object into order and contracts"""
