@@ -18,7 +18,6 @@ class Strategy(object):
     """
     CLASS PROPERTIES
     """
-    @abc.abstractproperty
     def decision_algorithm():
         doc = "The decision_algorithm property."
         def fget(self):
@@ -28,8 +27,8 @@ class Strategy(object):
         def fdel(self):
             del self._decision_algorithm
         return locals()
+    decision_algorithm = property(**decision_algorithm())
 
-    @abc.abstractproperty
     def portfolio():
         doc = "The portfolio property."
         def fget(self):
@@ -39,8 +38,8 @@ class Strategy(object):
         def fdel(self):
             del self._portfolio
         return locals()
+    portfolio = property(**portfolio())
 
-    @abc.abstractproperty
     def time_execution():
         doc = "The time_execution property."
         def fget(self):
@@ -50,6 +49,8 @@ class Strategy(object):
         def fdel(self):
             del self._time_execution
         return locals()
+        def time_execution():
+   time_execution = property(**time_execution())
 
     @abc.abstractmethod
     def checkPortfolio():
