@@ -49,7 +49,7 @@ class Strategy(object):
         def fdel(self):
             del self._time_execution
         return locals()
-   time_execution = property(**time_execution())
+    time_execution = property(**time_execution())
 
     @abc.abstractmethod
     def checkPortfolio():
