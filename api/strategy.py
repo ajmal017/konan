@@ -49,7 +49,6 @@ class Strategy(object):
         def fdel(self):
             del self._time_execution
         return locals()
-        def time_execution():
    time_execution = property(**time_execution())
 
     @abc.abstractmethod
