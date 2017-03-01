@@ -219,6 +219,9 @@ class IBBroker(Broker):
     def disconnect(self):
         self.tws.eDisconnect()
 
+    def connected(self):
+        return self.tws.isConnected()
+
     def nextOrderId(self):
         self.tws.reqIds(1)
         return self.callback.next_ValidId
@@ -365,6 +368,9 @@ class IBBroker(Broker):
         return contract
 
     def createOrder(self, trade_type, amount_units, price_per_unit = 0.0, order_specification = ''):
+        #if order_specification not in ('LIMIT', 'MARKET'):
+        #    #RAISE ERROR
+        #    print("order_specification is not a proper type")
         if order_specification == 'LIMIT':
             order = Order()
             order.m_orderType = 'LMT'
@@ -379,7 +385,7 @@ class IBBroker(Broker):
             order.m_action = trade_type
             return order
 
-    def preparePosition(position = position.Position()):
+    def preparePosition(self, position = position.Position()):
         """Unpack position object into order and contracts"""
         return None
 
@@ -481,6 +487,31 @@ class IBDataBroker(IBBroker, DataBroker):
         return locals()
     current_ticker_id = property(**current_ticker_id())
 
+    def _resetCallbackAttribute(self, attribute = ''):
+        if attribute in ('accountDownloadEnd_flag', 'account_SummaryEnd_flag',
+                            'positionEnd_flag', 'tickSnapshotEnd_flag',
+                            'connection_Closed', 'exec_DetailsEnd_flag',
+                            'contract_Details_flag', 'historical_DataEnd_flag',
+                            'scanner_Data_End_flag'):
+            setattr(self.callback, attribute, False)
+
+        if attribute in ('open_OrderEnd_flag'):
+            setattr(self.callback, attribute, True)
+
+        if attribute in ('update_AccountValue', 'update_Portfolio',
+                            'account_Summary', 'update_Position',
+                            'order_Status', 'open_Order', 'tick_Price',
+                            'tick_Size', 'tick_OptionComputation',
+                            'tick_Generic', 'tick_String', 'tick_EFP',
+                            'tickSnapshotEnd_reqId', 'exec_Details_reqId',
+                            'exec_Details_contract', 'exec_Details_execution',
+                            'update_MktDepth', 'update_MktDepthL2',
+                            'historical_Data', 'scanner_Data', 'real_timeBar'):
+            setattr(self.callback, attribute, [])
+
+        else:
+            print("Attribute not found.\nNo attribute reset.")
+
     def _incrementTickerID(self):
         self.current_ticker_id +=1
 
@@ -497,6 +528,9 @@ class IBDataBroker(IBBroker, DataBroker):
         if yes:
             return 1
         return 0
+
+    def getCallbackAttribute(self, attribute = ''):
+        return getattr(self.callback, attribute)
 
     def getAccountInformation(self, all_accounts = True, attributes = ','):
         """
@@ -554,6 +588,8 @@ class IBDataBroker(IBBroker, DataBroker):
             A value of "-1" means that the user can put on unlimited day trades.
         Leverage - GrossPositionValue / NetLiquidation
         """
+
+        self._resetCallbackAttribute('account_Summary')
 
         if all_accounts:
             group = "All"
@@ -625,8 +661,6 @@ class IBDataBroker(IBBroker, DataBroker):
         data.set_index('date', inplace=True)
         #end modularize
 
-        self._resetCallbackAttribute('historical_Data')
-
         #%Y%m%d %H:%M:%S
 
         #could modularize
@@ -660,35 +694,10 @@ class IBDataBroker(IBBroker, DataBroker):
         return self.callback.tick_Price
     """
 
-    def _resetCallbackAttribute(self, attribute = ''):
-        if attribute in ('accountDownloadEnd_flag', 'account_SummaryEnd_flag',
-                            'positionEnd_flag', 'tickSnapshotEnd_flag',
-                            'connection_Closed', 'exec_DetailsEnd_flag',
-                            'contract_Details_flag', 'historical_DataEnd_flag',
-                            'scanner_Data_End_flag'):
-            setattr(self.callback, attribute, False)
-
-        if attribute in ('open_OrderEnd_flag'):
-            setattr(self.callback, attribute, True)
-
-        if attribute in ('update_AccountValue', 'update_Portfolio',
-                            'account_Summary', 'update_Position',
-                            'order_Status', 'open_Order', 'tick_Price',
-                            'tick_Size', 'tick_OptionComputation',
-                            'tick_Generic', 'tick_String', 'tick_EFP',
-                            'tickSnapshotEnd_reqId', 'exec_Details_reqId',
-                            'exec_Details_contract', 'exec_Details_execution',
-                            'update_MktDepth', 'update_MktDepthL2',
-                            'historical_Data', 'scanner_Data', 'real_timeBar'):
-            setattr(self.callback, attribute, [])
-
-        else:
-            print("Attribute not found.")
-
     def getPositions(self):
-        
+
         self._resetCallbackAttribute('update_Position')
-        
+
         self.tws.reqPositions()
 
         time.sleep(1)
@@ -745,3 +754,6 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                             host = host, port = port,
                                             client_id = client_id,
                                             path_root = path_root)
+
+    def closeAllPositions(self, arg):
+        positions = self.getPositions()
