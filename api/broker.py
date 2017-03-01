@@ -254,6 +254,8 @@ class IBBroker(Broker):
         #The underlying's cuurrency.
         contract.m_currency = currency
 
+        contract.m_primaryExch = primary_exchange
+
         """
         #The contract's symbol within its primary exchange.
         contract.m_localSymbol = primary_exchange_ticker
@@ -757,3 +759,6 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
     def closeAllPositions(self, arg):
         positions = self.getPositions()
+
+        for position in positions.iterrows():
+            pass
