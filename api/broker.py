@@ -434,7 +434,7 @@ class IBDataBroker(IBBroker, DataBroker):
     CLASS CONSTRUCTOR
     """
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
-                    client_id = 100, path_root = '/'):
+                    client_id = 100, path_root = '/', **kw):
         super(IBDataBroker, self).__init__(account_name = account_name,
                                             host = host, port = port,
                                             client_id = client_id,
@@ -697,7 +697,7 @@ class IBDataBroker(IBBroker, DataBroker):
                                         'Multiplier', 'Right',
                                         'Financial Instrument', 'Strike Price',
                                         'Symbol', 'Trading Class',
-                                        'Number of Units', 'Average Unit Price'])
+                                        'Number of Units', 'Average Unit Prices'])
         return data
 
 class ExecutionBroker(Broker):
@@ -716,7 +716,7 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
     CLASS CONSTRUCTOR
     """
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
-                    client_id = 100):
+                    client_id = 100, **kw):
         super(IBExecutionBroker, self).__init__(account_name = account_name,
                                                 host = host, port = port,
                                                 client_id = client_id)
@@ -733,3 +733,12 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
 
     def cancelOrder(self, order_id):
         self.tws.cancelOrder(order_id)
+
+class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
+    """docstring for IBBrokerTotal."""
+    def __init__(self, account_name = 'DU603835', host = '', port = 7497,
+                    client_id = 100, path_root = '/'):
+        super(IBBrokerTotal, self).__init__(account_name = account_name,
+                                            host = host, port = port,
+                                            client_id = client_id,
+                                            path_root = path_root)
