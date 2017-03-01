@@ -9,16 +9,17 @@ from __future__ import print_function
 
 import abc
 
-import broker
+#import broker
 
 class System(object):
     """docstring for Execution."""
     __metaclass__ = abc.ABCMeta
-    def __init__(self, strategies):
-        self._strategies = strategies
-
-        #TODO: decide on the sharing of the connection resource between brokers
-        self._broker = broker.Broker()
+#    def __init__(self, strategies):
+#        self._strategies = strategies
+#
+#        #TODO: decide on the sharing of the connection resource between brokers
+#        self._broker = broker.Broker()   
+#    
 
     def strategies():
         doc = "The strategies property."

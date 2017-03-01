@@ -686,6 +686,9 @@ class IBDataBroker(IBBroker, DataBroker):
             print("Attribute not found.")
 
     def getPositions(self):
+        
+        self._resetCallbackAttribute('update_Position')
+        
         self.tws.reqPositions()
 
         time.sleep(1)
