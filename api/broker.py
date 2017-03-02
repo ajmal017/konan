@@ -370,24 +370,24 @@ class IBBroker(Broker):
         return contract
 
     def createOrder(self, trade_type, amount_units, price_per_unit = 0.0,
-                    order_type = ''):
+                    order_type = '', time_in_force = 'GTC'):
         if order_type not in ('LIMIT', 'MARKET'):
             print("Given order_type is not a proper type.")
             return None
 
+        order = Order()
+        order.m_totalQuantity = amount_units
+        order.m_action = trade_type
+        order.m_tif = time_in_force
+
         if order_type == 'LIMIT':
-            order = Order()
             order.m_orderType = 'LMT'
-            order.m_totalQuantity = amount_units
-            order.m_action = trade_type
             order.m_lmtPrice = price_per_unit
-            return order
+
         elif order_type == 'MARKET':
-            order = Order()
             order.m_orderType = 'MKT'
-            order.m_totalQuantity = amount_units
-            order.m_action = trade_type
-            return order
+
+        return order
 
     def preparePosition(self, position = position.Position()):
         """Unpack position object into order and contracts"""
@@ -844,3 +844,15 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
         self.placeOrder(order_id = order_id, contract = contract, order = order)
         time.sleep(1)
+
+    def createPriceOrder(self, amount_price, contract, trade_type, amount_units,
+                    price_per_unit = 0.0, order_type = ''):
+        data_contract = self.getDataAtTime(data_time = dt.datetime.now(),
+                                            contract = contract)
+
+        order = self.createOrder(trade_type = trade_type,
+                                    amount_units = amount_units,
+                                    price_per_unit = price_per_unit,
+                                    order_type = order_type)
+
+        return order
