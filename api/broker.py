@@ -602,10 +602,10 @@ class IBDataBroker(IBBroker, DataBroker):
                         columns = ['Request_ID', 'Account', 'Tag', 'Value',
                                     'Curency'])
 
-    def getDataAtTime(self, type_data = 'BID_ASK', contract = Contract(),
-                        type_time = '', data_time = dt.datetime.now(),
-                        in_trading_hours = True,
-                        duration = '60 S', bar_size = '1 min'):
+    def getDataAtTime(self, data_time, type_data = 'BID_ASK',
+                        contract = Contract(), type_time = '',
+                        in_trading_hours = True, duration = '60 S',
+                        bar_size = '1 min'):
         """
         REQUIRED PARAMETERS:
         contract
