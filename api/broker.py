@@ -758,3 +758,48 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                             host = host, port = port,
                                             client_id = client_id,
                                             path_root = path_root)
+
+    def closeAllPositions(self, order_specification = ''):
+        if order_specification == 'LIMIT':
+            pass
+            # CREATE CASE SPECIFIC VARIABLES TO PASS TO ORDER CONSTRUCTOR
+        if order_specification == 'MARKET':
+            pass
+
+        positions = self.getPositions()
+
+        order_id = self.nextOrderId()
+        for position in positions.iterrows():
+            position_details = position[1]
+
+            ticker = position_details['Symbol']
+            instrument_type = position_details['Financial_Instrument']
+
+            contract = self.createContract(ticker = ticker,
+                                            instrument_type = instrument_type,
+                                            exchange = 'SMART',
+                                            currency = 'USD')
+            # Make new contract? or is there some way to access previous contracts?
+
+            amount_units = position_details['Number_of_Units']
+            price_per_unit = position_details['Average_Unit_Price']
+
+            if amount_units < 0:
+                order_specification = 'BUY'
+            elif amount_units > 0:
+                order_specification = 'SELL'
+
+            order = self.createOrder(trade_type = 'MARKET',
+                                        amount_units = amount_units,
+                                        price_per_unit = price_per_unit,
+                                        order_specification = order_specification)
+
+            self.placeOrder(order_id = order_id, contract = contract, order = order)
+            time.sleep(1)
+
+            order_id += 1
+
+    def closePosition(self, symbol = '', order_type = ''):
+        positions = self.getPositions()
+
+        position_details = positions.loc[:,symbol]
