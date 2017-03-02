@@ -370,9 +370,10 @@ class IBBroker(Broker):
         return contract
 
     def createOrder(self, trade_type, amount_units, price_per_unit = 0.0, order_specification = ''):
-        #if order_specification not in ('LIMIT', 'MARKET'):
-        #    #RAISE ERROR
-        #    print("order_specification is not a proper type")
+        if order_specification not in ('LIMIT', 'MARKET'):
+            print("Given order_specification is not a proper type.")
+            return None
+
         if order_specification == 'LIMIT':
             order = Order()
             order.m_orderType = 'LMT'
@@ -643,20 +644,18 @@ class IBDataBroker(IBBroker, DataBroker):
                                  contract = contract,
                                  endDateTime = (data_time + dt.timedelta(seconds=1)).strftime('%Y%m%d %H:%M:%S'),
                                  durationStr = duration,
-                                 barSizeSetting = bar_size, whatToShow = type_data,
+                                 barSizeSetting = bar_size,
+                                 whatToShow = type_data,
                                  useRTH = trading_hours, formatDate = 1)
 
         time.sleep(1)
         #end modularize
 
         #could modularize
-        data = pd.DataFrame(self.callback.historical_Data, columns = ["reqId",
-                                                                        "date", "open",
-                                                                        "high", "low",
-                                                                        "close",
-                                                                        "volume",
-                                                                        "count", "WAP",
-                                                                        "hasGaps"])
+        data = pd.DataFrame(self.callback.historical_Data,
+                            columns = ['reqId','date', 'open', 'high', 'low',
+                                        'close', 'volume', 'count', 'WAP',
+                                        'hasGaps'])
 
         data.drop(data.index[-1], inplace=True)
         data['date'] = data['date'].apply(du.parser.parse)
@@ -683,7 +682,8 @@ class IBDataBroker(IBBroker, DataBroker):
 
         #print(data) #TODO:REMOVE
 
-        return data.loc[data_time.strftime(index_search_format)] #format must be same as bar_size
+        return data.loc[data_time.strftime(index_search_format)]
+        #format must be same as bar_size
         #end modularize
 
     def getDataInRange(self):
@@ -705,13 +705,15 @@ class IBDataBroker(IBBroker, DataBroker):
         time.sleep(1)
 
         data = pd.DataFrame(self.callback.update_Position,
-                            columns = ['Account Name', 'Contract Id',
+                            columns = ['Account_Name', 'Contract_Id',
                                         'Currency', 'Exchange', 'Expiry',
-                                        'Include Expired', 'Local Symbol',
+                                        'Include_Expired', 'Local_Symbol',
                                         'Multiplier', 'Right',
-                                        'Financial Instrument', 'Strike Price',
-                                        'Symbol', 'Trading Class',
-                                        'Number of Units', 'Average Unit Prices'])
+                                        'Financial Instrument', 'Strike_Price',
+                                        'Symbol', 'Trading_Class',
+                                        'Number_of_Units',
+                                        'Average_Unit_Price'])
+        data.set_index(keys = ['Contract Id'], inplace = True)
         return data
 
 class ExecutionBroker(Broker):
@@ -756,9 +758,3 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                             host = host, port = port,
                                             client_id = client_id,
                                             path_root = path_root)
-
-    def closeAllPositions(self, arg):
-        positions = self.getPositions()
-
-        for position in positions.iterrows():
-            pass
