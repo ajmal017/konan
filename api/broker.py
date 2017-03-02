@@ -369,19 +369,19 @@ class IBBroker(Broker):
     def _createMutualFundContract(self, contract = Contract()):
         return contract
 
-    def createOrder(self, trade_type, amount_units, price_per_unit = 0.0, order_specification = ''):
-        if order_specification not in ('LIMIT', 'MARKET'):
-            print("Given order_specification is not a proper type.")
+    def createOrder(self, trade_type, amount_units, price_per_unit = 0.0, order_type = ''):
+        if order_type not in ('LIMIT', 'MARKET'):
+            print("Given order_type is not a proper type.")
             return None
 
-        if order_specification == 'LIMIT':
+        if order_type == 'LIMIT':
             order = Order()
             order.m_orderType = 'LMT'
             order.m_totalQuantity = amount_units
             order.m_action = trade_type
             order.m_lmtPrice = price_per_unit
             return order
-        elif order_specification == 'MARKET':
+        elif order_type == 'MARKET':
             order = Order()
             order.m_orderType = 'MKT'
             order.m_totalQuantity = amount_units
@@ -709,11 +709,11 @@ class IBDataBroker(IBBroker, DataBroker):
                                         'Currency', 'Exchange', 'Expiry',
                                         'Include_Expired', 'Local_Symbol',
                                         'Multiplier', 'Right',
-                                        'Financial Instrument', 'Strike_Price',
+                                        'Financial_Instrument', 'Strike_Price',
                                         'Symbol', 'Trading_Class',
                                         'Number_of_Units',
                                         'Average_Unit_Price'])
-        data.set_index(keys = ['Contract Id'], inplace = True)
+        data.set_index(keys = ['Contract_Id'], inplace = True)
         return data
 
 class ExecutionBroker(Broker):
@@ -759,12 +759,10 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                             client_id = client_id,
                                             path_root = path_root)
 
-    def closeAllPositions(self, order_specification = ''):
-        if order_specification == 'LIMIT':
-            pass
-            # CREATE CASE SPECIFIC VARIABLES TO PASS TO ORDER CONSTRUCTOR
-        if order_specification == 'MARKET':
-            pass
+    def closeAllPositions(self, order_type = ''):
+        if order_type not in ('LIMIT', 'MARKET'):
+            print("Given order_type is not a proper type.")
+            return None
 
         positions = self.getPositions()
 
@@ -785,14 +783,14 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             price_per_unit = position_details['Average_Unit_Price']
 
             if amount_units < 0:
-                order_specification = 'BUY'
+                trade_type = 'BUY'
             elif amount_units > 0:
-                order_specification = 'SELL'
+                trade_type = 'SELL'
 
-            order = self.createOrder(trade_type = 'MARKET',
+            order = self.createOrder(trade_type = trade_type,
                                         amount_units = amount_units,
                                         price_per_unit = price_per_unit,
-                                        order_specification = order_specification)
+                                        order_type = order_type)
 
             self.placeOrder(order_id = order_id, contract = contract, order = order)
             time.sleep(1)
@@ -800,6 +798,40 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             order_id += 1
 
     def closePosition(self, symbol = '', order_type = ''):
+        if order_type not in ('LIMIT', 'MARKET'):
+            print("Given order_type is not a proper type.")
+            return None
+
+        order_id = self.nextOrderId()
+
         positions = self.getPositions()
 
-        position_details = positions.loc[:,symbol]
+        position_details = positions.loc[positions.loc[:,'Symbol'] == symbol]
+
+        ticker = position_details['Symbol'].iloc[0]
+        instrument_type = position_details['Financial_Instrument'].iloc[0]
+
+        contract = self.createContract(ticker = ticker,
+                                        instrument_type = instrument_type,
+                                        exchange = 'SMART',
+                                        currency = 'USD')
+
+        direction = position_details['Number_of_Units'].iloc[0]
+        amount_units = abs(direction)
+        price_per_unit = position_details['Average_Unit_Price'].iloc[0]
+
+        if direction < 0:
+            trade_type = 'BUY'
+        elif direction > 0:
+            trade_type = 'SELL'
+        else:
+            print("Position is already closed.")
+            return None
+
+        order = self.createOrder(trade_type = trade_type,
+                                    amount_units = amount_units,
+                                    price_per_unit = price_per_unit,
+                                    order_type = order_type)
+
+        self.placeOrder(order_id = order_id, contract = contract, order = order)
+        time.sleep(1)
