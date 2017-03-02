@@ -369,7 +369,8 @@ class IBBroker(Broker):
     def _createMutualFundContract(self, contract = Contract()):
         return contract
 
-    def createOrder(self, trade_type, amount_units, price_per_unit = 0.0, order_type = ''):
+    def createOrder(self, trade_type, amount_units, price_per_unit = 0.0,
+                    order_type = ''):
         if order_type not in ('LIMIT', 'MARKET'):
             print("Given order_type is not a proper type.")
             return None
@@ -779,13 +780,17 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                             currency = 'USD')
             # Make new contract? or is there some way to access previous contracts?
 
-            amount_units = position_details['Number_of_Units']
+            direction = position_details['Number_of_Units']
+            amount_units = abs(direction)
             price_per_unit = position_details['Average_Unit_Price']
 
-            if amount_units < 0:
+            if direction < 0:
                 trade_type = 'BUY'
-            elif amount_units > 0:
+            elif direction > 0:
                 trade_type = 'SELL'
+            else:
+                print(str(ticker) + "Position is already closed.")
+                pass
 
             order = self.createOrder(trade_type = trade_type,
                                         amount_units = amount_units,
