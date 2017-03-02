@@ -781,8 +781,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             # Make new contract? or is there some way to access previous contracts?
 
             direction = position_details['Number_of_Units']
-            amount_units = abs(direction)
-            price_per_unit = position_details['Average_Unit_Price']
+            amount_units = int(abs(direction))
+            price_per_unit = float(position_details['Average_Unit_Price'])
 
             if direction < 0:
                 trade_type = 'BUY'
@@ -826,8 +826,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                         currency = 'USD')
 
         direction = position_details['Number_of_Units'].iloc[0]
-        amount_units = abs(direction)
-        price_per_unit = position_details['Average_Unit_Price'].iloc[0]
+        amount_units = int(abs(direction))
+        price_per_unit = float(position_details['Average_Unit_Price'].iloc[0])
 
         if direction < 0:
             trade_type = 'BUY'
