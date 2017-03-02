@@ -473,7 +473,7 @@ class IBDataBroker(IBBroker, DataBroker):
         def fget(self):
             return self._tickers
         def fset(self, value):
-            print('add to dictionary')#self._tickers = value
+            print("add to dictionary")#self._tickers = value
         def fdel(self):
             del self._tickers
         return locals()
@@ -806,7 +806,11 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
         positions = self.getPositions()
 
-        position_details = positions.loc[positions.loc[:,'Symbol'] == symbol]
+        try:
+            position_details = positions.loc[positions.loc[:,'Symbol'] == symbol]
+        except:
+            print("Ticker was not found in positions.")
+            return None
 
         ticker = position_details['Symbol'].iloc[0]
         instrument_type = position_details['Financial_Instrument'].iloc[0]
