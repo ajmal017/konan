@@ -845,10 +845,13 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         self.placeOrder(order_id = order_id, contract = contract, order = order)
         time.sleep(1)
 
-    def createPriceOrder(self, amount_price, contract, trade_type, amount_units,
+    def createPriceOrder(self, amount_price, contract, trade_type,
                     price_per_unit = 0.0, order_type = ''):
         data_contract = self.getDataAtTime(data_time = dt.datetime.now(),
                                             contract = contract)
+
+        price_per_unit = data_contract['open']
+        amount_units = int(amount_price / price_per_unit)
 
         order = self.createOrder(trade_type = trade_type,
                                     amount_units = amount_units,
