@@ -788,9 +788,9 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                 trade_type = 'BUY'
             elif direction > 0:
                 trade_type = 'SELL'
-            else:
-                print(str(ticker) + "Position is already closed.")
-                pass
+            elif direction == 0:
+                print(str(ticker) + ": Position is already closed.")
+                continue
 
             order = self.createOrder(trade_type = trade_type,
                                         amount_units = amount_units,
