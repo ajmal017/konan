@@ -605,7 +605,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def getDataAtTime(self, data_time, type_data = 'BID_ASK',
                         contract = Contract(), type_time = '',
-                        in_trading_hours = True, duration = '60 S',
+                        in_trading_hours = False, duration = '60 S',
                         bar_size = '1 min'):
         """
         REQUIRED PARAMETERS:
