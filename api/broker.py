@@ -767,8 +767,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         positions = self.getPositions()
 
         order_id = self.nextOrderId()
-        for position in positions.iterrows():
-            position_details = position[1]
+        for position_record in positions.iterrows():
+            position_details = position_record[1]
 
             ticker = position_details['Symbol']
             instrument_type = position_details['Financial_Instrument']
