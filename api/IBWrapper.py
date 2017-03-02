@@ -21,7 +21,6 @@ class IBWrapper(EWrapper):
         setattr(self, 'update_Position', [])
         setattr(self, 'positionEnd_flag', False)
         # Orders
-        setattr(self, 'next_ValidId', [])
         setattr(self, 'order_Status', [])
         setattr(self, 'open_Order', [])
         setattr(self, 'open_OrderEnd_flag', True)
