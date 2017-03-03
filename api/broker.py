@@ -22,6 +22,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
+# Interactive Brokers related packages; IbPy package
 from IBWrapper import IBWrapper
 from ib.ext.EClientSocket import EClientSocket
 from ib.ext.ScannerSubscription import ScannerSubscription
@@ -98,6 +99,10 @@ class Broker(object):
     """
     def __init__(self):
         """
+        Broker constructor.
+        Initializes object properties.
+
+        SIGNATURE:
         """
         super(Broker, self).__init__()
 
@@ -112,6 +117,17 @@ class IBBroker(Broker):
     def __init__(self, account_name = 'DU603835',
                     connection = IBBrokerConnection(), host = '', port = 7497,
                     client_id = 100, **kw):
+        """
+        Broker constructor.
+        Initializes object properties.
+
+        SIGNATURE:
+        account_name -
+        connection -
+        host -
+        port -
+        client_id -
+        """
         super(IBBroker, self).__init__()
         self._account_name = account_name
 
@@ -130,7 +146,7 @@ class IBBroker(Broker):
     CLASS PROPERTIES
     """
     def account_name():
-        doc = "The account_name property."
+        doc = "The unique Interactive Brokers acccount name."
         def fget(self):
             return self._account_name
         def fset(self, value):
@@ -141,7 +157,7 @@ class IBBroker(Broker):
     account_name = property(**account_name())
 
     def callback():
-        doc = "The callback property."
+        doc = "The callback initialized by this broker instance."
         def fget(self):
             return self._callback
         def fset(self, value):
@@ -152,7 +168,7 @@ class IBBroker(Broker):
     callback = property(**callback())
 
     def connection():
-        doc = "The connection property."
+        doc = "The connection initialized for this broker instance."
         def fget(self):
             return self._connection
         def fset(self, value):
@@ -649,7 +665,7 @@ class IBDataBroker(IBBroker, DataBroker):
                                  whatToShow = type_data,
                                  useRTH = trading_hours, formatDate = 1)
 
-        time.sleep(.1)
+        time.sleep(1)
         #end modularize
 
         #could modularize
@@ -703,7 +719,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
         self.tws.reqPositions()
 
-        time.sleep(.1)
+        time.sleep(1)
 
         data = pd.DataFrame(self.callback.update_Position,
                             columns = ['Account_Name', 'Contract_Id',
@@ -734,6 +750,8 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
     """
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, **kw):
+        """
+        """
         super(IBExecutionBroker, self).__init__(account_name = account_name,
                                                 host = host, port = port,
                                                 client_id = client_id)
@@ -755,6 +773,18 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
     """docstring for IBBrokerTotal."""
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, path_root = '/'):
+        """
+        IBBrokerTotal constructor.
+        Initializes object properties.
+        Combines functionalties of <IBExecutionBroker> and <IBDataBroker>.
+
+        SIGNATURE:
+        account_name -
+        host -
+        port -
+        client_id -
+        path_root -
+        """
         super(IBBrokerTotal, self).__init__(account_name = account_name,
                                             host = host, port = port,
                                             client_id = client_id,
@@ -798,7 +828,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                         order_type = order_type)
 
             self.placeOrder(order_id = order_id, contract = contract, order = order)
-            time.sleep(.1)
+            time.sleep(1)
 
             order_id += 1
 
@@ -843,7 +873,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                     order_type = order_type)
 
         self.placeOrder(order_id = order_id, contract = contract, order = order)
-        time.sleep(.1)
+        time.sleep(1)
 
     def _totalPriceToTotalUnits(self, amount_price, contract):
         data_contract = self.getDataAtTime(data_time = dt.datetime.now(),
