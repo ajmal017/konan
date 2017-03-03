@@ -790,7 +790,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                             client_id = client_id,
                                             path_root = path_root)
 
-    def closeAllPositions(self, order_type = ''):
+    def closeAllPositions(self, order_type = '', exclude = ['']):
         if order_type not in ('LIMIT', 'MARKET'):
             print("Given order_type is not a proper type.")
             return None
@@ -802,6 +802,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             position_details = position_record[1]
 
             ticker = position_details['Symbol']
+            if ticker in exclude:
+                continue
             instrument_type = position_details['Financial_Instrument']
 
             contract = self.createContract(ticker = ticker,
@@ -875,15 +877,16 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         self.placeOrder(order_id = order_id, contract = contract, order = order)
         time.sleep(1)
 
-    def _totalPriceToTotalUnits(self, amount_price, contract):
+    def _totalDollarToTotalUnits(self, amount_dollars, contract):
         data_contract = self.getDataAtTime(data_time = dt.datetime.now(),
-                                            contract = contract)
+                                            contract = contract,
+                                            bar_size = '1 secs')
         price_per_unit = data_contract['open'].iloc[-1]
-        return int(amount_price / price_per_unit)
+        return int(amount_dollars / price_per_unit)
 
-    def createPriceOrder(self, amount_price, contract, trade_type,
+    def createDollarOrder(self, amount_dollars, contract, trade_type,
                             price_per_unit = 0.0, order_type = ''):
-        amount_units = self._totalPriceToTotalUnits(amount_price = amount_price,
+        amount_units = self._totalPriceToTotalUnits(amount_dollars = amount_dollars,
                                                     contract = contract)
 
         order = self.createOrder(trade_type = trade_type,
