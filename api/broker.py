@@ -878,7 +878,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
     def _totalPriceToTotalUnits(self, amount_price, contract):
         data_contract = self.getDataAtTime(data_time = dt.datetime.now(),
                                             contract = contract)
-        price_per_unit = data_contract['open']
+        price_per_unit = data_contract['open'].iloc[-1]
         return int(amount_price / price_per_unit)
 
     def createPriceOrder(self, amount_price, contract, trade_type,
