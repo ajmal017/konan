@@ -11,7 +11,7 @@ import abc
 
 class System(object):
     """docstring for System."""
-    def __init__(self, system_state, strategies, broker):
+    def __init__(self, system_state = None, strategies = None, broker = None):
         super(System, self).__init__()
         self._system_state = system_state
         self._strategies = strategies
