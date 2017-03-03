@@ -382,7 +382,7 @@ class IBBroker(Broker):
 
         if order_type == 'LIMIT':
             order.m_orderType = 'LMT'
-            order.m_lmtPrice = price_per_unit
+            order.m_lmtPrice = price_per_unit * amount_units
 
         elif order_type == 'MARKET':
             order.m_orderType = 'MKT'
@@ -649,7 +649,7 @@ class IBDataBroker(IBBroker, DataBroker):
                                  whatToShow = type_data,
                                  useRTH = trading_hours, formatDate = 1)
 
-        time.sleep(1)
+        time.sleep(.1)
         #end modularize
 
         #could modularize
@@ -703,7 +703,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
         self.tws.reqPositions()
 
-        time.sleep(1)
+        time.sleep(.1)
 
         data = pd.DataFrame(self.callback.update_Position,
                             columns = ['Account_Name', 'Contract_Id',
@@ -798,7 +798,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                         order_type = order_type)
 
             self.placeOrder(order_id = order_id, contract = contract, order = order)
-            time.sleep(1)
+            time.sleep(.1)
 
             order_id += 1
 
@@ -843,19 +843,4 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                     order_type = order_type)
 
         self.placeOrder(order_id = order_id, contract = contract, order = order)
-        time.sleep(1)
-
-    def createPriceOrder(self, amount_price, contract, trade_type,
-                    price_per_unit = 0.0, order_type = ''):
-        data_contract = self.getDataAtTime(data_time = dt.datetime.now(),
-                                            contract = contract)
-
-        price_per_unit = data_contract['open']
-        amount_units = int(amount_price / price_per_unit)
-
-        order = self.createOrder(trade_type = trade_type,
-                                    amount_units = amount_units,
-                                    price_per_unit = price_per_unit,
-                                    order_type = order_type)
-
-        return order
+        time.sleep(.1)
