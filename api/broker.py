@@ -886,7 +886,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
     def createDollarOrder(self, amount_dollars, contract, trade_type,
                             price_per_unit = 0.0, order_type = ''):
-        amount_units = self._totalPriceToTotalUnits(amount_dollars = amount_dollars,
+        amount_units = self._totalDollarToTotalUnits(amount_dollars = amount_dollars,
                                                     contract = contract)
 
         order = self.createOrder(trade_type = trade_type,
