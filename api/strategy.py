@@ -11,16 +11,18 @@ import abc
 
 import datetime as dt
 
+import broker
 import position
 
 class Strategy(object):
     """docstring for Strategy."""
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, decision_algorithm = None, portfolio = None,
+    def __init__(self, broker = broker.IBBrokerTotal(), decision_algorithm = None, portfolio = None,
                     time_execution = None):
         super(Strategy, self).__init__()
 
+        self._broker = broker
         self._decision_algorithm = decision_algorithm
         self._portfolio = portfolio
         self._time_execution = time_execution
@@ -28,6 +30,17 @@ class Strategy(object):
     """
     CLASS PROPERTIES
     """
+    def broker():
+        doc = "The broker property."
+        def fget(self):
+            return self._broker
+        def fset(self, value):
+            self._broker = value
+        def fdel(self):
+            del self._broker
+        return locals()
+    broker = property(**broker())
+
     def decision_algorithm():
         doc = "The decision_algorithm property."
         def fget(self):
