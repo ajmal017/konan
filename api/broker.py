@@ -41,10 +41,6 @@ class BrokerConnection(object):
     without disrupting properties of the connection.
     E.g. connection status, object representation.
     """
-
-    """
-    CLASS CONSTRUCTOR
-    """
     def __init__(self):
         """
         Basic BrokerConnection constructor
@@ -55,10 +51,6 @@ class IBBrokerConnection(BrokerConnection):
     """
     Connection interface implementing the Interactive Brokers (IB)
     EClientSocket API behaviours. Allows the EClientSocket object to be shared.
-    """
-
-    """
-    CLASS CONSTRUCTOR
     """
     def __init__(self, callback = IBWrapper()):
         """
@@ -93,10 +85,6 @@ class IBBrokerConnection(BrokerConnection):
 
 class Broker(object):
     """docstring for Broker."""
-
-    """
-    CLASS CONSTRUCTOR
-    """
     def __init__(self):
         """
         Broker constructor.
@@ -109,10 +97,6 @@ class Broker(object):
 class IBBroker(Broker):
     """
     docstring for IBBroker.
-    """
-
-    """
-    CLASS CONSTRUCTOR
     """
     def __init__(self, account_name = 'DU603835',
                     connection = IBBrokerConnection(), host = '', port = 7497,
@@ -411,10 +395,6 @@ class IBBroker(Broker):
 
 class DataBroker(Broker):
     """docstring for DataBroker."""
-
-    """
-    CLASS CONSTRUCTOR
-    """
     def __init__(self, path_root = '/', project = '', data_file = '', **kw):
         super(DataBroker, self).__init__()
 
@@ -455,10 +435,6 @@ class DataBroker(Broker):
 
 class IBDataBroker(IBBroker, DataBroker):
     """docstring for IBDataBroker."""
-
-    """
-    CLASS CONSTRUCTOR
-    """
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, path_root = '/', **kw):
         super(IBDataBroker, self).__init__(account_name = account_name,
@@ -735,19 +711,11 @@ class IBDataBroker(IBBroker, DataBroker):
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
-
-    """
-    CLASS CONSTRUCTOR
-    """
     def __init__(self, **kw):
         super(ExecutionBroker, self).__init__()
 
 class IBExecutionBroker(IBBroker, ExecutionBroker):
     """docstring for IBExecutionBroker."""
-
-    """
-    CLASS CONSTRUCTOR
-    """
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, **kw):
         """
