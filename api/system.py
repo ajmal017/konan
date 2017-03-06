@@ -13,6 +13,8 @@ import abc
 
 import cPickle
 
+import datetime as dt
+
 # internal/custom imports
 import directory # FULL PATH: konan.api.directory
 
@@ -25,15 +27,17 @@ class System(object):
                     # TODO: may replace IBBrokerTotal with new class name
         super(System, self).__init__()
         self._path_system_state = path_system_state
-        self._system_state = self.loadState(path_system_state = path_system_state)
+        try:
+            self._system_state = self.loadState(path_system_state = path_system_state)
+        except:
+            self._system_state = None
         # TODO: loadState + unpackState if there is an existing previous state;
         # if no valid previous state found OR path_system_state == ''
         # assume construction from null state
 
-        self._strategies = strategies
-        self._schedule = {}
-        for strategy in self.strategies:
-            self.schedule[strategy] = (strategy.time_execution, self.strategies[strategy])
+        self._strategy_schedule = {}
+        for strategy in strategies:
+            self.strategy_schedule[strategy] = (strategies[strategy].time_execution, strategies[strategy])
         self._time_sleep = time_sleep
 
         self._broker = broker
@@ -71,16 +75,16 @@ class System(object):
         return locals()
     strategies = property(**strategies())
 
-    def schedule():
-        doc = "The schedule property."
+    def strategy_schedule():
+        doc = "The strategy_schedule property."
         def fget(self):
-            return self._schedule
+            return self._strategy_schedule
         def fset(self, value):
-            self._schedule = value
+            self._strategy_schedule = value
         def fdel(self):
-            del self._schedule
+            del self._strategy_schedule
         return locals()
-    schedule = property(**schedule())
+    strategy_schedule = property(**strategy_schedule())
 
     def time_sleep():
         doc = "The time_sleep property."
@@ -107,9 +111,9 @@ class System(object):
     def loadState(self, path_system_state):
         if not directory.checkPath(path = path_system_state):
             with open(path_system_state, 'w+') as f:
-                return = cPickle.load(f)
+                return cPickle.load(f)
         with open(path_system_state, 'rb') as f:
-            return = cPickle.load(f)
+            return cPickle.load(f)
 
     def unpackState(self, state = None):
         #TODO
@@ -123,7 +127,7 @@ class System(object):
         self.broker.connect()
         # TODO: could possibly initiate multiple subprocesses; research
         while True:
-            for event in self.schedule:
-                if dt.datetime.now() >= event[1]:
+            for event in self.strategy_schedule:
+                if dt.datetime.now() >= dt.datetime.strptime(event[0], '%H%M'):
                     event[0].execute()
             time.sleep(self.time_sleep)
