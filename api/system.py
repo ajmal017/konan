@@ -13,6 +13,7 @@ import abc
 
 import cPickle
 
+import time
 import datetime as dt
 
 # internal/custom imports
@@ -128,6 +129,6 @@ class System(object):
         # TODO: could possibly initiate multiple subprocesses; research
         while True:
             for event in self.strategy_schedule:
-                if dt.datetime.now() >= dt.datetime.strptime(event[0], '%H%M'):
-                    event[0].execute()
+                if dt.datetime.now().time() >= dt.datetime.strptime(str(self.strategy_schedule[event][0]), '%H:%M:%S.%f').time():
+                    self.strategy_schedule[event][1].execute()
             time.sleep(self.time_sleep)
