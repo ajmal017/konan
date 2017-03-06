@@ -9,11 +9,21 @@ from __future__ import print_function
 
 import abc
 
+import datetime as dt
+
 import position
 
 class Strategy(object):
     """docstring for Strategy."""
     __metaclass__ = abc.ABCMeta
+
+    def __init__(self, decision_algorithm = None, portfolio = None,
+                    time_execution = None):
+        super(Strategy, self).__init__()
+
+        self._decision_algorithm = decision_algorithm
+        self._portfolio = portfolio
+        self._time_execution = time_execution
 
     """
     CLASS PROPERTIES
