@@ -36,12 +36,13 @@ class System(object):
         # if no valid previous state found OR path_system_state == ''
         # assume construction from null state
 
+        self._broker = broker
+
         self._strategy_schedule = {}
         for strategy in strategies:
+            strategy.broker = self.broker
             self.strategy_schedule[strategy] = (strategies[strategy].time_execution, strategies[strategy])
         self._time_sleep = time_sleep
-
-        self._broker = broker
 
     def path_system_state():
         doc = "The path_system_state property."
@@ -131,4 +132,5 @@ class System(object):
             for event in self.strategy_schedule:
                 if dt.datetime.now().time() >= dt.datetime.strptime(str(self.strategy_schedule[event][0]), '%H:%M:%S.%f').time():
                     self.strategy_schedule[event][1].execute()
+                    # TODO: need to implement multithreading for multiple strategies
             time.sleep(self.time_sleep)
