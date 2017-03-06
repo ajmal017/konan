@@ -5,12 +5,15 @@ api.strategy.py
 Created on 2017-02-15T11:54:00Z
 @author:Joshua Hu
 """
+# imports from future
 from __future__ import print_function
 
+#imports from stdlib
 import abc
 
 import datetime as dt
 
+# internal/custom imports
 import broker
 import position
 
