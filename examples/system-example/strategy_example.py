@@ -32,21 +32,18 @@ class exampleStrategy(strategy.Strategy):
     """
     """
     def __init__(self, broker = broker.IBBrokerTotal(),
-                    decision_algorithm = decision_algorithm,
-                    portfolio = portfolio,
                     time_execution = dt.datetime.now().time(),
-                    time_end = dt.datetime.now().time(),
-                    event_schedule = None):
+                    time_end = dt.datetime.now().time()):
 
         decision_algorithm = None #algorithm_example.exampleAlgorithm()
         portfolio = None #portfolio_example.examplePortfolio()
 
         time_format = '%H:%M:%S.%f'
 
-        time_stamp1 = '09:30:00'
-        time_stamp2 = '12:00:00'
-        time_stamp3 = '13:00:00'
-        time_stamp4 = '15:30:00'
+        time_stamp1 = '09:30:00.0'
+        time_stamp2 = '12:00:00.0'
+        time_stamp3 = '13:00:00.0'
+        time_stamp4 = '15:30:00.0'
 
         action1_arguments = 'thing'
         action2_arguments = 'not-thing'
@@ -63,18 +60,19 @@ class exampleStrategy(strategy.Strategy):
                             time_stamp2: (hedge_one, action2_arguments),
                             time_stamp3: (guard, action3_arguments),
                             time_stamp4: (end_day, action4_arguments)}
+        # TODO: argument mapping is not finished
 
         super(exampleStrategy, self).__init__(broker = broker,
                                                 decision_algorithm = decision_algorithm,
                                                 portfolio = portfolio,
                                                 time_execution = time_execution,
-                                                time_end = time_end,
+                                                time_end = dt.time(hour = 16, minute = 30),
                                                 event_schedule = event_schedule)
 
     #create specific actions groups below contstructor in function form
-    def openDay(self, thing):
+    def openDay(self, thing = None):
         pass
-    def hedgePositions(self, thing):
+    def hedgePositions(self, thing = None):
         pass
 
     def guardPositions(self):
