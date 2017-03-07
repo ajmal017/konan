@@ -24,7 +24,8 @@ import broker # FULL PATH: konan.api.broker
 class System(object):
     """docstring for System."""
     def __init__(self, path_system_state = '', strategies = {},
-                    broker = broker.IBBrokerTotal(), time_sleep = 0):
+                    time_end = dt.datetime.now().time(), time_sleep = 0,
+                    broker = None):
                     # TODO: may replace IBBrokerTotal with new class name
         super(System, self).__init__()
         self._path_system_state = path_system_state
@@ -40,8 +41,9 @@ class System(object):
 
         self._strategy_schedule = {}
         for strategy in strategies:
-            strategy.broker = self.broker
+            strategies[strategy].broker = self.broker
             self.strategy_schedule[strategy] = (strategies[strategy].time_execution, strategies[strategy])
+        self._time_end = time_end
         self._time_sleep = time_sleep
 
     def path_system_state():
@@ -88,6 +90,17 @@ class System(object):
         return locals()
     strategy_schedule = property(**strategy_schedule())
 
+    def time_end():
+        doc = "The time_end property."
+        def fget(self):
+            return self._time_end
+        def fset(self, value):
+            self._time_end = value
+        def fdel(self):
+            del self._time_end
+        return locals()
+    time_end = property(**time_end())
+
     def time_sleep():
         doc = "The time_sleep property."
         def fget(self):
@@ -126,11 +139,13 @@ class System(object):
             cPickle.dump(self.system_state,f,2)
 
     def run(self):
+        # TODO: check if connection actually passes to strategies
         self.broker.connect()
         # TODO: could possibly initiate multiple subprocesses; research
-        while True:
+        while dt.datetime.now().time() <= self.time_end:
             for event in self.strategy_schedule:
                 if dt.datetime.now().time() >= dt.datetime.strptime(str(self.strategy_schedule[event][0]), '%H:%M:%S.%f').time():
                     self.strategy_schedule[event][1].execute()
                     # TODO: need to implement multithreading for multiple strategies
             time.sleep(self.time_sleep)
+        self.broker.disconnect()
