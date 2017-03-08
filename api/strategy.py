@@ -24,7 +24,7 @@ class Strategy(object):
 
     def __init__(self, broker = None, decision_algorithm = None,
                     portfolio = None, time_execution = None, time_end = None,
-                    time_sleep = None, event_schedule = None):
+                    time_sleep = 0, event_schedule = None):
         super(Strategy, self).__init__()
 
         self._broker = broker
@@ -36,7 +36,7 @@ class Strategy(object):
         self._time_execution = time_execution
         self._time_end = time_end
 
-        self._time_sleep = 0#time_sleep
+        self._time_sleep = time_sleep
 
         self._event_schedule = event_schedule
 
@@ -137,8 +137,8 @@ class Strategy(object):
 
         while dt.datetime.now().time() <= self.time_end:
             for event in self.event_schedule:
-                # current <event_schedule> structure based on old <System> <run> method
                 if dt.datetime.now().time() >= dt.datetime.strptime(str(event), '%H:%M:%S.%f').time():
+                    # TODO: implement method of parameter passing
                     print(event)
                     print(self.event_schedule[event][0],':',self.event_schedule[event][1])
                     self.event_schedule[event][0]()#(self.event_schedule[event][1])
