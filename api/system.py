@@ -27,6 +27,24 @@ class System(object):
                     time_end = dt.datetime.now().time(), time_sleep = 0,
                     broker = None):
                     # TODO: may replace IBBrokerTotal with new class name
+        """
+        System class constructor.
+
+        PARAMETERS:
+        path_system_state - string representing path to the saved system state
+        strategies - dictionary containing imported strategies
+        time_end - datetime.time object representing the time the system should
+                    stop running
+        time_sleep - float number representing the number of seconds the system
+                        should be inactive between time checks
+        broker - broker object
+
+        RETURNS:
+        None
+
+        RESULTS:
+        Creates System object.
+        """
         super(System, self).__init__()
         self._path_system_state = path_system_state
         try:
@@ -124,6 +142,20 @@ class System(object):
     broker = property(**broker())
 
     def loadState(self, path_system_state):
+        """
+        Function loads a serialized object from a given path.
+        Function tries to find and read a path.
+
+        PARAMETERS:
+        path_system_state - string representing path to the saved system state
+
+        RETURNS:
+        Serialized Python2 object
+
+        RESULTS:
+        None
+        """
+        #TODO: implement catch for errors
         if not directory.checkPath(path = path_system_state):
             with open(path_system_state, 'w+') as f:
                 return cPickle.load(f)
@@ -131,14 +163,51 @@ class System(object):
             return cPickle.load(f)
 
     def unpackState(self, state = None):
+        """
+        Assigns values found in an object to the appropriate location in the
+        system.
+
+        PARAMETERS:
+        state - loaded serialized Python2 object
+
+        RETURNS:
+        None
+
+        RESULTS:
+        Loads values saved in the state object into the system.
+        """
         #TODO
         pass
 
     def saveState(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         with open(self.path_system_state, 'rb') as f:
             cPickle.dump(self.system_state,f,2)
 
     def run(self):
+        """
+        Main system method.
+        Executes all the strategies associated with this system.
+
+        PARAMETERS:
+        None
+
+        RETURNS:
+        None
+
+        RESULTS:
+        Strategies' main method executed.
+        """
         # TODO: check if connection actually passes to strategies
         self.broker.connect()
         # TODO: could possibly initiate multiple subprocesses; research
