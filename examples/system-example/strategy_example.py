@@ -33,7 +33,8 @@ class exampleStrategy(strategy.Strategy):
     """
     def __init__(self, broker = broker.IBBrokerTotal(),
                     time_execution = dt.datetime.now().time(),
-                    time_end = dt.datetime.now().time()):
+                    time_end = dt.time(hour = 16, minute = 30), time_sleep = 30):
+                    # time_execution = dt.time(hour = 9, minute = 30
 
         decision_algorithm = None #algorithm_example.exampleAlgorithm()
         portfolio = None #portfolio_example.examplePortfolio()
@@ -44,6 +45,8 @@ class exampleStrategy(strategy.Strategy):
         time_stamp2 = '12:00:00.0'
         time_stamp3 = '13:00:00.0'
         time_stamp4 = '15:30:00.0'
+        # test time
+        time_stamp_test = '11:38:30.0' #dt.datetime.now().time()
 
         action1_arguments = 'thing'
         action2_arguments = 'not-thing'
@@ -54,19 +57,22 @@ class exampleStrategy(strategy.Strategy):
         hedge_one = self.hedgePositions
         guard = self.guardPositions
         end_day = self.endDay
+        test_connection = self.testConnection
 
         # TODO: MAP & ZIP HERE
         event_schedule = {time_stamp1: (open_day, action1_arguments),
                             time_stamp2: (hedge_one, action2_arguments),
                             time_stamp3: (guard, action3_arguments),
-                            time_stamp4: (end_day, action4_arguments)}
+                            time_stamp4: (end_day, action4_arguments),
+                            time_stamp5: (test_connection, None)}
         # TODO: argument mapping is not finished
 
         super(exampleStrategy, self).__init__(broker = broker,
                                                 decision_algorithm = decision_algorithm,
                                                 portfolio = portfolio,
                                                 time_execution = time_execution,
-                                                time_end = dt.time(hour = 16, minute = 30),
+                                                time_end = time_end,
+                                                time_sleep = time_sleep,
                                                 event_schedule = event_schedule)
 
     #create specific actions groups below contstructor in function form
@@ -80,3 +86,11 @@ class exampleStrategy(strategy.Strategy):
 
     def endDay(self):
         pass
+
+    def testConnection(self):
+        if self.broker.connected():
+            print('IS CONNECTED')
+            self.broker.disconnect()
+            print('DISCONNECTED')
+        self.broker.connect()
+        print('CONNECTED')

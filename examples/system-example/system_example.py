@@ -32,10 +32,10 @@ def main():
     dict_strategies = {'eStrategy': strategy_example.exampleStrategy()}
 
     # create
-    eSystem = system.System(path_system_state = '',
+    eSystem = system.System(path_system_state = path_system_state,
                             strategies = dict_strategies,
                             time_end = dt.time(hour = 16, minute = 30),
-                            time_sleep = 10, broker = eBroker)
+                            time_sleep = 30, broker = eBroker)
 
     for event in eSystem.strategy_schedule:
         # TODO: modularize
