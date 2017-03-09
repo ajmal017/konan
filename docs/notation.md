@@ -1,10 +1,11 @@
-#DOCUMENTATION NOTATION:
+DOCUMENTATION NOTATION:
+=======================
 The following are wrapped around text.
 
 ##META INFORMATION
 - []: Denotes conceptual model components; i.e IO, Model, View, Controller, Server
 - {}: Denotes a path; e.g. {/absolute/path/to/object}, {./relative/path/to/object}
-- \$: Denotes an external reference; e.g. \$Markdown, \$JSON, \$StackOverflow
+- $: Denotes an external reference; e.g. $Markdown, $JSON, $StackOverflow
 
 ##CODE
 - <>: Denotes a high level code object; i.e. class, object
