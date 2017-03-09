@@ -245,6 +245,9 @@ class IBBroker(Broker):
         RESULTS:
 
         """
+        if self.connected():
+            print('Broker is already connected.')
+            pass
         self.tws.eConnect(self.host, self.port, self.client_id)
 
     def disconnect(self):
