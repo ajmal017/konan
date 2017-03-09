@@ -181,14 +181,17 @@ class System(object):
 
     def saveState(self):
         """
-        METHOD SUMMARY
+        Creates a serialized copy of key system attributes to continue from.
         METHOD DESCRIPTION
 
         PARAMETERS:
+        None
 
         RETURNS:
+        None
 
         RESULTS:
+        Serialized properties object stored in sytem state directory.
 
         """
         with open(self.path_system_state, 'rb') as f:
