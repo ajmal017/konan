@@ -14,58 +14,40 @@ import time
 import numpy as np
 import utils
 import pickle
-import utils.paths as utp
-
-
 # NOT USED
 # import random
 
-#nyse = pickle.load( open('C:\\Users\\Ray\\Google Drive\\myPythonProjects\\konan\\rd\\mcal_test.p', 'rb') )
-#nysecal = list(nyse.index.date)
-#dropbox = utp.dropbox_path().path
-
 # internal/custom imports
-import konan.api.broker as br
+import konan.api.broker as broker
 import konan.api.strategy as strategy
 # NOT USED
 # import konan.api.position as position
 
 # object imports
-#import deltix_algorithm_example
-import konan.examples.deltix_example.deltix_algorithm_example as deltixAlgo
+import deltix_algorithm_example
 
 # TODO: implement portfolio API
 # import <portfolio>
 # import portfolio_example
 
-#nyse = pickle.load( open('../../rd/mcal_test.p', 'rb') )
-
-
-google_drive = utp.google_drive_path().path
-
-nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
+nyse = pickle.load( open('./rd/mcal_test.p', 'rb') )
 
 nysecal = list(nyse.index.date)
-
-
 
 # Create a child class that inherits from the base <strategy> class
 # and rename appropriately for system import purposes
 class deltixStrategy(strategy.Strategy):
     """
     """
-#    def __init__(self, broker = br.IBBrokerTotal(),
-#                    time_execution = dt.datetime.now().time(),
-#                    time_end = dt.time(hour = 16, minute = 30), time_sleep = 30):
-
-
-    def __init__(self, broker = None,
+    def __init__(self, broker = broker.IBBrokerTotal(),
                     time_execution = dt.datetime.now().time(),
                     time_end = dt.time(hour = 16, minute = 30), time_sleep = 30):
-        decision_algorithm = deltixAlgo.deltixAlgorithm()
+                    # time_execution = dt.time(hour = 9, minute = 30
+
+        decision_algorithm = deltix_algorithm_example.deltixAlgorithm()
         portfolio = None #portfolio_example.examplePortfolio()
 
-#        time_format = '%H:%M:%S.%f' # NOT USEDs
+        time_format = '%H:%M:%S.%f' # NOT USED
 
         time_stamp_open_day = '09:30:00.0'
         time_stamp_close_day = '15:55:00.0'
