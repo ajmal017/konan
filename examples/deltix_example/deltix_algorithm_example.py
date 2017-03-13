@@ -6,7 +6,7 @@ Created on 2017-03-08T14:35:00Z
 @author:Joshua Hu
 """
 # imports from future
-from __future__ import print_function
+#from __future__ import print_function
 
 #imports from stdlib
 import os
@@ -29,9 +29,14 @@ import numpy as np
 import konan.api.algorithm as algorithm
 import konan.api.broker as broker
 
-nyse = pickle.load( open('./rd/mcal_test.p', 'rb') )
-nysecal = list(nyse.index.date)
+#nyse = pickle.load( open('../../rd/mcal_test.p', 'rb') )
+#nysecal = list(nyse.index.date)
 dropbox = utp.dropbox_path().path
+google_drive = utp.google_drive_path().path
+
+nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
+nysecal = list(nyse.index.date)
+
 
 
 class deltixAlgorithm(algorithm.DecisionAlgorithm):
