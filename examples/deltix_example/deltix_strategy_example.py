@@ -38,15 +38,23 @@ import konan.examples.deltix_example.deltix_algorithm_example as deltixAlgo
 # import <portfolio>
 # import portfolio_example
 
-#nyse = pickle.load( open('../../rd/mcal_test.p', 'rb') )
+if sys.platform == "linux" or sys.platform == "linux2":
+    # linux
+    pass
+elif sys.platform == "darwin":
+    # OS X: Josh
+    nyse = pickle.load( open('./rd/mcal_test.p', 'rb') )
+    nysecal = list(nyse.index.date)
+elif sys.platform == "win32":
+    # Windows: Ray
+    import utils
+    import utils.paths as utp
 
+    dropbox = utp.dropbox_path().path
+    google_drive = utp.google_drive_path().path
 
-google_drive = utp.google_drive_path().path
-
-nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
-
-nysecal = list(nyse.index.date)
-
+    nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
+    nysecal = list(nyse.index.date)
 
 
 # Create a child class that inherits from the base <strategy> class
@@ -54,18 +62,11 @@ nysecal = list(nyse.index.date)
 class deltixStrategy(strategy.Strategy):
     """
     """
-#    def __init__(self, broker = br.IBBrokerTotal(),
-#                    time_execution = dt.datetime.now().time(),
-#                    time_end = dt.time(hour = 16, minute = 30), time_sleep = 30):
-
-
     def __init__(self, broker = None,
                     time_execution = dt.datetime.now().time(),
                     time_end = dt.time(hour = 16, minute = 30), time_sleep = 30):
         decision_algorithm = deltixAlgo.deltixAlgorithm()
         portfolio = None #portfolio_example.examplePortfolio()
-
-#        time_format = '%H:%M:%S.%f' # NOT USEDs
 
         time_stamp_open_day = '09:30:00.0'
         time_stamp_close_day = '15:55:00.0'
