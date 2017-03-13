@@ -17,9 +17,9 @@ import time
 import datetime as dt
 
 # internal/custom imports
-import directory # FULL PATH: konan.api.directory
+import directory as dr # FULL PATH: konan.api.directory
 
-import broker # FULL PATH: konan.api.broker
+import broker as br # FULL PATH: konan.api.broker
 
 class System(object):
     """
@@ -188,7 +188,7 @@ class System(object):
         None
         """
         #TODO: implement catch for errors
-        if not directory.checkPath(path = path_system_state):
+        if not dr.checkPath(path = path_system_state):
             with open(path_system_state, 'w+') as f:
                 return cPickle.load(f)
         with open(path_system_state, 'rb') as f:
