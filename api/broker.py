@@ -981,15 +981,15 @@ class IBDataBroker(IBBroker, DataBroker):
                                         'close', 'volume', 'count', 'WAP',
                                         'hasGaps'])
 
-        try:        
+        try:
             data.drop(data.index[-1], inplace=True)
             data['date'] = data['date'].apply(du.parser.parse)
             data.set_index('date', inplace=True)
-                        
+
         except:
-            print("No Data available. Skipping: ", contract.m_symbol )
+            print("Error retrieving data for: ", contract.m_symbol, "\nEmpty callback.")
             return None
-        
+
         #end modularize
 
         #%Y%m%d %H:%M:%S
@@ -1169,7 +1169,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                             client_id = client_id,
                                             path_root = path_root)
 
-    def closeAllPositions(self, order_type = '', exclude_symbol = [''], include_instrument=['']):
+    def closeAllPositions(self, order_type = '', exclude_symbol = [''],
+                            exclude_instrument = ['']):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -1194,10 +1195,98 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             ticker = position_details['Symbol']
             if ticker in exclude_symbol:
                 continue
+
             instrument_type = position_details['Financial_Instrument']
-            
-            if instrument_type not in include_instrument:
+            if instrument_type in exclude_instrument:
                 continue
+
+            contract = self.createContract(ticker = ticker,
+                                            instrument_type = instrument_type,
+                                            exchange = 'SMART',
+                                            currency = 'USD')
+            # Make new contract? or is there some way to access previous contracts?
+
+            direction = position_details['Number_of_Units']
+            amount_units = int(abs(direction))
+            price_per_unit = float(position_details['Average_Unit_Price'])
+
+            if direction < 0:
+                trade_type = 'BUY'
+            elif direction > 0:
+                trade_type = 'SELL'
+            elif direction == 0:
+                print(str(ticker) + ": Position is already closed.")
+                continue
+
+            order = self.createOrder(trade_type = trade_type,
+                                        amount_units = amount_units,
+                                        price_per_unit = price_per_unit,
+                                        order_type = order_type)
+
+            self.placeOrder(order_id = order_id, contract = contract, order = order)
+            time.sleep(1)
+
+            order_id += 1
+
+    def closeAllTypePositions(self, order_type = '', instruments = ['']):
+        if order_type not in ('LIMIT', 'MARKET'):
+            print("Given order_type is not a proper type.")
+            return None
+
+        positions = self.getPositions()
+
+        order_id = self.nextOrderId()
+        for position_record in positions.iterrows():
+            position_details = position_record[1]
+
+            ticker = position_details['Symbol']
+            if instrument not in instruments:
+                continue
+            instrument_type = position_details['Financial_Instrument']
+
+            contract = self.createContract(ticker = ticker,
+                                            instrument_type = instrument_type,
+                                            exchange = 'SMART',
+                                            currency = 'USD')
+            # Make new contract? or is there some way to access previous contracts?
+
+            direction = position_details['Number_of_Units']
+            amount_units = int(abs(direction))
+            price_per_unit = float(position_details['Average_Unit_Price'])
+
+            if direction < 0:
+                trade_type = 'BUY'
+            elif direction > 0:
+                trade_type = 'SELL'
+            elif direction == 0:
+                print(str(ticker) + ": Position is already closed.")
+                continue
+
+            order = self.createOrder(trade_type = trade_type,
+                                        amount_units = amount_units,
+                                        price_per_unit = price_per_unit,
+                                        order_type = order_type)
+
+            self.placeOrder(order_id = order_id, contract = contract, order = order)
+            time.sleep(1)
+
+            order_id += 1
+
+    def closeAllNamePositions(self, order_type = '', tickers = ['']):
+        if order_type not in ('LIMIT', 'MARKET'):
+            print("Given order_type is not a proper type.")
+            return None
+
+        positions = self.getPositions()
+
+        order_id = self.nextOrderId()
+        for position_record in positions.iterrows():
+            position_details = position_record[1]
+
+            ticker = position_details['Symbol']
+            if ticker not in tickers:
+                continue
+            instrument_type = position_details['Financial_Instrument']
 
             contract = self.createContract(ticker = ticker,
                                             instrument_type = instrument_type,
