@@ -15,14 +15,8 @@ import numpy as np
 import utils
 import pickle
 import utils.paths as utp
-
-
 # NOT USED
 # import random
-
-#nyse = pickle.load( open('C:\\Users\\Ray\\Google Drive\\myPythonProjects\\konan\\rd\\mcal_test.p', 'rb') )
-#nysecal = list(nyse.index.date)
-#dropbox = utp.dropbox_path().path
 
 # internal/custom imports
 import konan.api.broker as br
@@ -73,6 +67,8 @@ class deltixStrategy(st.Strategy):
 
         action_arguments_none = None
 
+        has_executed = False
+
         open_day = self.openDay
         #hedge_one = self.hedgePositions
         #momentum_guard = self.momentumGuard
@@ -80,8 +76,8 @@ class deltixStrategy(st.Strategy):
         #test_connection = self.testConnection
 
         # TODO: MAP & ZIP HERE
-        event_schedule = {time_stamp_open_day: (open_day, action_arguments_none),
-                            time_stamp_close_day: (end_day, action_arguments_none)}
+        event_schedule = {time_stamp_open_day: [open_day, action_arguments_none, has_executed],
+                            time_stamp_close_day: [end_day, action_arguments_none, has_executed]}
         # TODO: argument mapping is not finished
 
         super(deltixStrategy, self).__init__(broker = broker,
