@@ -26,7 +26,7 @@ import utils.paths as utp
 
 # internal/custom imports
 import konan.api.broker as br
-import konan.api.strategy as strategy
+import konan.api.strategy as st
 # NOT USED
 # import konan.api.position as position
 
@@ -59,7 +59,7 @@ elif sys.platform == "win32":
 
 # Create a child class that inherits from the base <strategy> class
 # and rename appropriately for system import purposes
-class deltixStrategy(strategy.Strategy):
+class deltixStrategy(st.Strategy):
     """
     """
     def __init__(self, broker = None,
