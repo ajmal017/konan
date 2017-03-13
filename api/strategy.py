@@ -221,11 +221,16 @@ class Strategy(object):
         print('EXECUTING: ', self.__class__.__name__)
 
         while dt.datetime.now().time() <= self.time_end:
+
             for event in self.event_schedule:
+                event_group = self.event_schedule[event][0]
+                group_args = self.event_schedule[event][1]
+                has_executed = self.event_schedule[event][2]
+
                 #RUNS EVERY SINGLE EVENT EVERY TIME IF CONDITIONS ARE MET; THIS MEANS DUPLICATING ACTIONS
-                if dt.datetime.now().time() >= dt.datetime.strptime(str(event), '%H:%M:%S.%f').time():
+                if dt.datetime.now().time() >= dt.datetime.strptime(str(event), '%H:%M:%S.%f').time() and not has_executed:
                     # TODO: implement method of parameter passing
-                    print(event)
-                    print(self.event_schedule[event][0],':',self.event_schedule[event][1])
-                    self.event_schedule[event][0]()#(self.event_schedule[event][1])
+                    event_group()#(self.event_schedule[event][1])
+                    self.event_schedule[event][2] = True # Need to assign value directly or value change will not register
+
             time.sleep(self.time_sleep)
