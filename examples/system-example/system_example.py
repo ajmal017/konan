@@ -41,8 +41,11 @@ def main():
         # TODO: modularize
         print('--------------------------------')
         print('FROM: ',__file__) # TODO: argument
+        print('AT: ', dt.datetime.now())
         print('----------------')
+
         print(event,':', eSystem.strategy_schedule[event][0], ';', eSystem.strategy_schedule[event][1])
+        
         # TODO: more arguments
         print('--------------------------------')
         # TODO: end modularize
