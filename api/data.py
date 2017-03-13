@@ -38,6 +38,17 @@ import directory as dr
 
 class Repository(object):
     def __init__(self, path_root = '', project = '', data_file = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         self._root = path_root #find users Dropbox folder
 
         self._projects = os.listdir(self.root)
@@ -48,6 +59,9 @@ class Repository(object):
         self._special_files = {}
         self._special_directories = {}
 
+    """
+    CLASS PROPERTIES
+    """
     def root():
         doc = "The root property."
         def fget(self):
@@ -131,7 +145,25 @@ class Repository(object):
         return locals()
     special_directories = property(**special_directories())
 
+    """
+    CLASS PRIVATE METHODS
+    """
+
+    """
+    CLASS PUBLIC METHODS
+    """
     def selectProject(self, project = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         if dr.checkPath(path = self.root+project, is_file = False) and project in self.projects:
             return project
         elif project == '':
@@ -142,9 +174,31 @@ class Repository(object):
             return ''
 
     def markSpecialFile(self, key = '', path_file = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         self.special_files[key] = path_file
 
     def markSpecialDirectory(self, key = '', path_directory = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         self.special_directories[key] = path_directory
 
 class Filter(object):
@@ -152,6 +206,17 @@ class Filter(object):
     Base Class for data filters. Historical Filter for Backtest sub-system and Live Filter for Live Trading sub-system
     """
     def __init__(self, filter_lifespan = 1, filter_update_period = 1, hist_data_sources = [], live_data_sources = [], **kwds):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         """
         Constructor for dataFilter class
 
@@ -171,6 +236,9 @@ class Filter(object):
         self._hist_data_sources = hist_data_sources
         self._live_data_sources = live_data_sources
 
+    """
+    CLASS PROPERTIES
+    """
     @property
     def lifespan(self):
         return self._lifespan
@@ -217,7 +285,25 @@ class Filter(object):
             raise ValueError("Source list cannot be empty")
         self._live_data_sources = sources
 
+    """
+    CLASS PRIVATE METHODS
+    """
+
+    """
+    CLASS PUBLIC METHODS
+    """
     def rawFilter(self, data = pd.DataFrame(), columns = [], black = False):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         """
         Filter raw data to create a pandas DataFrame
 
@@ -236,6 +322,17 @@ class Filter(object):
 
     def _rawBlacklist(self, data = pd.DataFrame(), columns = []):
         """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        """
         Private function for filter class that returns a subsection of a pandas DataFrame using a blacklist of DataFrame columns.
 
         Parameters:
@@ -250,6 +347,17 @@ class Filter(object):
 
     def _rawWhitelist(self, data = pd.DataFrame(), columns = []):
         """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        """
         Private function for filter class that returns a subsection of a pandas DataFrame using a whitelist of DataFrame columns.
 
         Parameters:
@@ -263,6 +371,17 @@ class Filter(object):
         return filtered
 
     def rawValueFilter(self, data = pd.DataFrame(), columns = [], values = {}, comparators = {}):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         """
         Filter raw data to create a pandas DataFrame
 
@@ -290,6 +409,17 @@ class Filter(object):
 
     def rawSetFilter(self, data = pd.DataFrame(), set_ = [], columns = [], black = False):
         """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        """
         PARAMETERS:
         self -
         data -
@@ -307,6 +437,17 @@ class Filter(object):
         return df
 
     def calcFilter(self, data = pd.DataFrame(), columns = [], functions = [], black = False):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         """
         Filter raw data through the use of a calculated function from the data properties
 
@@ -326,6 +467,17 @@ class Filter(object):
 
     def _calcBlacklist(self, data = pd.DataFrame(), columns = [], functions = []):
         """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        """
         Private function for filter class that returns a subsection of a pandas DataFrame using functions to create a blacklist of DataFrame columns.
 
         Parameters:
@@ -341,6 +493,17 @@ class Filter(object):
         return df
 
     def _calcWhitelist(self, data = pd.DataFrame(), columns = [], functions = []):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         """
         Private function for filter class that returns a subsection of a pandas DataFrame using functions to create a blacklist of DataFrame columns.
 
@@ -362,6 +525,17 @@ class HistoricalFilter(Filter):
     """
     def __init__(self, filter_lifespan = 1, filter_update_period = 1, **kwds):
         """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        """
         Constructor for histFilter class
 
         Parameters:
@@ -377,7 +551,25 @@ class HistoricalFilter(Filter):
         self._update_period = base.update_period
         self._hist_data_sources = base.hist_data_sources
 
+    """
+    CLASS PRIVATE METHODS
+    """
+
+    """
+    CLASS PUBLIC METHODS
+    """
     def spawnLiveFilter(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return LiveFilter(filter_lifespan = self.lifespan, filter_update_period = self.filter_update_period)
 
 class LiveFilter(Filter):
@@ -385,6 +577,17 @@ class LiveFilter(Filter):
     Live Filter for Live trading sub-system
     """
     def __init__(self, filter_lifespan = 1, filter_update_period = 1, update_hour = 16, update_minute = 00, dict_candidate = {'candidate_columns':[],'candidate_values':{}, 'candidate_comparators':{}}, dict_whitelist = {'whitelist_columns':[],'whitelist_values':{}, 'whitelist_comparators':{}}, columns = [], candidate_values = {}, whitelist_values ={}, comparators = {}, **kwds):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         """
         Constructor for liveFilter class
 
@@ -411,6 +614,9 @@ class LiveFilter(Filter):
         self._whitelist_values = dict_whitelist['whitelist_values']
         self._whitelist_comparators = dict_whitelist['whitelist_comparators']
 
+    """
+    CLASS PROPERTIES
+    """
     @property
     def birthdate(self):
         return self._birthdate
@@ -450,7 +656,25 @@ class LiveFilter(Filter):
         else:
             return False
 
+    """
+    CLASS PRIVATE METHODS
+    """
+
+    """
+    CLASS PUBLIC METHODS
+    """
     def updateCandidateList(self, data = pd.DataFrame(), columns = []):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         """
         Parameters:
         self
@@ -467,6 +691,17 @@ class LiveFilter(Filter):
 
     def updateWhitelist(self, data = pd.DataFrame(), columns = []):
         """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        """
         Parameters:
         self
         data
@@ -482,6 +717,17 @@ class LiveFilter(Filter):
 
     def connect(self, source):
         """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        """
         Connect to a given data source.
 
         Parameters:
@@ -494,6 +740,17 @@ class LiveFilter(Filter):
         return connection
 
     def readConnection(self, connection):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         """
         Read information form a connection to a data source.
 
