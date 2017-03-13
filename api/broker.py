@@ -43,6 +43,17 @@ class BrokerConnection(object):
     """
     def __init__(self):
         """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        """
         Basic BrokerConnection constructor
         """
         super(BrokerConnection, self).__init__()
@@ -57,10 +68,15 @@ class IBBrokerConnection(BrokerConnection):
         IBBrokerConnection constructor.
         Initializes object properties.
 
-        SIGNATURE:
+        PARAMETERS:
         callback - IBWrapper()
             Implementation of an abstract class in the Interactive Brokers (IB)
             API which stores the results of API calls
+
+        RETURNS:
+
+        RESULTS:
+
         """
         super(IBBrokerConnection, self).__init__()
         self._interface = EClientSocket(callback)
@@ -90,7 +106,11 @@ class Broker(object):
         Broker constructor.
         Initializes object properties.
 
-        SIGNATURE:
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
         """
         super(Broker, self).__init__()
 
@@ -105,7 +125,7 @@ class IBBroker(Broker):
         Broker constructor.
         Initializes object properties.
 
-        SIGNATURE:
+        PARAMETERS:
         account_name -
         connection -
         host -
@@ -214,15 +234,62 @@ class IBBroker(Broker):
     CLASS PUBLIC METHODS
     """
     def connect(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        if self.connected():
+            print('Broker is already connected.')
+            pass
         self.tws.eConnect(self.host, self.port, self.client_id)
 
     def disconnect(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         self.tws.eDisconnect()
 
     def connected(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return self.tws.isConnected()
 
     def nextOrderId(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         self.tws.reqIds(1)
         return self.callback.next_ValidId
 
@@ -235,6 +302,17 @@ class IBBroker(Broker):
                         secIdType = None, secId = None,
                         combo_legs_description = None, combo_legs = None,
                         under_comp = None):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         contract = Contract()
 
         #The unique IB contract identifier.
@@ -313,9 +391,31 @@ class IBBroker(Broker):
         return dict_instrument_type[instrument_type](contract = contract)
 
     def _createStockContract(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return contract
 
     def _createOptionContract(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         #The contract's last trading day or contract month
         #(for Options and Futures).
         #Strings with format YYYYMM will be interpreted as the Contract Month
@@ -334,6 +434,17 @@ class IBBroker(Broker):
         return contract
 
     def _createFutureContract(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         #The contract's last trading day or contract month
         #(for Options and Futures).
         #Strings with format YYYYMM will be interpreted as the Contract Month
@@ -346,31 +457,130 @@ class IBBroker(Broker):
         return contract
 
     def _createIndexContract(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return contract
 
     def _createCashContract(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return contract
 
     def _createCombinationContract(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return contract
 
     def _createWarrantContract(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return contract
 
     def _createBondContract(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return contract
 
     def _createCommodityContract(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return contract
 
     def _createNewsContract(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return contract
 
     def _createMutualFundContract(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return contract
 
     def createOrder(self, trade_type, amount_units, price_per_unit = 0.0,
                     order_type = '', time_in_force = 'GTC'):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         if order_type not in ('LIMIT', 'MARKET'):
             print("Given order_type is not a proper type.")
             return None
@@ -390,12 +600,34 @@ class IBBroker(Broker):
         return order
 
     def preparePosition(self, position = position.Position()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         """Unpack position object into order and contracts"""
         return None
 
 class DataBroker(Broker):
     """docstring for DataBroker."""
     def __init__(self, path_root = '/', project = '', data_file = '', **kw):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         super(DataBroker, self).__init__()
 
         self._data_repository = data.Repository(path_root = path_root,
@@ -426,6 +658,17 @@ class DataBroker(Broker):
     path_root = property(**path_root())
 
     def getLocalData(self, type_data = '', path_data = '', file_name = ''): #data.Repository()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         files = glob.iglob(path_data + '*.' + type_data)
         while True:
             f = files.next()
@@ -437,6 +680,17 @@ class IBDataBroker(IBBroker, DataBroker):
     """docstring for IBDataBroker."""
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, path_root = '/', **kw):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         super(IBDataBroker, self).__init__(account_name = account_name,
                                             host = host, port = port,
                                             client_id = client_id,
@@ -484,6 +738,17 @@ class IBDataBroker(IBBroker, DataBroker):
     current_ticker_id = property(**current_ticker_id())
 
     def _resetCallbackAttribute(self, attribute = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         if attribute in ('accountDownloadEnd_flag', 'account_SummaryEnd_flag',
                             'positionEnd_flag', 'tickSnapshotEnd_flag',
                             'connection_Closed', 'exec_DetailsEnd_flag',
@@ -509,9 +774,31 @@ class IBDataBroker(IBBroker, DataBroker):
             print("Attribute not found.\nNo attribute reset.")
 
     def _incrementTickerID(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         self.current_ticker_id +=1
 
     def _addTicker(self, ticker = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         if ticker in self.tickers:
             ticker_id = self.tickers[ticker]
         else:
@@ -521,14 +808,47 @@ class IBDataBroker(IBBroker, DataBroker):
         return ticker_id
 
     def _isInTradingHours(self, yes = True):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         if yes:
             return 1
         return 0
 
     def getCallbackAttribute(self, attribute = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         return getattr(self.callback, attribute)
 
     def getAccountInformation(self, all_accounts = True, attributes = ','):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         """
         attributes values:
         AccountType - Identifies the IB account structure
@@ -599,6 +919,17 @@ class IBDataBroker(IBBroker, DataBroker):
                         contract = Contract(), type_time = '',
                         in_trading_hours = False, duration = '60 S',
                         bar_size = '1 min'):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         """
         REQUIRED PARAMETERS:
         contract
@@ -680,6 +1011,17 @@ class IBDataBroker(IBBroker, DataBroker):
         #end modularize
 
     def getDataInRange(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         # EXTEND USING getDataAtTime()
         return pd.DataFrame()
 
@@ -690,7 +1032,17 @@ class IBDataBroker(IBBroker, DataBroker):
     """
 
     def getPositions(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
 
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         self._resetCallbackAttribute('update_Position')
 
         self.tws.reqPositions()
@@ -712,6 +1064,17 @@ class IBDataBroker(IBBroker, DataBroker):
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
     def __init__(self, **kw):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         super(ExecutionBroker, self).__init__()
 
 class IBExecutionBroker(IBBroker, ExecutionBroker):
@@ -719,6 +1082,15 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, **kw):
         """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
         """
         super(IBExecutionBroker, self).__init__(account_name = account_name,
                                                 host = host, port = port,
@@ -732,9 +1104,31 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
     """
 
     def placeOrder(self, order_id, contract, order):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         self.tws.placeOrder(order_id, contract, order)
 
     def cancelOrder(self, order_id):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         self.tws.cancelOrder(order_id)
 
 class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
@@ -742,11 +1136,22 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, path_root = '/'):
         """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        """
         IBBrokerTotal constructor.
         Initializes object properties.
         Combines functionalties of <IBExecutionBroker> and <IBDataBroker>.
 
-        SIGNATURE:
+        PARAMETERS:
         account_name -
         host -
         port -
@@ -759,6 +1164,17 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                             path_root = path_root)
 
     def closeAllPositions(self, order_type = '', exclude = ['']):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         if order_type not in ('LIMIT', 'MARKET'):
             print("Given order_type is not a proper type.")
             return None
@@ -803,6 +1219,17 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             order_id += 1
 
     def closePosition(self, symbol = '', order_type = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         if order_type not in ('LIMIT', 'MARKET'):
             print("Given order_type is not a proper type.")
             return None
@@ -846,6 +1273,17 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         time.sleep(1)
 
     def _totalDollarToTotalUnits(self, amount_dollars, contract):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         data_contract = self.getDataAtTime(data_time = dt.datetime.now(),
                                             contract = contract,
                                             bar_size = '1 secs')
@@ -854,6 +1292,17 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
     def createDollarOrder(self, amount_dollars, contract, trade_type,
                             price_per_unit = 0.0, order_type = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         amount_units = self._totalDollarToTotalUnits(amount_dollars = amount_dollars,
                                                     contract = contract)
 
