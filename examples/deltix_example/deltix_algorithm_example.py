@@ -357,14 +357,15 @@ class deltixAlgorithm(algo.DecisionAlgorithm):
 
     ''' # ========================================================= # '''
 
-    def scrubEarningsCalendar(self, WSHlocal, date=None ):
+    def scrubEarningsCalendar(self, date=None ):
 
         ''' # ========================================================= # '''
         for stk in self.earningsCalendar.keys():
 
             if ( (date==self.actualCutoff[stk]) and len(self.actualCutoff)>0 ) :
-
-                self.earningsCalendar[stk].drop( self.earningsCalendar[stk].loc[:date], inplace=True )
+                
+                print "SCRUBBING: ", stk, " on ", date
+                self.earningsCalendar[stk].drop( self.earningsCalendar[stk].loc[:date].index, inplace=True )
 
 
     ''' # ========================================================= # '''

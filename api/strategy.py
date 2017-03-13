@@ -15,7 +15,7 @@ import time
 import datetime as dt
 
 # internal/custom imports
-import broker
+import broker as br
 import position
 
 class Strategy(object):

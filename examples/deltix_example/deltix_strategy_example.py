@@ -103,29 +103,44 @@ class deltixStrategy(st.Strategy):
 
     def openDay(self, thing = None):
         date = dt.date.today()
+        openDT = dt.datetime.combine( date, dt.time(9,30) ) #could just use time
+        
         # LOAD DATA
+        print('Loading WSH data for today')
         WSHdata = self.decision_algorithm.getData(dataType='WSH', date=date)
+        print('Loading last saved Earnings Calendar')
         self.decision_algorithm.getData(dataType='WSHEarningsCalendar', date=date)
+        print('Loading last saved cutoff calendar')
         self.decision_algorithm.getData(dataType='WSHCutoffCalendar', date=date)
 
         # UPDATE DATA
+        print('Update earnings calendar') 
         self.decision_algorithm.constructEarningsCalendar(WSHdata, date)
-        self.decision_algorithm.generatePositionsForClose(WSHdata, date)
+        print('Generate positions')
+        self.decision_algorithm.generatePositionsForClose(WSHdata, date)        
+        print('Pickling earnings calendar')
         self.decision_algorithm.pickleCalendars()
 
+        print('Momentum Guard')
         self.momentumGuard()
-        self.hedgePositions()
+        print('Hedge positions')
+        self.hedgePositions(data_time=openDT)
 
     def endDay(self):
         date = dt.date.today()
-
         closeDT = dt.datetime.combine( date, dt.time(15,55) ) #could just use time
-        self.broker.closeAllPositions()
+        
+        print('Close all positions')
+        self.broker.closeAllPositions(order_type='MARKET', include_instrument=['STK'], exclude_symbol=['SPY'])
+        print('Enter new positions')
         self.enterNewPositions()
+        print('Hedge positions')
         self.hedgePositions( data_time=closeDT )
 
+        print('Scrub earnings calendar')
         self.decision_algorithm.scrubEarningsCalendar(date=date)
 
+        print('Pickling calendar')
         self.decision_algorithm.pickleCalendars()
 
     def momentumGuard(self):
@@ -217,35 +232,42 @@ class deltixStrategy(st.Strategy):
         order_id = self.broker.nextOrderId()+2
 
         for stk in self.decision_algorithm.bulls.keys():
-            stk_ = stk.replace("."," ")
-            print('Long: ', stk, order_id)
-            c = self.broker.createContract(ticker=stk_,
-                                               instrument_type="STK",
-                                               primary_exchange ='NYSE')
-            buy_order = self.broker.createDollarOrder(trade_type = 'BUY',
-                                                         contract = c,
-                                                         amount_dollars = self.dW,
-                                                         order_type='MARKET' )  # default is market order
-            self.broker.placeOrder(order_id, c, buy_order )
-
-            time.sleep(1)
-            self.broker.callback.order_Status
-            time.sleep(1)
+            try:
+                stk_ = stk.replace("."," ")
+                print('Long: ', stk, order_id)
+                c = self.broker.createContract(ticker=stk_,
+                                                   instrument_type="STK",
+                                                   primary_exchange ='NYSE')
+                buy_order = self.broker.createDollarOrder(trade_type = 'BUY',
+                                                             contract = c,
+                                                             amount_dollars = self.dW,
+                                                             order_type='MARKET' )  # default is market order
+                self.broker.placeOrder(order_id, c, buy_order )
+    
+                time.sleep(1)
+                self.broker.callback.order_Status
+                time.sleep(1)
+            except:
+                continue
 
             order_id = order_id + 1
 
         for stk in self.decision_algorithm.bears.keys():
-            stk_ = stk.replace("."," ")
-            print('Short: ', stk, order_id)
-            c = self.broker.createContract(ticker=stk_,
-                                               instrument_type="STK",
-                                               primary_exchange ='NYSE')
-            sell_order = self.broker.createDollarOrder( trade_type = 'SELL',
-                                                           amount_dollars = self.dW,
-                                                           contract = c,
-                                                           order_type='MARKET')  # default is market order
-            time.sleep(1)
-            self.broker.placeOrder( order_id, c, sell_order )
-            time.sleep(1)
+            
+            try:
+                stk_ = stk.replace("."," ")
+                print('Short: ', stk, order_id)
+                c = self.broker.createContract(ticker=stk_,
+                                                   instrument_type="STK",
+                                                   primary_exchange ='NYSE')
+                sell_order = self.broker.createDollarOrder( trade_type = 'SELL',
+                                                               amount_dollars = self.dW,
+                                                               contract = c,
+                                                               order_type='MARKET')  # default is market order
+                time.sleep(1)
+                self.broker.placeOrder( order_id, c, sell_order )
+                time.sleep(1)
+            except:
+                continue
 
             order_id = order_id + 1

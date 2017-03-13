@@ -981,9 +981,15 @@ class IBDataBroker(IBBroker, DataBroker):
                                         'close', 'volume', 'count', 'WAP',
                                         'hasGaps'])
 
-        data.drop(data.index[-1], inplace=True)
-        data['date'] = data['date'].apply(du.parser.parse)
-        data.set_index('date', inplace=True)
+        try:        
+            data.drop(data.index[-1], inplace=True)
+            data['date'] = data['date'].apply(du.parser.parse)
+            data.set_index('date', inplace=True)
+                        
+        except:
+            print("No Data available. Skipping: ", contract.m_symbol )
+            return None
+        
         #end modularize
 
         #%Y%m%d %H:%M:%S
@@ -1163,7 +1169,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                             client_id = client_id,
                                             path_root = path_root)
 
-    def closeAllPositions(self, order_type = '', exclude = ['']):
+    def closeAllPositions(self, order_type = '', exclude_symbol = [''], include_instrument=['']):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -1186,9 +1192,12 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             position_details = position_record[1]
 
             ticker = position_details['Symbol']
-            if ticker in exclude:
+            if ticker in exclude_symbol:
                 continue
             instrument_type = position_details['Financial_Instrument']
+            
+            if instrument_type not in include_instrument:
+                continue
 
             contract = self.createContract(ticker = ticker,
                                             instrument_type = instrument_type,
