@@ -46,12 +46,15 @@ class exampleStrategy(strategy.Strategy):
         time_stamp3 = '13:00:00.0'
         time_stamp4 = '15:30:00.0'
         # test time
-        time_stamp_test = '11:38:30.0' #dt.datetime.now().time()
+        time_stamp_test = '13:16:30.0' #dt.datetime.now().time()
 
+        # NOT SUPPORTED YET
         action1_arguments = 'thing'
         action2_arguments = 'not-thing'
         action3_arguments = None
         action4_arguments = None
+
+        has_executed = False
 
         open_day = self.openDay
         hedge_one = self.hedgePositions
@@ -60,11 +63,11 @@ class exampleStrategy(strategy.Strategy):
         test_connection = self.testConnection
 
         # TODO: MAP & ZIP HERE
-        event_schedule = {time_stamp1: (open_day, action1_arguments),
-                            time_stamp2: (hedge_one, action2_arguments),
-                            time_stamp3: (guard, action3_arguments),
-                            time_stamp4: (end_day, action4_arguments),
-                            time_stamp5: (test_connection, None)}
+        event_schedule = {time_stamp1: [open_day, action1_arguments, has_executed],
+                            time_stamp2: [hedge_one, action2_arguments, has_executed],
+                            time_stamp3: [guard, action3_arguments, has_executed],
+                            time_stamp4: [end_day, action4_arguments, has_executed],
+                            time_stamp_test: [test_connection, None, has_executed]}
         # TODO: argument mapping is not finished
 
         super(exampleStrategy, self).__init__(broker = broker,
