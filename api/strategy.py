@@ -25,6 +25,29 @@ class Strategy(object):
     def __init__(self, broker = None, decision_algorithm = None,
                     portfolio = None, time_execution = None, time_end = None,
                     time_sleep = 0, event_schedule = None):
+        """
+        Strategy class constructor.
+
+        PARAMETERS:
+        broker - broker object
+        decision_algorithm - decision algorithm object
+        portfolio - portfolio object
+        time_execution - datetime.time object; CURRENTLY NOT USED: 17/03/09
+        time_end - datetime.time object representing the time the strategy
+                    should stop running
+        time_sleep - float number representing the number of seconds the
+                        strategy should be inactive between time checks
+        event_schedule - dictionary of tuples associated with a string timestamp
+                            representation (HH:MM:SS.f) containing (in order)
+                            a function aggregating a group of functions, and the
+                            aggregate function's arguments
+
+        RETURNS:
+        None
+
+        RESULTS:
+        Creates Strategy object.
+        """
         super(Strategy, self).__init__()
 
         self._broker = broker
@@ -120,23 +143,86 @@ class Strategy(object):
         return locals()
     event_schedule = property(**event_schedule())
 
+    """
+    CLASS PRIVATE METHODS
+    """
+
+    """
+    CLASS PUBLIC METHODS
+    """
     def checkPortfolio():
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         raise NotImplementedError("checkPortfolio() has not been implemented in the API")
 
     def checkDecision():
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         raise NotImplementedError("checkDecision() has not been implemented in the API")
 
     def makeTrade(position = position.Position()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         raise NotImplementedError("makeTrade() has not been implemented in the API")
 
     def updatePortfolio(position = position.Position()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         raise NotImplementedError("updatePortfolio() has not been implemented in the API")
 
     def execute(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
         print('EXECUTING: ', self.__class__.__name__)
 
         while dt.datetime.now().time() <= self.time_end:
             for event in self.event_schedule:
+                #RUNS EVERY SINGLE EVENT EVERY TIME IF CONDITIONS ARE MET; THIS MEANS DUPLICATING ACTIONS
                 if dt.datetime.now().time() >= dt.datetime.strptime(str(event), '%H:%M:%S.%f').time():
                     # TODO: implement method of parameter passing
                     print(event)
