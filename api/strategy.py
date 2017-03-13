@@ -16,7 +16,7 @@ import datetime as dt
 
 # internal/custom imports
 import broker as br
-import position
+import position as ps
 
 class Strategy(object):
     """docstring for Strategy."""
@@ -178,7 +178,7 @@ class Strategy(object):
         """
         raise NotImplementedError("checkDecision() has not been implemented in the API")
 
-    def makeTrade(position = position.Position()):
+    def makeTrade(position = ps.Position()):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -192,7 +192,7 @@ class Strategy(object):
         """
         raise NotImplementedError("makeTrade() has not been implemented in the API")
 
-    def updatePortfolio(position = position.Position()):
+    def updatePortfolio(position = ps.Position()):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
