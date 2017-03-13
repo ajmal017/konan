@@ -1228,7 +1228,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
             order_id += 1
 
-    def closeAllTypePositions(self, order_type = '', instruments = ['']):
+    def closeAllTypePositions(self, order_type = '', instruments = [''],
+                                exclude_symbol = ['']):
         if order_type not in ('LIMIT', 'MARKET'):
             print("Given order_type is not a proper type.")
             return None
@@ -1240,9 +1241,12 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             position_details = position_record[1]
 
             ticker = position_details['Symbol']
-            if instrument not in instruments:
+            if ticker in exclude_symbol:
                 continue
+
             instrument_type = position_details['Financial_Instrument']
+            if instrument_type not in instruments:
+                continue
 
             contract = self.createContract(ticker = ticker,
                                             instrument_type = instrument_type,
@@ -1286,6 +1290,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             ticker = position_details['Symbol']
             if ticker not in tickers:
                 continue
+
             instrument_type = position_details['Financial_Instrument']
 
             contract = self.createContract(ticker = ticker,
