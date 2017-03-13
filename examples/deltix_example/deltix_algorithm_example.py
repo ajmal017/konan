@@ -10,9 +10,8 @@ Created on 2017-03-08T14:35:00Z
 
 #imports from stdlib
 import os
+import sys
 import warnings
-import utils
-import utils.paths as utp
 
 import datetime as dt
 
@@ -29,13 +28,25 @@ import numpy as np
 import konan.api.algorithm as algorithm
 import konan.api.broker as broker
 
-#nyse = pickle.load( open('../../rd/mcal_test.p', 'rb') )
-#nysecal = list(nyse.index.date)
-dropbox = utp.dropbox_path().path
-google_drive = utp.google_drive_path().path
 
-nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
-nysecal = list(nyse.index.date)
+
+if sys.platform == "linux" or sys.platform == "linux2":
+    # linux
+    pass
+elif sys.platform == "darwin":
+    # OS X: Josh
+    nyse = pickle.load( open('./rd/mcal_test.p', 'rb') )
+    nysecal = list(nyse.index.date)
+elif sys.platform == "win32":
+    # Windows: Ray
+    import utils
+    import utils.paths as utp
+
+    dropbox = utp.dropbox_path().path
+    google_drive = utp.google_drive_path().path
+
+    nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
+    nysecal = list(nyse.index.date)
 
 
 
