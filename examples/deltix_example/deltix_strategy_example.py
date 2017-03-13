@@ -104,7 +104,7 @@ class deltixStrategy(st.Strategy):
     def openDay(self, thing = None):
         date = dt.date.today()
         openDT = dt.datetime.combine( date, dt.time(9,30) ) #could just use time
-        
+
         # LOAD DATA
         print('Loading WSH data for today')
         WSHdata = self.decision_algorithm.getData(dataType='WSH', date=date)
@@ -114,10 +114,10 @@ class deltixStrategy(st.Strategy):
         self.decision_algorithm.getData(dataType='WSHCutoffCalendar', date=date)
 
         # UPDATE DATA
-        print('Update earnings calendar') 
+        print('Update earnings calendar')
         self.decision_algorithm.constructEarningsCalendar(WSHdata, date)
         print('Generate positions')
-        self.decision_algorithm.generatePositionsForClose(WSHdata, date)        
+        self.decision_algorithm.generatePositionsForClose(WSHdata, date)
         print('Pickling earnings calendar')
         self.decision_algorithm.pickleCalendars()
 
@@ -129,9 +129,9 @@ class deltixStrategy(st.Strategy):
     def endDay(self):
         date = dt.date.today()
         closeDT = dt.datetime.combine( date, dt.time(15,55) ) #could just use time
-        
+
         print('Close all positions')
-        self.broker.closeAllPositions(order_type='MARKET', include_instrument=['STK'], exclude_symbol=['SPY'])
+        self.broker.closeAllTypePositions(order_type='MARKET', instruments=['STK'], exclude_symbol=['SPY'])
         print('Enter new positions')
         self.enterNewPositions()
         print('Hedge positions')
@@ -243,7 +243,7 @@ class deltixStrategy(st.Strategy):
                                                              amount_dollars = self.dW,
                                                              order_type='MARKET' )  # default is market order
                 self.broker.placeOrder(order_id, c, buy_order )
-    
+
                 time.sleep(1)
                 self.broker.callback.order_Status
                 time.sleep(1)
@@ -253,7 +253,7 @@ class deltixStrategy(st.Strategy):
             order_id = order_id + 1
 
         for stk in self.decision_algorithm.bears.keys():
-            
+
             try:
                 stk_ = stk.replace("."," ")
                 print('Short: ', stk, order_id)
