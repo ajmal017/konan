@@ -25,10 +25,8 @@ import numpy as np
 # from dateutil.parser import parse
 
 # internal/custom imports
-import konan.api.algorithm as algorithm
-import konan.api.broker as broker
-
-
+import konan.api.algorithm as algo
+import konan.api.broker as br
 
 if sys.platform == "linux" or sys.platform == "linux2":
     # linux
@@ -50,7 +48,7 @@ elif sys.platform == "win32":
 
 
 
-class deltixAlgorithm(algorithm.DecisionAlgorithm):
+class deltixAlgorithm(algo.DecisionAlgorithm):
 
     def __init__(self):
 
