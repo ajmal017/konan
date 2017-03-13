@@ -22,28 +22,40 @@ import directory # FULL PATH: konan.api.directory
 import broker # FULL PATH: konan.api.broker
 
 class System(object):
-    """docstring for System."""
+    """
+    <System> class.
+
+    Each <System> instantiation is unique to an Interactive Brokers account.
+
+    The <System> class is responsible for setting up global resources such as
+    brokers or portfolios and handling the execution of trading strategies
+    associated with its account through threading at a predetermined time.
+    The <System> saves critical and important values in order to preserve its
+    current state in the case of system failure or interruption
+    as a <SystemState> object.
+    """
     def __init__(self, path_system_state = '', strategies = {},
                     time_end = dt.datetime.now().time(), time_sleep = 0,
                     broker = None):
                     # TODO: may replace IBBrokerTotal with new class name
         """
-        System class constructor.
+        <System> class constructor.
 
         PARAMETERS:
-        path_system_state - string representing path to the saved system state
+        path_system_state - string representing path to the serialized
+                            <SystemState>
         strategies - dictionary containing imported strategies
-        time_end - datetime.time object representing the time the system should
+        time_end - <datetime.time> object representing the time the system should
                     stop running
         time_sleep - float number representing the number of seconds the system
                         should be inactive between time checks
-        broker - broker object
+        broker - <Broker> object
 
         RETURNS:
         None
 
         RESULTS:
-        Creates System object.
+        Creates <System> object.
         """
         super(System, self).__init__()
         self._path_system_state = path_system_state
@@ -64,8 +76,15 @@ class System(object):
         self._time_end = time_end
         self._time_sleep = time_sleep
 
+    """
+    CLASS PROPERTIES
+    """
     def path_system_state():
-        doc = "The path_system_state property."
+        doc = """
+                The <<path_system_state>> property provides a string representation
+                of the path to the serialized <SystemState> object where the
+                <<system_state>> is to be stored and read from.
+            """
         def fget(self):
             return self._path_system_state
         def fset(self, value):
@@ -76,7 +95,11 @@ class System(object):
     path_system_state = property(**path_system_state())
 
     def system_state():
-        doc = "The system_state property."
+        doc = """
+                The <<system_state>> property is the <SystemState> object in
+                which the system's state values are stored for reference
+                and storage.
+            """
         def fget(self):
             return self._system_state
         def fset(self, value):
@@ -86,19 +109,13 @@ class System(object):
         return locals()
     system_state = property(**system_state())
 
-    def strategies():
-        doc = "The strategies property."
-        def fget(self):
-            return self._strategies
-        def fset(self, value):
-            self._strategies = value
-        def fdel(self):
-            del self._strategies
-        return locals()
-    strategies = property(**strategies())
-
     def strategy_schedule():
-        doc = "The strategy_schedule property."
+        doc = """
+                The <<strategy_schedule>> property is a <dictionary> containing
+                a <string> key representation of the strategy
+                (typically a human readable name) associated with an imported
+                child of the <Strategy> class created for a particular strategy.
+            """
         def fget(self):
             return self._strategy_schedule
         def fset(self, value):
@@ -109,7 +126,10 @@ class System(object):
     strategy_schedule = property(**strategy_schedule())
 
     def time_end():
-        doc = "The time_end property."
+        doc = """
+                The <<time_end>> property is a <datetime.time> object which
+                represents the time when the system should shutdown.
+            """
         def fget(self):
             return self._time_end
         def fset(self, value):
@@ -120,7 +140,11 @@ class System(object):
     time_end = property(**time_end())
 
     def time_sleep():
-        doc = "The time_sleep property."
+        doc = """
+                The <<time_sleep>> property is a <float> which represents the
+                time, in granularity of seconds, which the system should sleep
+                between execution cycles.
+            """
         def fget(self):
             return self._time_sleep
         def fset(self, value):
@@ -131,7 +155,11 @@ class System(object):
     time_sleep = property(**time_sleep())
 
     def broker():
-        doc = "The broker property."
+        doc = """
+                The broker property is a <Broker> class instance and
+                a global resource used by all strategies to request
+                external or local data and execute trades with a broker.
+            """
         def fget(self):
             return self._broker
         def fset(self, value):
@@ -141,13 +169,17 @@ class System(object):
         return locals()
     broker = property(**broker())
 
+    """
+    CLASS PUBLIC METHODS
+    """
     def loadState(self, path_system_state):
         """
         Function loads a serialized object from a given path.
         Function tries to find and read a path.
 
         PARAMETERS:
-        path_system_state - string representing path to the saved system state
+        path_system_state - string representing path to the serialized
+                            <SystemState> object
 
         RETURNS:
         Serialized Python2 object
@@ -164,7 +196,7 @@ class System(object):
 
     def unpackState(self, state = None):
         """
-        Assigns values found in an object to the appropriate location in the
+        Assigns values found in an object to the appropriate values in the
         system.
 
         PARAMETERS:
@@ -174,7 +206,7 @@ class System(object):
         None
 
         RESULTS:
-        Loads values saved in the state object into the system.
+        Loads values saved in the <SystemState> object into the system.
         """
         #TODO
         pass
@@ -191,7 +223,7 @@ class System(object):
         None
 
         RESULTS:
-        Serialized properties object stored in sytem state directory.
+        Serialized properties object stored in system state directory.
 
         """
         with open(self.path_system_state, 'rb') as f:
@@ -209,7 +241,8 @@ class System(object):
         None
 
         RESULTS:
-        Strategies' main method executed.
+        Main method of each <Strategy> associated with the <System> instantiation
+        is executed.
         """
         # TODO: check if connection actually passes to strategies
         self.broker.connect()
@@ -221,3 +254,16 @@ class System(object):
                     # TODO: need to implement multithreading for multiple strategies
             time.sleep(self.time_sleep)
         self.broker.disconnect()
+
+class SystemState(object):
+    """
+    <SystemState> class.
+
+    Each <SystemState> instantiation is unique to a <System> in one point in
+    time.
+
+    The <SystemState> class is responsible for storing serialized
+    [trading system state values] for reliable reads in case of system failure.
+    """
+    def __init__(self):
+        super(SystemState, self).__init__()
