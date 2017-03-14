@@ -1031,11 +1031,9 @@ class IBDataBroker(IBBroker, DataBroker):
         # EXTEND USING getDataAtTime()
         return pd.DataFrame()
 
-    """
     def getLiveMarketData(self):
         self.tws.reqMktData()
         return self.callback.tick_Price
-    """
 
     def getPositions(self):
         """
@@ -1375,7 +1373,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         self.placeOrder(order_id = order_id, contract = contract, order = order)
         time.sleep(1)
 
-    def _totalDollarToTotalUnits(self, amount_dollars, contract):
+    def _totalDollarToTotalUnits(self, amount_dollars, contract,
+                                    data_time = dt.datetime.now()):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -1387,7 +1386,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         RESULTS:
 
         """
-        data_contract = self.getDataAtTime(data_time = dt.datetime.now(),
+        data_contract = self.getDataAtTime(data_time = data_time,
                                             contract = contract,
                                             bar_size = '1 secs')
         price_per_unit = data_contract['open'].iloc[-1]
