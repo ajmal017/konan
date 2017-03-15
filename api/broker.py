@@ -1065,6 +1065,7 @@ class IBDataBroker(IBBroker, DataBroker):
         data.set_index(keys = ['Contract_Id'], inplace = True)
         return data
 
+    # TODO: CHECK IF IT IS POSSIBLE TO ACQUIRE PAST PORTFOLIO VALUES
     def getPortfolio(self):
         """
         METHOD SUMMARY
@@ -1077,6 +1078,8 @@ class IBDataBroker(IBBroker, DataBroker):
         RESULTS:
 
         """
+        self._resetCallbackAttribute('update_Portfolio')
+
         self.tws.reqAccountUpdates(1, self.account_name)
 
         time.sleep(1)
@@ -1093,6 +1096,67 @@ class IBDataBroker(IBBroker, DataBroker):
                                                 'Unrealised_PnL',
                                                 'Realised_PnL', 'Account_Name'])
         return portfolio
+
+    # TODO: MAKE RECORD AND GETTING STRATEGY SPECIFIC; STRATEGY PNL NOT RECORDED
+    # ONLY ACCOUNT WIDE PNL
+    # TODO: CHECK IF IT IS POSSIBLE TO ACQUIRE PAST PORTFOLIO VALUES
+    def getPNLToday(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        portfolio = self.getPortfolio()
+
+        PNL = portfolio.loc[:, ['Date', 'Contract_ID', 'Symbol',
+                                'Market_Value', 'Market_Price', 'Position',
+                                'Unrealised_PnL', 'Realised_PnL']]
+
+        PNL.loc[:,['Date']] = dt.date.today()
+
+        return PNL
+
+    # TODO: MAKE RECORD AND GETTING STRATEGY SPECIFIC; STRATEGY PNL NOT RECORDED
+    # ONLY ACCOUNT WIDE PNL
+    def recordPNLToday(self, path = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        # TODO: always write a new file
+        PNL = self.getPNL()
+
+        PNL.to_csv(path_or_buf = path, encoding = 'utf-8')
+
+    def recordPNLDailyPerformance(self, path = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        # TODO: append to an existing file if it exists
+        PNL = self.getPNL()
+
+        PNL.to_csv(path_or_buf = path,, encoding = 'utf-8', mode = 'w+')
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
