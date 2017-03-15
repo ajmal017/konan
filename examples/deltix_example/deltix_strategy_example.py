@@ -207,7 +207,9 @@ class deltixStrategy(st.Strategy):
         ''' data_time would be the time we intend to hedge '''
         pos = self.broker.getPositions()
         shorts = pos[ (pos['Number_of_Units']<0) & (pos['Symbol']!= self.hedgeInstrument) ]
+        print("Shorts: ", shorts['Symbol'])
         longs = pos[ (pos['Number_of_Units']>0) & (pos['Symbol']!= self.hedgeInstrument) ]
+        print("Longs: ", longs['Symbol'])
         shortExp, longExp = 0, 0
 
         ''' Get short exposure '''
@@ -218,7 +220,7 @@ class deltixStrategy(st.Strategy):
                                      data_time=data_time,
                                      bar_size='1 secs'
                                      )['close'].iloc[-1]
-            shortExp = shortExp + stk['Number_of_Units']*avgPrice
+            shortExp = shortExp + stk['Number_of_Units']*avgPrice                        
             time.sleep(1)
 
         ''' Get long exposure '''
@@ -266,13 +268,8 @@ class deltixStrategy(st.Strategy):
             self.broker.placeOrder(order_id=order_id,
                                        contract=hedgeContract,
                                        order=hedge_order)
-        elif (delta_stkExposureReq ==0):
+        elif ( (delta_stkExposureReq==0) and (desiredFinalExposure !=0) ):
             order_id = order_id + 1
-#            hedgeTrade = action[ np.sign(delta_stkExposureReq) ]
-#            hedge_order = self.broker.createOrder( trade_type=hedgeTrade, amount_units= int(abs(delta_stkExposureReq)), order_type='MARKET' )
-#            self.broker.placeOrder(order_id=order_id,
-#                                       contract=hedgeContract,
-#                                       order=hedge_order)
             self.broker.closePosition(symbol=self.hedgeInstrument , order_type='MARKET')
 
 
