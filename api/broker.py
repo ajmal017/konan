@@ -1173,7 +1173,7 @@ class IBDataBroker(IBBroker, DataBroker):
         # TODO: append to an existing file if it exists
         PNL = self.getPNL()
 
-        PNL.to_csv(path_or_buf = path,, encoding = 'utf-8', mode = 'w+')
+        PNL.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'w+')
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
