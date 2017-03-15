@@ -10,12 +10,16 @@ from __future__ import print_function
 
 #imports from stdlib
 import sys
+
 import datetime as dt
 import time
+
+import collections
+
 import numpy as np
-import utils
+
 import pickle
-import utils.paths as utp
+
 import traceback
 # NOT USED
 # import random
@@ -78,9 +82,10 @@ class deltixStrategy(st.Strategy):
         #test_connection = self.testConnection
 
         # TODO: MAP & ZIP HERE
-        event_schedule = {  self.time_stamp_open_day: [open_day, action_arguments_none, has_executed],
+        dict_event_schedule = {  self.time_stamp_open_day: [open_day, action_arguments_none, has_executed],
                             self.time_stamp_close_day: [end_day, action_arguments_none, has_executed]}
 
+        event_schedule = collections.OrderedDict(sorted(dict_event_schedule.items(), key = lambda x: x[0]))
 
         print("Event schedule: ", event_schedule)
 
@@ -110,10 +115,10 @@ class deltixStrategy(st.Strategy):
 
     def openDay(self, thing = None):
         date = dt.date.today()
-        
+
         openM = int(self.time_stamp_open_day.split(":")[1])
         openH = int(self.time_stamp_open_day.split(":")[0])
-        
+
         openDT = dt.datetime.combine( date, dt.time(openH,openM) ) #could just use time
 
         # LOAD DATA
@@ -134,7 +139,7 @@ class deltixStrategy(st.Strategy):
         self.decision_algorithm.bulls
         print("TO SHORT:")
         self.decision_algorithm.bears
-        
+
         print('Pickling earnings calendar')
         self.decision_algorithm.pickleCalendars()
 
@@ -145,10 +150,10 @@ class deltixStrategy(st.Strategy):
 
     def endDay(self):
         date = dt.date.today()
-        
+
         closeM = int(self.time_stamp_close_day.split(":")[1])
         closeH = int(self.time_stamp_close_day.split(":")[0])
-        
+
         closeDT = dt.datetime.combine( date, dt.time(closeH,closeM) ) #could just use time
 
         print('Close all positions')
@@ -212,9 +217,9 @@ class deltixStrategy(st.Strategy):
                                      contract = shortContract,
                                      data_time=data_time,
                                      bar_size='1 secs'
-                                     )['close'].iloc[-1]            
+                                     )['close'].iloc[-1]
             shortExp = shortExp + stk['Number_of_Units']*avgPrice
-            time.sleep(1)                                                 
+            time.sleep(1)
 
         ''' Get long exposure '''
         for row, stk in longs.iterrows():
@@ -224,31 +229,31 @@ class deltixStrategy(st.Strategy):
                                      data_time=data_time,
                                      bar_size='1 secs'
                                      )['close'].iloc[-1]
-            
+
             longExp = longExp + stk['Number_of_Units']*avgPrice
-            time.sleep(1)                                                 
+            time.sleep(1)
 
         ''' target exposure '''
         desiredFinalExposure = -( longExp + shortExp )
         print("Desired final exposure: ", desiredFinalExposure)
-        
+
         hedgePosition = pos[ pos['Symbol']== self.hedgeInstrument  ]
-        
+
         hedgeContract = self.broker.createContract(ticker=self.hedgeInstrument, instrument_type='STK')
         avgPrice = self.broker.getDataAtTime( type_data='MIDPOINT',
                                  contract = hedgeContract,
                                  data_time=data_time,
                                  bar_size='1 secs'
                                  )['close'].iloc[-1]
-                                             
+
         if( not hedgePosition.empty) :
             currentHedgeExp = (hedgePosition['Number_of_Units']*avgPrice).values[0]
             print("Current hedge exposure: ", currentHedgeExp)
         else:
             currentHedgeExp = 0
-            
+
         delta_stkExposureReq = int( ( desiredFinalExposure - currentHedgeExp ) / avgPrice )  #units of stocks
-        
+
         print ("Hedge required: ", delta_stkExposureReq, " stock units")
 
         action = { 1: 'BUY', -1: 'SELL' }
@@ -261,7 +266,7 @@ class deltixStrategy(st.Strategy):
             self.broker.placeOrder(order_id=order_id,
                                        contract=hedgeContract,
                                        order=hedge_order)
-        elif (delta_stkExposureReq ==0):            
+        elif (delta_stkExposureReq ==0):
             order_id = order_id + 1
 #            hedgeTrade = action[ np.sign(delta_stkExposureReq) ]
 #            hedge_order = self.broker.createOrder( trade_type=hedgeTrade, amount_units= int(abs(delta_stkExposureReq)), order_type='MARKET' )
@@ -269,7 +274,7 @@ class deltixStrategy(st.Strategy):
 #                                       contract=hedgeContract,
 #                                       order=hedge_order)
             self.broker.closePosition(symbol=self.hedgeInstrument , order_type='MARKET')
-            
+
 
 
     def enterNewPositions(self):
@@ -288,7 +293,7 @@ class deltixStrategy(st.Strategy):
                                                              amount_dollars = self.dW,
                                                              order_type='MARKET' )  # default is market order
                 self.broker.placeOrder(order_id, c, buy_order )
-    
+
                 time.sleep(1)
                 self.broker.callback.order_Status
                 time.sleep(1)
