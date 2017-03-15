@@ -918,7 +918,7 @@ class IBDataBroker(IBBroker, DataBroker):
     def getDataAtTime(self, data_time, type_data = 'BID_ASK',
                         contract = Contract(), type_time = '',
                         in_trading_hours = False, duration = '60 S',
-                        bar_size = '1 min'):
+                        bar_size = '1 min', wait_time_out = 10):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -965,7 +965,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
         #could modularize
         now = dt.datetime.now()
-        end_wait = now + dt.timedelta(seconds = 10)
+        end_wait = now + dt.timedelta(seconds = wait_time_out)
 
         data = pd.DataFrame(self.callback.historical_Data,
                             columns = ['reqId','date', 'open', 'high', 'low',
