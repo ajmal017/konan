@@ -1098,9 +1098,11 @@ class IBDataBroker(IBBroker, DataBroker):
         """
         self._resetCallbackAttribute('update_Portfolio')
 
-        self.tws.reqAccountUpdates(1, self.account_name)
+        self.tws.reqAccountUpdates(True, self.account_name)
 
         time.sleep(1)
+
+        self.tws.reqAccountUpdates(False, self.account_name)
 
         portfolio = pd.DataFrame(self.callback.update_Portfolio,
                                     columns = ['Contract_ID', 'Currency',
@@ -1111,8 +1113,8 @@ class IBDataBroker(IBBroker, DataBroker):
                                                 'Symbol', 'Trading_Class',
                                                 'Position', 'Market_Price',
                                                 'Market_Value', 'Average_Cost',
-                                                'Unrealised_PnL',
-                                                'Realised_PnL', 'Account_Name'])
+                                                'Unrealized_PnL',
+                                                'Realized_PnL', 'Account_Name'])
         return portfolio
 
     # TODO: MAKE RECORD AND GETTING STRATEGY SPECIFIC; STRATEGY PNL NOT RECORDED
@@ -1134,7 +1136,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
         PNL = portfolio.loc[:, ['Date', 'Contract_ID', 'Symbol',
                                 'Market_Value', 'Market_Price', 'Position',
-                                'Unrealised_PnL', 'Realised_PnL']]
+                                'Unrealized_PnL', 'Realized_PnL']]
 
         PNL.loc[:,['Date']] = dt.date.today()
 
@@ -1155,7 +1157,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
         """
         # TODO: always write a new file
-        PNL = self.getPNL()
+        PNL = self.getPNLToday()
 
         PNL.to_csv(path_or_buf = path, encoding = 'utf-8')
 
@@ -1172,9 +1174,15 @@ class IBDataBroker(IBBroker, DataBroker):
 
         """
         # TODO: append to an existing file if it exists
-        PNL = self.getPNL()
+        PNL = self.getPNLToday()
 
-        PNL.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'w+')
+        # TODO: sum positions to one record
+        PNL_day = pd.DataFrame(index = [0])
+        PNL_day['Date'] = PNL['Date'].max()
+        PNL_day['Unrealized_PnL'] = PNL['Unrealized_PnL'].sum()
+        PNL_day['Realized_PnL'] = PNL['Realized_PnL'].sum()
+
+        PNL_day.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'w+')
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
