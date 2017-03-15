@@ -918,7 +918,7 @@ class IBDataBroker(IBBroker, DataBroker):
     def getDataAtTime(self, data_time, type_data = 'BID_ASK',
                         contract = Contract(), type_time = '',
                         in_trading_hours = False, duration = '60 S',
-                        bar_size = '1 min', wait_time_out = 10):
+                        bar_size = '1 min', time_out = 10):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -950,22 +950,23 @@ class IBDataBroker(IBBroker, DataBroker):
 
         ticker_id = self._addTicker(ticker = contract.m_symbol)
 
-        if type_time == 'OPEN':
-            data_time = dt.datetime(year = data_time.year,
-                                    month = data_time.month,
-                                    day = data_time.day,
-                                    hour = 9, minute = 30)
-        if type_time == 'CLOSE':
-            data_time = dt.datetime(year = data_time.year,
-                                    month = data_time.month,
-                                    day = data_time.day,
-                                    hour = 16)
+        if type_time in ('OPEN', 'CLOSE'):
+            if type_time == 'OPEN':
+                data_time = dt.datetime(year = data_time.year,
+                                        month = data_time.month,
+                                        day = data_time.day,
+                                        hour = 9, minute = 30)
+            if type_time == 'CLOSE':
+                data_time = dt.datetime(year = data_time.year,
+                                        month = data_time.month,
+                                        day = data_time.day,
+                                        hour = 16)
 
         trading_hours = self._isInTradingHours(in_trading_hours)
 
         #could modularize
         now = dt.datetime.now()
-        end_wait = now + dt.timedelta(seconds = wait_time_out)
+        end_wait = now + dt.timedelta(seconds = time_out)
 
         data = pd.DataFrame(self.callback.historical_Data,
                             columns = ['reqId','date', 'open', 'high', 'low',
@@ -1004,7 +1005,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
         if data.equals(data_null):
             print("Error retrieving data for: ", contract.m_symbol,
-                    "\nEmpty callback.")
+                    "\nEmpty callback.\nWait time out.")
             return None
 
         #end modularize
