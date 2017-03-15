@@ -964,30 +964,47 @@ class IBDataBroker(IBBroker, DataBroker):
         trading_hours = self._isInTradingHours(in_trading_hours)
 
         #could modularize
-        self.tws.reqHistoricalData( tickerId = ticker_id,
-                                 contract = contract,
-                                 endDateTime = (data_time + dt.timedelta(seconds=1)).strftime('%Y%m%d %H:%M:%S'),
-                                 durationStr = duration,
-                                 barSizeSetting = bar_size,
-                                 whatToShow = type_data,
-                                 useRTH = trading_hours, formatDate = 1)
+        now = dt.datetime.now()
+        end_wait = now + dt.timedelta(seconds = 10)
 
-        time.sleep(1)
-        #end modularize
-
-        #could modularize
         data = pd.DataFrame(self.callback.historical_Data,
                             columns = ['reqId','date', 'open', 'high', 'low',
                                         'close', 'volume', 'count', 'WAP',
                                         'hasGaps'])
+        data_null = data
+        while data.equals(data_null) and now <= end_wait:
+            self.tws.reqHistoricalData( tickerId = ticker_id,
+                                     contract = contract,
+                                     endDateTime = (data_time + dt.timedelta(seconds=1)).strftime('%Y%m%d %H:%M:%S'),
+                                     durationStr = duration,
+                                     barSizeSetting = bar_size,
+                                     whatToShow = type_data,
+                                     useRTH = trading_hours, formatDate = 1)
 
-        try:
-            data.drop(data.index[-1], inplace=True)
-            data['date'] = data['date'].apply(du.parser.parse)
-            data.set_index('date', inplace=True)
+            time.sleep(1)
+            #end modularize
 
-        except:
-            print("Error retrieving data for: ", contract.m_symbol, "\nEmpty callback.")
+            #could modularize
+            data = pd.DataFrame(self.callback.historical_Data,
+                                columns = ['reqId','date', 'open', 'high', 'low',
+                                            'close', 'volume', 'count', 'WAP',
+                                            'hasGaps'])
+
+            now = dt.datetime.now()
+
+            try:
+                data.drop(data.index[-1], inplace=True)
+                data['date'] = data['date'].apply(du.parser.parse)
+                data.set_index('date', inplace=True)
+
+            except:
+                # FIX LOGIC BRANCH, CANNOT RETURN HERE
+                print("Error retrieving data for: ", contract.m_symbol,
+                        "\nEmpty callback.\nTrying again.")
+
+        if data.equals(data_null):
+            print("Error retrieving data for: ", contract.m_symbol,
+                    "\nEmpty callback.")
             return None
 
         #end modularize
