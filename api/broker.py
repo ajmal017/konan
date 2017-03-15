@@ -785,7 +785,7 @@ class IBDataBroker(IBBroker, DataBroker):
         RESULTS:
 
         """
-        self.current_ticker_id +=1
+        self.current_ticker_id += 1
 
     def _addTicker(self, ticker = ''):
         """
@@ -1064,6 +1064,35 @@ class IBDataBroker(IBBroker, DataBroker):
                                         'Average_Unit_Price'])
         data.set_index(keys = ['Contract_Id'], inplace = True)
         return data
+
+    def getPortfolio(self):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        self.tws.reqAccountUpdates(1, self.account_name)
+
+        time.sleep(1)
+
+        portfolio = pd.DataFrame(self.callback.update_Portfolio,
+                                    columns = ['Contract_ID', 'Currency',
+                                                'Expiry', 'Include_Expired',
+                                                'Local_Symbol', 'Multiplier',
+                                                'Primary_Exchange', 'Right',
+                                                'Security_Type', 'Strike',
+                                                'Symbol', 'Trading_Class',
+                                                'Position', 'Market_Price',
+                                                'Market_Value', 'Average_Cost',
+                                                'Unrealised_PnL',
+                                                'Realised_PnL', 'Account_Name'])
+        return portfolio
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
