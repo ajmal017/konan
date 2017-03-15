@@ -16,6 +16,7 @@ import numpy as np
 import utils
 import pickle
 import utils.paths as utp
+import traceback
 # NOT USED
 # import random
 
@@ -63,8 +64,8 @@ class deltixStrategy(st.Strategy):
         decision_algorithm = deltixAlgo.deltixAlgorithm()
         portfolio = None #portfolio_example.examplePortfolio()
 
-        time_stamp_open_day = '09:30:00.0'
-        time_stamp_close_day = '15:55:00.0'
+        self.time_stamp_open_day = '09:30:00.0'
+        self.time_stamp_close_day = '14:23:00.0'
 
         action_arguments_none = None
 
@@ -77,8 +78,14 @@ class deltixStrategy(st.Strategy):
         #test_connection = self.testConnection
 
         # TODO: MAP & ZIP HERE
-        event_schedule = {time_stamp_open_day: [open_day, action_arguments_none, has_executed],
-                            time_stamp_close_day: [end_day, action_arguments_none, has_executed]}
+        event_schedule = {  self.time_stamp_open_day: [open_day, action_arguments_none, has_executed],
+                            self.time_stamp_close_day: [end_day, action_arguments_none, has_executed]}
+
+
+        print("Event schedule: ", event_schedule)
+
+#        event_schedule = { self.time_stamp_close_day: [end_day, action_arguments_none, has_executed] }
+
         # TODO: argument mapping is not finished
 
         super(deltixStrategy, self).__init__(broker = broker,
@@ -103,7 +110,11 @@ class deltixStrategy(st.Strategy):
 
     def openDay(self, thing = None):
         date = dt.date.today()
-        openDT = dt.datetime.combine( date, dt.time(9,30) ) #could just use time
+        
+        openM = int(self.time_stamp_open_day.split(":")[1])
+        openH = int(self.time_stamp_open_day.split(":")[0])
+        
+        openDT = dt.datetime.combine( date, dt.time(openH,openM) ) #could just use time
 
         # LOAD DATA
         print('Loading WSH data for today')
@@ -118,6 +129,12 @@ class deltixStrategy(st.Strategy):
         self.decision_algorithm.constructEarningsCalendar(WSHdata, date)
         print('Generate positions')
         self.decision_algorithm.generatePositionsForClose(WSHdata, date)
+        print("Tentative entries:")
+        print("TO LONG:")
+        self.decision_algorithm.bulls
+        print("TO SHORT:")
+        self.decision_algorithm.bears
+        
         print('Pickling earnings calendar')
         self.decision_algorithm.pickleCalendars()
 
@@ -128,7 +145,11 @@ class deltixStrategy(st.Strategy):
 
     def endDay(self):
         date = dt.date.today()
-        closeDT = dt.datetime.combine( date, dt.time(15,55) ) #could just use time
+        
+        closeM = int(self.time_stamp_close_day.split(":")[1])
+        closeH = int(self.time_stamp_close_day.split(":")[0])
+        
+        closeDT = dt.datetime.combine( date, dt.time(closeH,closeM) ) #could just use time
 
         print('Close all positions')
         self.broker.closeAllTypePositions(order_type='MARKET', instruments=['STK'], exclude_symbol=['SPY'])
@@ -191,8 +212,9 @@ class deltixStrategy(st.Strategy):
                                      contract = shortContract,
                                      data_time=data_time,
                                      bar_size='1 secs'
-                                     )['close'].iloc[-1]
+                                     )['close'].iloc[-1]            
             shortExp = shortExp + stk['Number_of_Units']*avgPrice
+            time.sleep(1)                                                 
 
         ''' Get long exposure '''
         for row, stk in longs.iterrows():
@@ -202,19 +224,32 @@ class deltixStrategy(st.Strategy):
                                      data_time=data_time,
                                      bar_size='1 secs'
                                      )['close'].iloc[-1]
+            
             longExp = longExp + stk['Number_of_Units']*avgPrice
+            time.sleep(1)                                                 
 
         ''' target exposure '''
-        desiredFinalExposire = -( longExp + shortExp )
+        desiredFinalExposure = -( longExp + shortExp )
+        print("Desired final exposure: ", desiredFinalExposure)
+        
         hedgePosition = pos[ pos['Symbol']== self.hedgeInstrument  ]
+        
         hedgeContract = self.broker.createContract(ticker=self.hedgeInstrument, instrument_type='STK')
         avgPrice = self.broker.getDataAtTime( type_data='MIDPOINT',
                                  contract = hedgeContract,
                                  data_time=data_time,
                                  bar_size='1 secs'
                                  )['close'].iloc[-1]
-        currentHedgeExp = (hedgePosition['Number_of_Units']*avgPrice).values[0]
-        delta_stkExposureReq = int( ( desiredFinalExposire - currentHedgeExp ) / avgPrice )  #units of stocks
+                                             
+        if( not hedgePosition.empty) :
+            currentHedgeExp = (hedgePosition['Number_of_Units']*avgPrice).values[0]
+            print("Current hedge exposure: ", currentHedgeExp)
+        else:
+            currentHedgeExp = 0
+            
+        delta_stkExposureReq = int( ( desiredFinalExposure - currentHedgeExp ) / avgPrice )  #units of stocks
+        
+        print ("Hedge required: ", delta_stkExposureReq, " stock units")
 
         action = { 1: 'BUY', -1: 'SELL' }
         order_id = self.broker.nextOrderId()+1
@@ -226,6 +261,16 @@ class deltixStrategy(st.Strategy):
             self.broker.placeOrder(order_id=order_id,
                                        contract=hedgeContract,
                                        order=hedge_order)
+        elif (delta_stkExposureReq ==0):            
+            order_id = order_id + 1
+#            hedgeTrade = action[ np.sign(delta_stkExposureReq) ]
+#            hedge_order = self.broker.createOrder( trade_type=hedgeTrade, amount_units= int(abs(delta_stkExposureReq)), order_type='MARKET' )
+#            self.broker.placeOrder(order_id=order_id,
+#                                       contract=hedgeContract,
+#                                       order=hedge_order)
+            self.broker.closePosition(symbol=self.hedgeInstrument , order_type='MARKET')
+            
+
 
     def enterNewPositions(self):
         ''' This should be entered at the close '''
@@ -243,11 +288,12 @@ class deltixStrategy(st.Strategy):
                                                              amount_dollars = self.dW,
                                                              order_type='MARKET' )  # default is market order
                 self.broker.placeOrder(order_id, c, buy_order )
-
+    
                 time.sleep(1)
                 self.broker.callback.order_Status
                 time.sleep(1)
             except:
+                print("error:", traceback.format_exc())
                 continue
 
             order_id = order_id + 1
