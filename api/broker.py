@@ -1030,7 +1030,12 @@ class IBDataBroker(IBBroker, DataBroker):
 
         #print(data) #TODO:REMOVE
 
-        return data.loc[data_time.strftime(index_search_format)]
+        try:
+           return data.loc[data_time.strftime(index_search_format)]
+       except:
+           print("Index not found problem")
+           print(traceback.format_exc)
+           return data.iloc[-1]
         #format must be same as bar_size
         #end modularize
 
