@@ -226,23 +226,23 @@ class Strategy(object):
             print('FROM: ', __file__) # TODO: argument
             print('AT: ', dt.datetime.now())
 
-            for event in self.event_schedule:
-                event_group = self.event_schedule[event][0]
-                group_args = self.event_schedule[event][1]
-                has_executed = self.event_schedule[event][2]
+            for event_time in self.event_schedule:
+                event_group = self.event_schedule[event_time][0]
+                group_args = self.event_schedule[event_time][1]
+                has_executed = self.event_schedule[event_time][2]
 
                 print('----------------')
-                print('event: ', event)
+                print('event_time: ', event_time)
                 print('event_group: ', event_group)
                 print('event arguments: ', group_args)
                 print('has_executed: ', has_executed)
                 print('----------------')
 
                 #RUNS EVERY SINGLE EVENT EVERY TIME IF CONDITIONS ARE MET; THIS MEANS DUPLICATING ACTIONS
-                if dt.datetime.now().time() >= dt.datetime.strptime(str(event), '%H:%M:%S.%f').time() and not has_executed:
+                if dt.datetime.now().time() >= dt.datetime.strptime(str(event_time), '%H:%M:%S.%f').time() and not has_executed:
                     # TODO: implement method of parameter passing
-                    event_group()#(self.event_schedule[event][1])
-                    self.event_schedule[event][2] = True # Need to assign value directly or value change will not register
+                    event_group()#(self.event_schedule[event_time][1])
+                    self.event_schedule[event_time][2] = True # Need to assign value directly or value change will not register
                     print('EXECUTING: ', event_group)
 
             print('--------------------------------')

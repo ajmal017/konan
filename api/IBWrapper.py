@@ -65,14 +65,14 @@ class IBWrapper(EWrapper):
                         averageCost, unrealizedPnL, realizedPnL, accountName):
         update_Portfolio = self.update_Portfolio
         update_Portfolio.append((contract.m_conId, contract.m_currency,
-                                 contract.m_expiry, contract.m_includeExpired,
-                                 contract.m_localSymbol, contract.m_multiplier,
-                                 contract.m_primaryExch, contract.m_right,
-                                 contract.m_secType, contract.m_strike,
-                                 contract.m_symbol, contract.m_tradingClass,
-                                 position, marketPrice, marketValue,
-                                 averageCost, unrealizedPnL, realizedPnL,
-                                 accountName))
+                                contract.m_expiry, contract.m_includeExpired,
+                                contract.m_localSymbol, contract.m_multiplier,
+                                contract.m_primaryExch, contract.m_right,
+                                contract.m_secType, contract.m_strike,
+                                contract.m_symbol, contract.m_tradingClass,
+                                position, marketPrice, marketValue,
+                                averageCost, unrealizedPnL, realizedPnL,
+                                accountName))
 
     def updateAccountTime(self, timeStamp):
         self.update_AccountTime = timeStamp
