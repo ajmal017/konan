@@ -719,8 +719,21 @@ class IBDataBroker(IBBroker, DataBroker):
         doc = "The tickers property."
         def fget(self):
             return self._tickers
-        def fset(self, value):
-            print("add to dictionary")#self._tickers = value
+        def fset(self, contract): # ('ticker', Contract())
+            if self.current_ticker_id in self._tickers:
+                self._incrementTickerID()
+            ticker_id = self.current_ticker_id
+            print(ticker_id)
+            ticker = contract.m_symbol
+            if self._tickers == {}:
+                self._tickers[ticker_id] = (ticker, contract)
+                return
+            for element in self._tickers:
+                if ticker in self._tickers[element]:
+                    print("Contract already in dictionary.")
+                    return
+            self._tickers[ticker_id] = (ticker, contract)
+            self._incrementTickerID()
         def fdel(self):
             del self._tickers
         return locals()
@@ -787,7 +800,7 @@ class IBDataBroker(IBBroker, DataBroker):
         """
         self.current_ticker_id += 1
 
-    def _addTicker(self, ticker = ''):
+    def _addTicker(self, ticker = '', contract = Contract()):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -803,7 +816,7 @@ class IBDataBroker(IBBroker, DataBroker):
             ticker_id = self.tickers[ticker]
         else:
             ticker_id = self.current_ticker_id
-            self.tickers[ticker] = ticker_id
+            self.tickers[ticker] = (ticker_id, contract)
             self._incrementTickerID()
         return ticker_id
 
@@ -1052,10 +1065,11 @@ class IBDataBroker(IBBroker, DataBroker):
         RESULTS:
 
         """
+        raise NotImplementedError("API method has not been implemented.")
         # EXTEND USING getDataAtTime()
         return pd.DataFrame()
 
-    def getLiveMarketData(self):
+    def getLiveMarketData(self, contract = Contract()):
         self.tws.reqMktData()
         return self.callback.tick_Price
 
