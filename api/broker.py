@@ -1316,7 +1316,7 @@ class IBDataBroker(IBBroker, DataBroker):
         # TODO: always write a new file
         PNL = self.getPNLToday()
 
-        PNL.to_csv(path_or_buf = path, encoding = 'utf-8')
+        PNL.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'w+')
 
     def recordPNLDailyPerformance(self, path = ''):
         """
@@ -1339,7 +1339,7 @@ class IBDataBroker(IBBroker, DataBroker):
         PNL_day['Unrealized_PnL'] = PNL['Unrealized_PnL'].sum()
         PNL_day['Realized_PnL'] = PNL['Realized_PnL'].sum()
 
-        PNL_day.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'w+')
+        PNL_day.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'a+')
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
