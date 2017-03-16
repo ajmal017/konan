@@ -17,6 +17,7 @@ import time
 import collections
 
 import numpy as np
+import os
 
 import pickle
 
@@ -168,6 +169,13 @@ class deltixStrategy(st.Strategy):
 
         print('Pickling calendar')
         self.decision_algorithm.pickleCalendars()
+                
+        print('Record today PL ')
+        performancepath = google_drive+'myPythonProjects\\papertrader\\papar252\\performance\\Deltix\\'
+        self.broker.recordPNLToday( path=os.path.join(performancepath, str(date)+"positionPNL.csv" ) )
+        self.broker.recordPNLDailyPerformance( path=os.path.join(performancepath, "deltixAggregatedPNL.csv" ) )
+                
+        
 
     def momentumGuard(self):
         pos = self.broker.getPositions()
