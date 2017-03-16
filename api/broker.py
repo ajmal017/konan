@@ -1002,6 +1002,7 @@ class IBDataBroker(IBBroker, DataBroker):
                 # FIX LOGIC BRANCH, CANNOT RETURN HERE
                 print("Error retrieving data for: ", contract.m_symbol,
                         "\nEmpty callback.\nTrying again.")
+                time.sleep(15)
 
         if data.equals(data_null):
             print("Error retrieving data for: ", contract.m_symbol,
