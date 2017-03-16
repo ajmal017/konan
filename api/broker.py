@@ -1072,6 +1072,80 @@ class IBDataBroker(IBBroker, DataBroker):
         # EXTEND USING getDataAtTime()
         return pd.DataFrame()
 
+    def searchTickers(self, search_object, type_search = '', type_data = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        if type_data not in ('ID','CONTRACT','TUPLE'):
+            print("Type of data must be 'ID', 'CONTRACT' or 'TUPLE'.")
+            return None
+
+        if type_search not in ('TICKER','CONTRACT'):
+            print("Type of search must be 'ID' or 'CONTRACT'.")
+            return None
+
+        if type_search == 'TICKER':
+            return self.tickerSearch(ticker = search_object,
+                                        type_data = type_data)
+
+        if type_search == 'CONTRACT':
+            return self.contractSearch(contract = search_object,
+                                        type_data = type_data)
+
+    def tickerSearch(self, ticker, type_data = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        items = []
+        for element in self.tickers:
+            if ticker == self.tickers[element][0]:
+                if type_data == 'ID':
+                    items.append(element)
+                if type_data == 'CONTRACT':
+                    items.append(self.tickers[element][1])
+                if type_data == 'TUPLE':
+                    items.append(self.tickers[element])
+        return items
+
+    def contractSearch(self, contract, type_data = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        items = []
+        for element in self.tickers:
+            if contract == self.tickers[element][1]:
+                if type_data == 'ID':
+                    items.append(element)
+                if type_data == 'CONTRACT':
+                    items.append(self.tickers[element][1])
+                if type_data == 'TUPLE':
+                    items.append(self.tickers[element])
+        return items
+
     def getLiveMarketData(self, contract = Contract()):
         """
         genericTickList options:
