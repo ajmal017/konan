@@ -1073,8 +1073,68 @@ class IBDataBroker(IBBroker, DataBroker):
         return pd.DataFrame()
 
     def getLiveMarketData(self, contract = Contract()):
-        self.tws.reqMktData()
-        return self.callback.tick_Price
+        """
+        genericTickList options:
+        100 Option Volume (currently for stocks)
+        101 Option Open Interest (currently for stocks)
+        104 Historical Volatility (currently for stocks)
+        106 Option Implied Volatility (currently for stocks)
+        162 Index Future Premium
+        165 Miscellaneous Stats
+        221 Mark Price (used in TWS P&L computations)
+        225 Auction values (volume, price and imbalance)
+        233 RTVolume - contains the last trade price, last trade size, last trade time, total volume, VWAP, and single trade flag.
+        236 Shortable
+        256 Inventory
+        258 Fundamental Ratios
+        411 Realtime Historical Volatility
+        456 IBDividends
+        """
+        tick_type = {0 : "BID SIZE",
+                        1 : "BID PRICE",
+                        2 : "ASK PRICE",
+                        3 : "ASK SIZE",
+                        4 : "LAST PRICE",
+                        5 : "LAST SIZE",
+                        6 : "HIGH",
+                        7 : "LOW",
+                        8 : "VOLUME",
+                        9 : "CLOSE PRICE",
+                        10 : "BID OPTION COMPUTATION",
+                        11 : "ASK OPTION COMPUTATION",
+                        12 : "LAST OPTION COMPUTATION",
+                        13 : "MODEL OPTION COMPUTATION",
+                        14 : "OPEN_TICK",
+                        15 : "LOW 13 WEEK",
+                        16 : "HIGH 13 WEEK",
+                        17 : "LOW 26 WEEK",
+                        18 : "HIGH 26 WEEK",
+                        19 : "LOW 52 WEEK",
+                        20 : "HIGH 52 WEEK",
+                        21 : "AVG VOLUME",
+                        22 : "OPEN INTEREST",
+                        23 : "OPTION HISTORICAL VOL",
+                        24 : "OPTION IMPLIED VOL",
+                        27 : "OPTION CALL OPEN INTEREST",
+                        28 : "OPTION PUT OPEN INTEREST",
+                        29 : "OPTION CALL VOLUME"}
+
+        self.tickers = contract
+
+        ticker_id = self.searchTickers(search_object = contract,
+                                        type_search = 'CONTRACT',
+                                        type_data = 'ID')[0]
+
+        self.tws.reqMktData(tickerId = ticker_id, Contract = contract,
+                            genericTickList = '', snapshot = True)
+
+        time.sleep(1)
+
+        data = pd.DataFrame(self.callback.tick_Price,
+                            columns = ['tickerId', 'field', 'price',
+                                        'canAutoExecute'])
+
+        return data
 
     def getPositions(self):
         """
