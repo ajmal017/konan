@@ -1177,12 +1177,8 @@ class IBDataBroker(IBBroker, DataBroker):
         PNL = self.getPNLToday()
 
         # TODO: sum positions to one record
-        PNL_day = pd.DataFrame(index = [0])
-        PNL_day['Date'] = PNL['Date'].max()
-        PNL_day['Unrealized_PnL'] = PNL['Unrealized_PnL'].sum()
-        PNL_day['Realized_PnL'] = PNL['Realized_PnL'].sum()
 
-        PNL_day.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'w+')
+        PNL.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'w+')
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
