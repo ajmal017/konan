@@ -723,13 +723,12 @@ class IBDataBroker(IBBroker, DataBroker):
             if self.current_ticker_id in self._tickers:
                 self._incrementTickerID()
             ticker_id = self.current_ticker_id
-            print(ticker_id)
             ticker = contract.m_symbol
             if self._tickers == {}:
                 self._tickers[ticker_id] = (ticker, contract)
                 return
             for element in self._tickers:
-                if ticker in self._tickers[element]:
+                if contract == self._tickers[element][1]:
                     print("Contract already in dictionary.")
                     return
             self._tickers[ticker_id] = (ticker, contract)
