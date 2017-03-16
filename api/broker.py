@@ -924,9 +924,13 @@ class IBDataBroker(IBBroker, DataBroker):
             group = "All"
         self.tws.reqAccountSummary(reqId = self.current_request_id,
                                     group = group, tags = attributes)
-        return pd.DataFrame(self.callback.account_Summary,
+
+        time.sleep(1)
+
+        data =  pd.DataFrame(self.callback.account_Summary,
                         columns = ['Request_ID', 'Account', 'Tag', 'Value',
                                     'Curency'])
+        return data
 
     def getDataAtTime(self, data_time, type_data = 'BID_ASK',
                         contract = Contract(), type_time = '',
