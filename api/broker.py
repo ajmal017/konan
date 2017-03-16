@@ -1032,7 +1032,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
         try:
            return data.loc[data_time.strftime(index_search_format)]
-       except:
+        except:
            print("Index not found problem")
            print(traceback.format_exc)
            return data.iloc[-1]
