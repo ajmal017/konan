@@ -69,7 +69,7 @@ class deltixStrategy(st.Strategy):
         portfolio = None #portfolio_example.examplePortfolio()
 
         self.time_stamp_open_day = '09:30:00.0'
-        self.time_stamp_close_day = '14:23:00.0'
+        self.time_stamp_close_day = '15:55:00.0'
 
         action_arguments_none = None
 
@@ -182,11 +182,11 @@ class deltixStrategy(st.Strategy):
             if(sgn!=0):
                 ''' Check if returns have moved against us '''
                 contract = self.broker.createContract(ticker=ticker, instrument_type=position_['Financial_Instrument'])
-                todayOpen = dt.datetime.now().replace( hour=9, minute=30 )
+                todayOpen = dt.datetime.now().replace( hour=9, minute=30,second=0 )
                 idx = utils.find_date_in_list(calendar=nysecal,
                                               target_date=dt.date.today(),
                                               move=0)
-                prevClose = dt.datetime.combine( nysecal[idx-1], dt.time(16,00) )
+                prevClose = dt.datetime.combine( nysecal[idx-1], dt.time(16,0,0) )
                 prevClosePrice = self.broker.getDataAtTime( type_data='MIDPOINT',
                                              contract = contract,
                                              data_time = prevClose,
@@ -215,6 +215,7 @@ class deltixStrategy(st.Strategy):
         ''' Get short exposure '''
         for row, stk in shorts.iterrows():
             shortContract = self.broker.createContract(ticker=stk['Symbol'], instrument_type='STK')
+                        
             avgPrice = self.broker.getDataAtTime( type_data='MIDPOINT',
                                      contract = shortContract,
                                      data_time=data_time,
@@ -268,7 +269,7 @@ class deltixStrategy(st.Strategy):
             self.broker.placeOrder(order_id=order_id,
                                        contract=hedgeContract,
                                        order=hedge_order)
-        elif ( (delta_stkExposureReq==0) and (desiredFinalExposure !=0) ):
+        elif ( (delta_stkExposureReq==0) and (desiredFinalExposure ==0) ):
             order_id = order_id + 1
             self.broker.closePosition(symbol=self.hedgeInstrument , order_type='MARKET')
 
