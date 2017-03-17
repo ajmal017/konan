@@ -612,7 +612,17 @@ class IBBroker(Broker):
 
         """
         """Unpack position object into order and contracts"""
+        raise NotImplementedError("API method preparePosition has not been implemented.")
         return None
+
+    def createExecutionFilter(self, contract):
+        execution_filter = ExecutionFilter()
+        execution_filter.m_clientId = self.client_id
+        execution_filter.m_acctCode = self.account_name
+        execution_filter.m_symbol = contract.m_symbol
+        execution_filter.m_secType = contract.m_secType
+        execution_filter.m_exchange = contract.m_exchange
+        return execution_filter
 
 class DataBroker(Broker):
     """docstring for DataBroker."""
