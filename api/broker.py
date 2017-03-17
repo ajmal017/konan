@@ -1146,6 +1146,24 @@ class IBDataBroker(IBBroker, DataBroker):
                     items.append(self.tickers[element])
         return items
 
+    def removeFromTickers(self, search_object, type_object):
+        if type_object not in ('ID','TICKER','CONTRACT'):
+            print("Type of data must be 'ID', 'TICKER' or 'CONTRACT'.")
+            return None
+
+        if type_object == 'ID':
+            del self.tickers[search_object]
+
+        if type_object == 'TICKER':
+            ticker_id = self.tickerSearch(ticker = search_object,
+                                            type_data = 'ID')
+            del self.tickers[ticker_id[0]]
+
+        if type_object == 'CONTRACT':
+            ticker_id = self.contractSearch(contract = search_object,
+                                            type_data = 'ID')
+            del self.tickers[ticker_id[0]]
+
     def getLiveMarketData(self, contract = Contract()):
         """
         genericTickList options:
