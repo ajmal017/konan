@@ -1199,7 +1199,7 @@ class IBDataBroker(IBBroker, DataBroker):
                                         type_search = 'CONTRACT',
                                         type_data = 'ID')[0]
 
-        self.tws.reqMktData(tickerId = ticker_id, Contract = contract,
+        self.tws.reqMktData(tickerId = ticker_id, contract = contract,
                             genericTickList = '', snapshot = True)
 
         time.sleep(1)
