@@ -799,6 +799,7 @@ class IBDataBroker(IBBroker, DataBroker):
         """
         self.current_ticker_id += 1
 
+    # MAY NOT NEED ANYMORE
     def _addTicker(self, ticker = '', contract = Contract()):
         """
         METHOD SUMMARY
@@ -834,6 +835,98 @@ class IBDataBroker(IBBroker, DataBroker):
         if yes:
             return 1
         return 0
+
+    def searchTickers(self, search_object, type_search = '', type_data = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        if type_data not in ('ID','CONTRACT','TUPLE'):
+            print("Type of data must be 'ID', 'CONTRACT' or 'TUPLE'.")
+            return None
+
+        if type_search not in ('TICKER','CONTRACT'):
+            print("Type of search must be 'ID' or 'CONTRACT'.")
+            return None
+
+        if type_search == 'TICKER':
+            return self.tickerSearch(ticker = search_object,
+                                        type_data = type_data)
+
+        if type_search == 'CONTRACT':
+            return self.contractSearch(contract = search_object,
+                                        type_data = type_data)
+
+    def tickerSearch(self, ticker, type_data = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        items = []
+        for element in self.tickers:
+            if ticker == self.tickers[element][0]:
+                if type_data == 'ID':
+                    items.append(element)
+                if type_data == 'CONTRACT':
+                    items.append(self.tickers[element][1])
+                if type_data == 'TUPLE':
+                    items.append(self.tickers[element])
+        return items
+
+    def contractSearch(self, contract, type_data = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        items = []
+        for element in self.tickers:
+            if contract == self.tickers[element][1]:
+                if type_data == 'ID':
+                    items.append(element)
+                if type_data == 'CONTRACT':
+                    items.append(self.tickers[element][1])
+                if type_data == 'TUPLE':
+                    items.append(self.tickers[element])
+        return items
+
+    def removeFromTickers(self, search_object, type_object):
+        if type_object not in ('ID','TICKER','CONTRACT'):
+            print("Type of data must be 'ID', 'TICKER' or 'CONTRACT'.")
+            return None
+
+        if type_object == 'ID':
+            del self.tickers[search_object]
+
+        if type_object == 'TICKER':
+            ticker_id = self.tickerSearch(ticker = search_object,
+                                            type_data = 'ID')
+            del self.tickers[ticker_id[0]]
+
+        if type_object == 'CONTRACT':
+            ticker_id = self.contractSearch(contract = search_object,
+                                            type_data = 'ID')
+            del self.tickers[ticker_id[0]]
 
     def getCallbackAttribute(self, attribute = ''):
         """
@@ -1068,103 +1161,11 @@ class IBDataBroker(IBBroker, DataBroker):
         RESULTS:
 
         """
-        raise NotImplementedError("API method has not been implemented.")
         # EXTEND USING getDataAtTime()
-        return pd.DataFrame()
+        raise NotImplementedError("API method getDataInRange has not been implemented.")
+        return None
 
-    def searchTickers(self, search_object, type_search = '', type_data = ''):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        if type_data not in ('ID','CONTRACT','TUPLE'):
-            print("Type of data must be 'ID', 'CONTRACT' or 'TUPLE'.")
-            return None
-
-        if type_search not in ('TICKER','CONTRACT'):
-            print("Type of search must be 'ID' or 'CONTRACT'.")
-            return None
-
-        if type_search == 'TICKER':
-            return self.tickerSearch(ticker = search_object,
-                                        type_data = type_data)
-
-        if type_search == 'CONTRACT':
-            return self.contractSearch(contract = search_object,
-                                        type_data = type_data)
-
-    def tickerSearch(self, ticker, type_data = ''):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        items = []
-        for element in self.tickers:
-            if ticker == self.tickers[element][0]:
-                if type_data == 'ID':
-                    items.append(element)
-                if type_data == 'CONTRACT':
-                    items.append(self.tickers[element][1])
-                if type_data == 'TUPLE':
-                    items.append(self.tickers[element])
-        return items
-
-    def contractSearch(self, contract, type_data = ''):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        items = []
-        for element in self.tickers:
-            if contract == self.tickers[element][1]:
-                if type_data == 'ID':
-                    items.append(element)
-                if type_data == 'CONTRACT':
-                    items.append(self.tickers[element][1])
-                if type_data == 'TUPLE':
-                    items.append(self.tickers[element])
-        return items
-
-    def removeFromTickers(self, search_object, type_object):
-        if type_object not in ('ID','TICKER','CONTRACT'):
-            print("Type of data must be 'ID', 'TICKER' or 'CONTRACT'.")
-            return None
-
-        if type_object == 'ID':
-            del self.tickers[search_object]
-
-        if type_object == 'TICKER':
-            ticker_id = self.tickerSearch(ticker = search_object,
-                                            type_data = 'ID')
-            del self.tickers[ticker_id[0]]
-
-        if type_object == 'CONTRACT':
-            ticker_id = self.contractSearch(contract = search_object,
-                                            type_data = 'ID')
-            del self.tickers[ticker_id[0]]
-
-    def getLiveMarketData(self, contract = Contract()):
+    def getLiveMarketData(self, contract = Contract(), time_out = 5):
         """
         genericTickList options:
         100 Option Volume (currently for stocks)
@@ -1217,14 +1218,35 @@ class IBDataBroker(IBBroker, DataBroker):
                                         type_search = 'CONTRACT',
                                         type_data = 'ID')[0]
 
-        self.tws.reqMktData(tickerId = ticker_id, contract = contract,
-                            genericTickList = '', snapshot = True)
-
-        time.sleep(1)
-
+        self._resetCallbackAttribute('tick_Price')
         data = pd.DataFrame(self.callback.tick_Price,
                             columns = ['tickerId', 'field', 'price',
                                         'canAutoExecute'])
+        data_null = data
+
+        now = dt.datetime.now()
+        end_wait = now + dt.timedelta(seconds = time_out)
+
+        while data.equals(data_null) and now <= end_wait:
+
+            self.tws.reqMktData(tickerId = ticker_id, contract = contract,
+                                genericTickList = '', snapshot = True)
+
+            time.sleep(1)
+
+            data = pd.DataFrame(self.callback.tick_Price,
+                                columns = ['tickerId', 'field', 'price',
+                                            'canAutoExecute'])
+
+            now = dt.datetime.now()
+
+        if data.equals(data_null):
+            print("Error retrieving data for: ", contract.m_symbol, ':',
+                    contract, "\nEmpty callback.\nWait time out.")
+
+            self.removeFromTickers(search_object = contract,
+                                    type_object = 'CONTRACT')
+            return None
 
         data["Type"] = data["field"].map(tick_type)
 
