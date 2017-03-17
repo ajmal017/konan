@@ -572,7 +572,7 @@ class IBBroker(Broker):
                     order_type = '', time_in_force = 'GTC'):
         """
         METHOD SUMMARY
-        METHOD DESCRIPTION
+        METHOD DESCRIPTIO
 
         PARAMETERS:
 
@@ -795,6 +795,20 @@ class IBDataBroker(IBBroker, DataBroker):
         else:
             print("Attribute not found.\nNo attribute reset.")
 
+    def getCallbackAttribute(self, attribute = ''):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        return getattr(self.callback, attribute)
+
     def _incrementTickerID(self):
         """
         METHOD SUMMARY
@@ -937,20 +951,6 @@ class IBDataBroker(IBBroker, DataBroker):
             ticker_id = self.contractSearch(contract = search_object,
                                             type_data = 'ID')
             del self.tickers[ticker_id[0]]
-
-    def getCallbackAttribute(self, attribute = ''):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        return getattr(self.callback, attribute)
 
     def getAccountInformation(self, all_accounts = True, attributes = ','):
         """
@@ -1325,6 +1325,63 @@ class IBDataBroker(IBBroker, DataBroker):
                                                 'Unrealized_PnL',
                                                 'Realized_PnL', 'Account_Name'])
         return portfolio
+
+    def getExecutedOrders(self, contract = Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        self._resetCallbackAttribute('exec_Details_contract')
+        self._resetCallbackAttribute('exec_Details_execution')
+
+        execution_filter = self.createExecutionFilter(contract = contract)
+
+        self.tws.reqExecutions(1, execution_filter) # TODO: check if request_id is valid and static
+
+        time.sleep(1)
+
+        execution_contract = self.callback.exec_Details_contract.__dict__
+        execution_details = self.callback.exec_Details_execution.__dict__
+        execution = dict(execution_contract, **execution_details)
+
+        data = pd.DataFrame.from_dict([execution])
+        data.rename(columns = {'m_acctNumber': 'Account_Name',
+                                'm_avgPrice': 'Average_Unit_Price',
+                                'm_clientId': 'Client_ID',
+                                'm_conId': 'Contract_ID',
+                                'm_cumQty': 'Cumulative_Quantity',
+                                'm_currency': 'Currency',
+                                'm_evMultiplier': 'Economic_Value_Multiplier',
+                                'm_evRule': 'Economic_Value_Rule',
+                                'm_exchange': 'Exchange',
+                                'm_execId': 'Execution_ID',
+                                'm_expiry': 'Expiry',
+                                'm_includeExpired': 'Include_Expired',
+                                'm_liquidation': 'Liquidation',
+                                'm_localSymbol': 'Local_Symbol',
+                                'm_multiplier': 'Multiplier',
+                                'm_orderId': 'Order_ID',
+                                'm_orderRef': 'Order_Reference',
+                                'm_permId': 'Permanent_ID',
+                                'm_price': 'Price',
+                                'm_right': 'Right',
+                                'm_secType': 'Financial_Instrument',
+                                'm_shares': 'Shares',
+                                'm_side': 'Side',
+                                'm_strike': 'Strike',
+                                'm_symbol': 'Ticker',
+                                'm_time': 'Server_Time',
+                                'm_tradingClass':'Trading_Class'},
+                    inplace = True)
+
+        return data
 
     # TODO: MAKE RECORD AND GETTING STRATEGY SPECIFIC; STRATEGY PNL NOT RECORDED
     # ONLY ACCOUNT WIDE PNL
