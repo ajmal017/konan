@@ -1208,6 +1208,8 @@ class IBDataBroker(IBBroker, DataBroker):
                             columns = ['tickerId', 'field', 'price',
                                         'canAutoExecute'])
 
+        data["Type"] = data["field"].map(tick_type)
+
         return data
 
     def getPositions(self):
