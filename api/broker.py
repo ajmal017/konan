@@ -572,7 +572,7 @@ class IBBroker(Broker):
                     order_type = '', time_in_force = 'GTC'):
         """
         METHOD SUMMARY
-        METHOD DESCRIPTIO
+        METHOD DESCRIPTION
 
         PARAMETERS:
 
@@ -615,13 +615,20 @@ class IBBroker(Broker):
         raise NotImplementedError("API method preparePosition has not been implemented.")
         return None
 
-    def createExecutionFilter(self, contract):
+    def createExecutionFilter(self, contract = None, order_time = None):
+        if contract == None:
+            return ExecutionFilter()
         execution_filter = ExecutionFilter()
         execution_filter.m_clientId = self.client_id
         execution_filter.m_acctCode = self.account_name
         execution_filter.m_symbol = contract.m_symbol
         execution_filter.m_secType = contract.m_secType
         execution_filter.m_exchange = contract.m_exchange
+
+        if order_time == None:
+            execution_filter.m_time = dt.datetime.now().strftime('%Y%m%d %H:%M:%S')
+        else:
+            execution_filter.m_time = order_time.strftime('%Y%m%d %H:%M:%S')
         return execution_filter
 
 class DataBroker(Broker):
@@ -1326,7 +1333,7 @@ class IBDataBroker(IBBroker, DataBroker):
                                                 'Realized_PnL', 'Account_Name'])
         return portfolio
 
-    def getExecutedOrders(self, contract = Contract()):
+    def getExecutedOrders(self, contract = Contract(), since = None):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -1338,10 +1345,11 @@ class IBDataBroker(IBBroker, DataBroker):
         RESULTS:
 
         """
-        self._resetCallbackAttribute('exec_Details_contract')
-        self._resetCallbackAttribute('exec_Details_execution')
-
-        execution_filter = self.createExecutionFilter(contract = contract)
+        if since == None:
+            execution_filter = self.createExecutionFilter(contract = contract)
+        else:
+            execution_filter = self.createExecutionFilter(contract = contract,
+                                                            order_time = since)
 
         self.tws.reqExecutions(1, execution_filter) # TODO: check if request_id is valid and static
 
@@ -1380,6 +1388,9 @@ class IBDataBroker(IBBroker, DataBroker):
                                 'm_time': 'Server_Time',
                                 'm_tradingClass':'Trading_Class'},
                     inplace = True)
+
+        #self._resetCallbackAttribute('exec_Details_contract')
+        #self._resetCallbackAttribute('exec_Details_execution')
 
         return data
 
@@ -1449,6 +1460,10 @@ class IBDataBroker(IBBroker, DataBroker):
         PNL_day['Realized_PnL'] = PNL['Realized_PnL'].sum()
 
         PNL_day.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'a+')
+
+    def recordTransaction(self, contract, path = '', other_columns = [],
+                            other_column_values = {}):
+        self.getExecutedOrder(contract)
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
@@ -1759,7 +1774,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         time.sleep(1)
 
     def _totalDollarToTotalUnits(self, amount_dollars, contract,
-                                    data_time = dt.datetime.now()):
+                                    data_time = None):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -1771,6 +1786,9 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         RESULTS:
 
         """
+        if data_time == None:
+            data_time = dt.datetime.now()
+
         data_contract = self.getDataAtTime(data_time = data_time,
                                             contract = contract,
                                             bar_size = '1 secs')
