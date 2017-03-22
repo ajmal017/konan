@@ -19,6 +19,7 @@ import fnmatch
 
 # third party imports
 import pandas as pd
+import pandas_datareader as pdr
 import numpy as np
 from tqdm import tqdm
 
@@ -227,6 +228,12 @@ class IBBroker(Broker):
     client_id = property(**client_id())
 
     """
+    CLASS SPECIAL METHODS
+    """
+    def __str__(self):
+        return "Acount Name:{} on Port:{} with Client ID:{} ".format(self.account_name, self.client_id, self.port)
+
+    """
     CLASS PRIVATE METHODS
     """
 
@@ -388,6 +395,7 @@ class IBBroker(Broker):
                                 'NEWS':self._createNewsContract,
                                 'FUND':self._createMutualFundContract}
 
+        # TODO: NEED TO PASS ALL THE AVAILABLE PARAMETERS TO LOWER METHODS
         return dict_instrument_type[instrument_type](contract = contract)
 
     def _createStockContract(self, contract = Contract()):
@@ -1058,6 +1066,7 @@ class IBDataBroker(IBBroker, DataBroker):
         """
         """
         REQUIRED PARAMETERS:
+        data_time
         contract
 
         type_data:
@@ -1181,6 +1190,59 @@ class IBDataBroker(IBBroker, DataBroker):
         # EXTEND USING getDataAtTime()
         raise NotImplementedError("API method getDataInRange has not been implemented.")
         return None
+
+    def getDailyData(self, stock_list, provider, date_start, date_end = None):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+            date_start - days will consider from this date to current days
+                            market data
+            date_end - specify for date range
+
+            TO BE DECIDED:
+            return_as_panel = False
+
+        RETURNS:
+            data: pandas Panel
+                items - <<stock_list>> items
+                major axis (rows) - days from <<date_start>> and <<date_end>>
+                minor axis (columns) - Open, High, Low, Close, Volume, Adj Close
+
+            data_frame: pandas Dataframe
+            Returned when only one item is in the <<stock_list>> or when
+            <<return_as_panel>> method parameter is set to <<False>>
+
+        RESULTS:
+
+        """
+        data = pdr.data.DataReader(stock_list, provider, date_start, date_end)
+
+        if type(data) == type(pd.DataFrame()):
+            return data
+        if type(data) == type(pd.Panel()):
+            # MORE INFORMATION REGARDING PANDAS PANELS:
+            # http://pandas.pydata.org/pandas-docs/stable/dsintro.html#panel
+
+            # if not return_as_panel:
+            # data_frame = data.to_frame()
+            # return data_frame
+
+            # ASSIGNS ORIGINAL MINOR INDEX (2: <<stock_list>>)
+            # TO ITEMS INDEX (0: [stock values])
+            data.transpose(2, 1, 0)
+            """
+            GRAB BY TICKER
+            data['ticker']
+
+            GRAB BY DATE
+            data.major_xs('%Y-%m%d')
+
+            GRAB BY Value
+            data.minor_xs('value')
+            """
+            return data
 
     def getLiveMarketData(self, contract = Contract(), time_out = 5):
         """
