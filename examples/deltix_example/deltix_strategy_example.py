@@ -190,21 +190,34 @@ class deltixStrategy(st.Strategy):
             if(sgn!=0):
                 ''' Check if returns have moved against us '''
                 contract = self.broker.createContract(ticker=ticker, instrument_type=position_['Financial_Instrument'])
-                todayOpen = dt.datetime.now().replace( hour=9, minute=30,second=0 )
+                #todayOpen = dt.datetime.now().replace( hour=9, minute=30,second=0 )
                 idx = utils.find_date_in_list(calendar=nysecal,
                                               target_date=dt.date.today(),
                                               move=0)
-                prevClose = dt.datetime.combine( nysecal[idx-1], dt.time(16,0,0) )
-                prevClosePrice = self.broker.getDataAtTime( type_data='MIDPOINT',
-                                             contract = contract,
-                                             data_time = prevClose,
-                                             bar_size='1 secs'
-                                             )['close'].iloc[-1]
-                todayOpenPrice = self.broker.getDataAtTime( type_data='MIDPOINT',
-                                             contract = contract,
-                                             data_time = todayOpen,
-                                             bar_size='1 secs'
-                                             )['close'].iloc[-1]
+#                prevClose = dt.datetime.combine( nysecal[idx-1], dt.time(16,0,0) )                                                
+#                prevClosePrice = self.broker.getDataAtTime( type_data='MIDPOINT',
+#                                             contract = contract,
+#                                             data_time = prevClose,
+#                                             bar_size='1 secs'
+#                                             )['close'].iloc[-1]
+                
+                
+#                print(ticker)
+                prevClose = self.broker.getDailyData(ticker, provider='yahoo', date_start=nysecal[idx-1], date_end=nysecal[idx-1] )
+                prevClosePrice = prevClose['Adj Close'].values[0]
+                                                           
+                liveData = self.broker.getLiveMarketData(contract=contract)
+                                
+                askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]
+                bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]
+                
+                todayOpenPrice = ( askPrice +bidPrice )*0.5 #mid point
+#                todayOpenPrice = self.broker.getDataAtTime( type_data='MIDPOINT',
+#                                             contract = contract,
+#                                             data_time = todayOpen,
+#                                             bar_size='1 secs'
+#                                             )['close'].iloc[-1]
+                                
                 interDayRtns = sgn*( todayOpenPrice -  prevClosePrice ) / prevClosePrice
                 print(ticker, interDayRtns)
 
@@ -224,22 +237,38 @@ class deltixStrategy(st.Strategy):
         for row, stk in shorts.iterrows():
             shortContract = self.broker.createContract(ticker=stk['Symbol'], instrument_type='STK')
                         
-            avgPrice = self.broker.getDataAtTime( type_data='MIDPOINT',
-                                     contract = shortContract,
-                                     data_time=data_time,
-                                     bar_size='1 secs'
-                                     )['close'].iloc[-1]
+#            avgPrice = self.broker.getDataAtTime( type_data='MIDPOINT',
+#                                     contract = shortContract,
+#                                     data_time=data_time,
+#                                     bar_size='1 secs'
+#                                     )['close'].iloc[-1]
+                        
+            liveData = self.broker.getLiveMarketData(contract=shortContract)
+                                
+            askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]
+            bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]
+            avgPrice = ( askPrice +bidPrice )*0.5 #mid point
+                                                 
             shortExp = shortExp + stk['Number_of_Units']*avgPrice                        
             time.sleep(1)
 
         ''' Get long exposure '''
         for row, stk in longs.iterrows():
+            
             longContract = self.broker.createContract(ticker=stk['Symbol'], instrument_type='STK')
-            avgPrice = self.broker.getDataAtTime( type_data='MIDPOINT',
-                                     contract = longContract,
-                                     data_time=data_time,
-                                     bar_size='1 secs'
-                                     )['close'].iloc[-1]
+
+            
+            liveData = self.broker.getLiveMarketData( contract=longContract )
+            askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]            
+            bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]         
+            
+            avgPrice = ( askPrice +bidPrice )*0.5 #mid point
+            
+#            avgPrice = self.broker.getDataAtTime( type_data='MIDPOINT',
+#                                     contract = longContract,
+#                                     data_time=data_time,
+#                                     bar_size='1 secs'
+#                                     )['close'].iloc[-1]
 
             longExp = longExp + stk['Number_of_Units']*avgPrice
             time.sleep(1)
@@ -251,11 +280,18 @@ class deltixStrategy(st.Strategy):
         hedgePosition = pos[ pos['Symbol']== self.hedgeInstrument  ]
 
         hedgeContract = self.broker.createContract(ticker=self.hedgeInstrument, instrument_type='STK')
-        avgPrice = self.broker.getDataAtTime( type_data='MIDPOINT',
-                                 contract = hedgeContract,
-                                 data_time=data_time,
-                                 bar_size='1 secs'
-                                 )['close'].iloc[-1]
+#        avgPrice = self.broker.getDataAtTime( type_data='MIDPOINT',
+#                                 contract = hedgeContract,
+#                                 data_time=data_time,
+#                                 bar_size='1 secs'
+#                                 )['close'].iloc[-1]
+        
+        liveData = self.broker.getLiveMarketData( contract=hedgeContract )
+        askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]            
+        bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]         
+        avgPrice = ( askPrice +bidPrice )*0.5 #mid point
+        
+        
 
         if( not hedgePosition.empty) :
             currentHedgeExp = (hedgePosition['Number_of_Units']*avgPrice).values[0]

@@ -19,7 +19,8 @@ import fnmatch
 
 # third party imports
 import pandas as pd
-import pandas_datareader as pdr
+#import pandas_datareader as pdr
+from pandas_datareader import data as web
 import numpy as np
 from tqdm import tqdm
 
@@ -1217,8 +1218,9 @@ class IBDataBroker(IBBroker, DataBroker):
         RESULTS:
 
         """
-        data = pdr.data.DataReader(stock_list, provider, date_start, date_end)
-
+#        data = pdr.data.DataReader(stock_list, provider, date_start, date_end)
+        data = web.DataReader(stock_list, provider, date_start, date_end)
+        
         if type(data) == type(pd.DataFrame()):
             return data
         if type(data) == type(pd.Panel()):
@@ -1851,10 +1853,18 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         if data_time == None:
             data_time = dt.datetime.now()
 
-        data_contract = self.getDataAtTime(data_time = data_time,
-                                            contract = contract,
-                                            bar_size = '1 secs')
-        price_per_unit = data_contract['open'].iloc[-1]
+#        data_contract = self.getDataAtTime(data_time = data_time,
+#                                            contract = contract,
+#                                            bar_size = '1 secs')
+#        
+        
+        liveData = self.broker.getLiveMarketData( contract= contract )
+        askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]            
+        bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]         
+            
+        price_per_unit = ( askPrice +bidPrice )*0.5 #mid point
+        
+#       price_per_unit = data_contract['open'].iloc[-1]
         return int(amount_dollars / price_per_unit)
 
     def createDollarOrder(self, amount_dollars, contract, trade_type,
