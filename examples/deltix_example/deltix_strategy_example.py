@@ -20,6 +20,7 @@ import numpy as np
 import os
 
 import pickle
+import pandas as pd
 
 import traceback
 # NOT USED
@@ -56,6 +57,18 @@ elif sys.platform == "win32":
 
     nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
     nysecal = list(nyse.index.date)
+    
+    
+def getID():
+    time.sleep(0.2)
+    dt_ = dt.datetime.now()    
+#    strID = "".join( (str(dt_.year)[-2:], str(dt_.month), str(dt_.day), str(dt_.hour), str(dt_.minute), str(dt_.second), str(dt_.microsecond)[0:1]) )
+    strID = "".join( (str(dt_.month), str(dt_.day), str(dt_.hour), str(dt_.minute), str(dt_.second), str(dt_.microsecond)[0:1]) )
+    return (int(strID))
+    
+    
+    
+    
 
 
 # Create a child class that inherits from the base <strategy> class
@@ -70,7 +83,8 @@ class deltixStrategy(st.Strategy):
         portfolio = None #portfolio_example.examplePortfolio()
 
         self.time_stamp_open_day = '09:30:00.0'
-        self.time_stamp_close_day = '15:55:00.0'
+#        self.time_stamp_close_day = '15:55:00.0'
+        self.time_stamp_close_day = '13:02:0.0'
 
         action_arguments_none = None
 
@@ -148,6 +162,9 @@ class deltixStrategy(st.Strategy):
         self.momentumGuard()
         print('Hedge positions')
         self.hedgePositions(data_time=openDT)
+        
+        
+        
 
     def endDay(self):
         date = dt.date.today()
@@ -194,17 +211,17 @@ class deltixStrategy(st.Strategy):
                 idx = utils.find_date_in_list(calendar=nysecal,
                                               target_date=dt.date.today(),
                                               move=0)
-#                prevClose = dt.datetime.combine( nysecal[idx-1], dt.time(16,0,0) )                                                
-#                prevClosePrice = self.broker.getDataAtTime( type_data='MIDPOINT',
-#                                             contract = contract,
-#                                             data_time = prevClose,
-#                                             bar_size='1 secs'
-#                                             )['close'].iloc[-1]
+                prevClose = dt.datetime.combine( nysecal[idx-1], dt.time(16,0,0) )                                                
+                prevClosePrice = self.broker.getDataAtTime( type_data='MIDPOINT',
+                                             contract = contract,
+                                             data_time = prevClose,
+                                             bar_size='1 secs'
+                                             )['close'].iloc[-1]
                 
                 
-#                print(ticker)
-                prevClose = self.broker.getDailyData(ticker, provider='yahoo', date_start=nysecal[idx-1], date_end=nysecal[idx-1] )
-                prevClosePrice = prevClose['Adj Close'].values[0]
+                print(ticker, prevClosePrice)
+#                prevClose = self.broker.getDailyData(ticker, provider='yahoo', date_start=nysecal[idx-1], date_end=nysecal[idx-1] )
+#                prevClosePrice = prevClose['Adj Close'].values[0]
                                                            
                 liveData = self.broker.getLiveMarketData(contract=contract)
                                 
@@ -256,7 +273,6 @@ class deltixStrategy(st.Strategy):
         for row, stk in longs.iterrows():
             
             longContract = self.broker.createContract(ticker=stk['Symbol'], instrument_type='STK')
-
             
             liveData = self.broker.getLiveMarketData( contract=longContract )
             askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]            
@@ -304,24 +320,116 @@ class deltixStrategy(st.Strategy):
         print ("Hedge required: ", delta_stkExposureReq, " stock units")
 
         action = { 1: 'BUY', -1: 'SELL' }
-        order_id = self.broker.nextOrderId()+1
+#        order_id = self.broker.nextOrderId()+1        
+        order_id = getID()
 
         if (delta_stkExposureReq !=0):
-            order_id = order_id + 1
+#            order_id = order_id + 1
+            order_id = getID()
             hedgeTrade = action[ np.sign(delta_stkExposureReq) ]
             hedge_order = self.broker.createOrder( trade_type=hedgeTrade, amount_units= int(abs(delta_stkExposureReq)), order_type='MARKET' )
             self.broker.placeOrder(order_id=order_id,
                                        contract=hedgeContract,
                                        order=hedge_order)
         elif ( (delta_stkExposureReq==0) and (desiredFinalExposure ==0) ):
-            order_id = order_id + 1
+#            order_id = order_id + 1
+            order_id = getID()
             self.broker.closePosition(symbol=self.hedgeInstrument , order_type='MARKET')
 
 
 
     def enterNewPositions(self):
         ''' This should be entered at the close '''
-        order_id = self.broker.nextOrderId()+2
+#        order_id = self.broker.nextOrderId()+2
+        order_id = getID()
+            
+        
+        todayBulls = pd.Series()
+        todayBears = pd.Series()
+        
+        # Get top 30 positions
+        
+        for stk in self.decision_algorithm.bulls.keys():
+            
+            ''' live Data '''
+            contract = self.broker.createContract(ticker=stk, instrument_type='STK')
+            liveData = self.broker.getLiveMarketData(contract=contract)                                
+            askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]
+            bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]
+            
+            todayClosePrice = ( askPrice +bidPrice )*0.5 #mid point
+                        
+            ''' prevClose '''            
+            idx = utils.find_date_in_list(calendar=nysecal,
+                                          target_date=dt.date.today(),
+                                          move=0)
+            prevClose = dt.datetime.combine( nysecal[idx-1], dt.time(16,0,0) )                                                
+            prevClosePrice = self.broker.getDataAtTime( type_data='MIDPOINT',
+                                         contract = contract,
+                                         data_time = prevClose,
+                                         bar_size='1 secs'
+                                         )['close'].iloc[-1]
+            
+            ''' Inter Close-Close returns '''
+            todayBulls[stk] = (todayClosePrice - prevClosePrice) /prevClosePrice
+        
+        
+        for stk in self.decision_algorithm.bears.keys():
+            
+            ''' live Data '''
+            contract = self.broker.createContract(ticker=stk, instrument_type='STK')
+            liveData = self.broker.getLiveMarketData(contract=contract)
+                                
+            askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]
+            bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]
+            
+            todayClosePrice = ( askPrice +bidPrice )*0.5 #mid price
+                        
+            ''' prevClose '''            
+            idx = utils.find_date_in_list(calendar=nysecal,
+                                          target_date=dt.date.today(),
+                                          move=0)
+            prevClose = dt.datetime.combine( nysecal[idx-1], dt.time(16,0,0) )                                                
+            prevClosePrice = self.broker.getDataAtTime( type_data='MIDPOINT',
+                                         contract = contract,
+                                         data_time = prevClose,
+                                         bar_size='1 secs'
+                                         )['close'].iloc[-1]
+            
+            ''' Inter Close-Close returns '''
+            todayBears[stk] = (todayClosePrice - prevClosePrice) /prevClosePrice
+            
+        
+        todayBulls.sort_values( inplace=True, ascending=True )
+        todayBears.sort_values( inplace=True, ascending=False )
+        
+        ''' keep only the top 30 '''
+        
+        todayBears = todayBears.iloc[ :min(self.decision_algorithm.params[2], todayBears.size)]
+        todayBulls = todayBears.iloc[ :min(self.decision_algorithm.params[2], todayBulls.size)]       
+        
+        ''' List of tickers to remove '''
+        # Bears
+        popBear = []                
+        for stk in self.decision_algorithm.bears.keys():            
+            if stk not in todayBears.keys():
+                popBear.append(stk)
+        
+        # Bulls
+        popBull = []
+        for stk in self.decision_algorithm.bulls.keys():
+            if stk not in todayBulls.keys():
+                popBull.append(stk)
+
+
+        ''' Remove those not in top 30 '''
+        for stk in popBull: 
+            self.decision_algorithm.bulls.pop(stk, "None")
+            
+        for stk in popBear:
+            self.decision_algorithm.bears.pop(stk, "None")
+
+       
 
         for stk in self.decision_algorithm.bulls.keys():
             try:
@@ -333,7 +441,7 @@ class deltixStrategy(st.Strategy):
                 buy_order = self.broker.createDollarOrder(trade_type = 'BUY',
                                                              contract = c,
                                                              amount_dollars = self.dW,
-                                                             order_type='MARKET' )  # default is market order
+                                                             order_type='MOC' )  # default is market order
                 self.broker.placeOrder(order_id, c, buy_order )
 
                 time.sleep(1)
@@ -343,7 +451,9 @@ class deltixStrategy(st.Strategy):
                 print("error:", traceback.format_exc())
                 continue
 
-            order_id = order_id + 1
+#            order_id = order_id + 1
+            order_id = getID()
+
 
         for stk in self.decision_algorithm.bears.keys():
 
@@ -356,11 +466,12 @@ class deltixStrategy(st.Strategy):
                 sell_order = self.broker.createDollarOrder( trade_type = 'SELL',
                                                                amount_dollars = self.dW,
                                                                contract = c,
-                                                               order_type='MARKET')  # default is market order
+                                                               order_type='MOC')  # default is market order
                 time.sleep(1)
                 self.broker.placeOrder( order_id, c, sell_order )
                 time.sleep(1)
             except:
                 continue
 
-            order_id = order_id + 1
+#            order_id = order_id + 1
+            order_id = getID()

@@ -313,6 +313,7 @@ class deltixAlgorithm(algo.DecisionAlgorithm):
         ''' FIND SIGNALS EVERY DAY ONLY IN THE APPROPRIATE QUARTERS '''
         ''' ------------------------------------------------------- '''
 
+#        todayBulls, todayBears = pd.Series(), pd.Series()
         if(WSHlocal.empty):
             self.bears = {}
             self.bulls = {}
@@ -335,12 +336,16 @@ class deltixAlgorithm(algo.DecisionAlgorithm):
 
                     deltaD = signals['dD']
                     deltaU = signals['dU']
+                    
+                    print stk, deltaD, deltaU  # check if we are calculating the right metrics
 
                     #print 'Trying to open: ', stk, deltaD, deltaU
                     if ( (deltaD < self.params[0]) & (deltaU < self.params[1]) ):
                         try:
-                            #todayBulls[stk] = priceData[stk]['CloseRtns'].loc[tday] # reset everyday
+#                            todayBulls[stk] = priceData[stk]['CloseRtns'].loc[tday] # reset everyday                            
+                            # Get close-close returns                            
                             self.bulls[stk] = (deltaD, deltaU)
+                            
                         except:
                             print stk, "price data not found. Cannot long"
                             pass
