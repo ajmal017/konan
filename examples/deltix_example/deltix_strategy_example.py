@@ -429,6 +429,8 @@ class deltixStrategy(st.Strategy):
         for stk in popBear:
             self.decision_algorithm.bears.pop(stk, "None")
 
+       
+
         for stk in self.decision_algorithm.bulls.keys():
             try:
                 stk_ = stk.replace("."," ")
