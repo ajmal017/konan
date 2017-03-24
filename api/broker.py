@@ -1293,11 +1293,15 @@ class IBDataBroker(IBBroker, DataBroker):
                         28 : "OPTION PUT OPEN INTEREST",
                         29 : "OPTION CALL VOLUME"}
 
+        """
         self.tickers = contract
 
         ticker_id = self.searchTickers(search_object = contract,
                                         type_search = 'CONTRACT',
                                         type_data = 'ID')[0]
+        """
+
+        ticker_id = 1 # SOME SORT OF INCREMENTAL VALUE
 
         self._resetCallbackAttribute('tick_Price')
         data = pd.DataFrame(self.callback.tick_Price,
@@ -1381,6 +1385,17 @@ class IBDataBroker(IBBroker, DataBroker):
         self.tws.reqAccountUpdates(True, self.account_name)
 
         time.sleep(1)
+        """
+        VALUE WAIT ALTERNATIVE TO TIME WAIT:
+        def acctUp():
+        ib._resetCallbackAttribute('update_Portfolio')
+        ib.tws.reqAccountUpdates(True, 'DU550479')
+        updated = ib.callback.accountDownloadEnd_flag
+        while not updated:
+                updated = ib.callback.accountDownloadEnd_flag
+        print pd.DataFrame(ib.callback.update_Portfolio)
+        ib.tws.reqAccountUpdates(False, 'DU550479')
+        """
 
         self.tws.reqAccountUpdates(False, self.account_name)
 
@@ -1525,9 +1540,20 @@ class IBDataBroker(IBBroker, DataBroker):
 
         PNL_day.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'a+')
 
-    def recordTransaction(self, contract, path = '', other_columns = [],
-                            other_column_values = {}):
-        self.getExecutedOrder(contract)
+    def recordTransaction(self, contract, path = '', additional_values = {}):
+        order_details = self.getExecutedOrder(contract)
+
+        if additional_values:
+            additional_details = pd.DataFrame.from_dict([additional_values])
+            transaction_details = pd.concat([order_details,additional_details],
+                                            axis = 1)
+            transaction_details.to_csv(path_or_buf = path, encoding = 'utf-8',
+                                       mode = 'a+', header = None,
+                                       index_label=['Server_Time'])
+
+        order_details.to_csv(path_or_buf = path, encoding = 'utf-8',
+                             mode = 'a+', header = None,
+                             index_label = ['Server_Time'])
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
@@ -1888,3 +1914,9 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                     price_per_unit = price_per_unit,
                                     order_type = order_type)
         return order
+
+    def placeRecordedOrder(self, order_id, contract, order, path = '',
+                           additional_values = {}):
+        self.tws.placeOrder(order_id, contract, order)
+        return self.recordTransaction(contract=contract, path=path,
+                                      additional_values=additional_values)
