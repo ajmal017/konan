@@ -83,8 +83,8 @@ class deltixStrategy(st.Strategy):
         portfolio = None #portfolio_example.examplePortfolio()
 
         self.time_stamp_open_day = '09:30:00.0'
-#        self.time_stamp_close_day = '15:55:00.0'
-        self.time_stamp_close_day = '13:02:0.0'
+        self.time_stamp_close_day = '15:45:00.0'
+#        self.time_stamp_close_day = '13:02:0.0'
 
         action_arguments_none = None
 
@@ -306,7 +306,7 @@ class deltixStrategy(st.Strategy):
         askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]            
         bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]         
         avgPrice = ( askPrice +bidPrice )*0.5 #mid point
-        
+       
         
 
         if( not hedgePosition.empty) :
@@ -335,7 +335,6 @@ class deltixStrategy(st.Strategy):
 #            order_id = order_id + 1
             order_id = getID()
             self.broker.closePosition(symbol=self.hedgeInstrument , order_type='MARKET')
-
 
 
     def enterNewPositions(self):
