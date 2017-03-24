@@ -1993,3 +1993,12 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         self.tws.placeOrder(order_id, contract, order)
         return self.recordTransaction(contract=contract, path=path,
                                       additional_values=additional_values)
+
+    def getLiveMidPriceData(self, contract):
+        liveData = self.getLiveMidData(contract)
+
+        askPrice = liveData['price'][liveData['Type'] == 'ASK PRICE'].values[0]
+        bidPrice = liveData['price'][liveData['Type'] == 'BID PRICE'].values[0]
+
+        midPrice = (askPrice + bidPrice) * 0.5  # mid point
+        return midPrice
