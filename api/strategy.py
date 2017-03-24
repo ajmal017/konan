@@ -238,7 +238,6 @@ class Strategy(object):
                 print('has_executed: ', has_executed)
                 print('----------------')
 
-                #RUNS EVERY SINGLE EVENT EVERY TIME IF CONDITIONS ARE MET; THIS MEANS DUPLICATING ACTIONS
                 if dt.datetime.now().time() >= dt.datetime.strptime(str(event_time), '%H:%M:%S.%f').time() and not has_executed:
                     # TODO: implement method of parameter passing
                     event_group()#(self.event_schedule[event_time][1])
