@@ -34,8 +34,9 @@ from ib.ext.Order import Order
 from ib.ext.ExecutionFilter import ExecutionFilter
 
 # internal/custom imports
+import directory as dr
 import data
-import position
+import position as pos
 
 class BrokerConnection(object):
     """
@@ -286,7 +287,7 @@ class IBBroker(Broker):
         """
         return self.tws.isConnected()
 
-    def nextOrderId(self):
+    def nextOrderId(self, from_IB = False):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -298,8 +299,15 @@ class IBBroker(Broker):
         RESULTS:
 
         """
-        self.tws.reqIds(1)
-        return self.callback.next_ValidId
+        if from_IB:
+            self.tws.reqIds(1)
+            return self.callback.next_ValidId
+        else:
+            dt_ = dt.datetime.now()
+            strID = "".join((str(dt_.month), str(dt_.day), str(dt_.hour),
+                             str(dt_.minute), str(dt_.second),
+                             str(dt_.microsecond)[0:1]))
+            return (int(strID))
 
     def createContract(self, ticker, instrument_type,
                         exchange = 'SMART', currency = 'USD',
@@ -608,7 +616,7 @@ class IBBroker(Broker):
 
         return order
 
-    def preparePosition(self, position = position.Position()):
+    def preparePosition(self, position = pos.Position()):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -1538,6 +1546,12 @@ class IBDataBroker(IBBroker, DataBroker):
         PNL_day['Unrealized_PnL'] = PNL['Unrealized_PnL'].sum()
         PNL_day['Realized_PnL'] = PNL['Realized_PnL'].sum()
 
+        if dr.checkPath(path = path):
+            header = None
+            PNL_day.to_csv(path_or_buf=path, encoding='utf-8', mode='a+',
+                           header=header)
+            return
+
         PNL_day.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'a+')
 
     def recordTransaction(self, contract, path = '', additional_values = {}):
@@ -1892,7 +1906,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         except:
             print("Ticker was not found in positions.")
             return None
-
+        if(position_details.empty):
+            return None
         ticker = position_details['Symbol'].iloc[0]
         instrument_type = position_details['Financial_Instrument'].iloc[0]
 
