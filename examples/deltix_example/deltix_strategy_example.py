@@ -81,7 +81,7 @@ class deltixStrategy(st.Strategy):
 
         self.time_stamp_open_day = '09:30:00.0'
         self.time_stamp_close_day = '15:45:00.0'
-        self.time_stamp_close_day = '10:53:00.0'
+#        self.time_stamp_close_day = '10:53:00.0'
 #        self.time_stamp_close_day = '13:02:0.0'
 
         action_arguments_none = None
@@ -346,9 +346,7 @@ class deltixStrategy(st.Strategy):
         todayBears = pd.Series()
         
         # Get top 30 positions
-        
-        ticker_id = 1
-        
+               
         for stk in self.decision_algorithm.bulls.keys():
             
             
@@ -368,12 +366,9 @@ class deltixStrategy(st.Strategy):
             prevClosePrice = self.broker.getDataAtTime( type_data='MIDPOINT',
                                          contract = contract,
                                          data_time = prevClose,
-                                         bar_size='1 secs',
-                                         ticker_id = ticker_id
+                                         bar_size='1 secs',                                         
                                          )['close'].iloc[-1]
-            
-            ticker_id = ticker_id + 1
-            
+                                    
             ''' Inter Close-Close returns '''
             todayBulls[stk] = (todayClosePrice - prevClosePrice) /prevClosePrice
             
@@ -381,8 +376,7 @@ class deltixStrategy(st.Strategy):
         
         
         for stk in self.decision_algorithm.bears.keys():
-            
-            ticker_id = ticker_id + 1
+                    
             
             ''' live Data '''
             contract = self.broker.createContract(ticker=stk, instrument_type='STK')
@@ -458,7 +452,7 @@ class deltixStrategy(st.Strategy):
                 buy_order = self.broker.createDollarOrder(trade_type = 'BUY',
                                                              contract = c,
                                                              amount_dollars = self.dW,
-                                                             order_type='MOC' )  # default is market order
+                                                             order_type='MARKET' )  # default is market order
                 self.broker.placeOrder(order_id, c, buy_order )
 
                 time.sleep(1)
@@ -480,7 +474,7 @@ class deltixStrategy(st.Strategy):
                 sell_order = self.broker.createDollarOrder( trade_type = 'SELL',
                                                                amount_dollars = self.dW,
                                                                contract = c,
-                                                               order_type='MOC')  # default is market order
+                                                               order_type='MARKET')  # default is market order
                 time.sleep(1)
                 self.broker.placeOrder( order_id, c, sell_order )
                 time.sleep(1)

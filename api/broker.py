@@ -602,7 +602,7 @@ class IBBroker(Broker):
         RESULTS:
 
         """
-        if order_type not in ('LIMIT', 'MARKET'):
+        if order_type not in ('LIMIT', 'MARKET', 'MOC'):
             print("Given order_type is not a proper type.")
             return None
 
@@ -617,6 +617,10 @@ class IBBroker(Broker):
 
         elif order_type == 'MARKET':
             order.m_orderType = 'MKT'
+            
+        elif order_type == 'MOC':
+            order.m_orderType = 'MOC'
+            
 
         return order
 
@@ -1751,7 +1755,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         RESULTS:
 
         """
-        if order_type not in ('LIMIT', 'MARKET'):
+        if order_type not in ('LIMIT', 'MARKET','MOC'):
             print("Given order_type is not a proper type.")
             return None
 
@@ -1799,7 +1803,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
     def closeAllTypePositions(self, order_type = '', instruments = [''],
                                 exclude_symbol = ['']):
-        if order_type not in ('LIMIT', 'MARKET'):
+        if order_type not in ('LIMIT', 'MARKET', 'MOC'):
             print("Given order_type is not a proper type.")
             return None
 
@@ -1846,7 +1850,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             order_id += 1
 
     def closeAllNamePositions(self, order_type = '', tickers = ['']):
-        if order_type not in ('LIMIT', 'MARKET'):
+        if order_type not in ('LIMIT', 'MARKET', 'MOC'):
             print("Given order_type is not a proper type.")
             return None
 
@@ -1902,7 +1906,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         RESULTS:
 
         """
-        if order_type not in ('LIMIT', 'MARKET'):
+        if order_type not in ('LIMIT', 'MARKET', 'MOC'):
             print("Given order_type is not a proper type.")
             return None
 
