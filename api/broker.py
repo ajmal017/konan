@@ -1679,6 +1679,12 @@ class IBDataBroker(IBBroker, DataBroker):
         Gets the executed transactions of the current day.
         """
 
+        """
+        TODO: just a read or prepare in some fashion? from strategy POV how
+        should the strategy deal with reading from state?
+        """
+        raise NotImplementedError("API method <getTransactions >"\
+                                  "has not been implemented.")
         return None
 
 class ExecutionBroker(Broker):
