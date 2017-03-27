@@ -304,7 +304,11 @@ class IBBroker(Broker):
             return self.callback.next_ValidId
         else:
             dt_ = dt.datetime.now()
-            strID = "".join((str(dt_.month), str(dt_.day), str(dt_.hour),
+#            strID = "".join((str(dt_.month), str(dt_.day), str(dt_.hour),
+#                             str(dt_.minute), str(dt_.second),
+#                             str(dt_.microsecond)[0:1]))
+            
+            strID = "".join((str(dt_.day), str(dt_.hour),
                              str(dt_.minute), str(dt_.second),
                              str(dt_.microsecond)[0:1]))
             return (int(strID))
@@ -1308,8 +1312,13 @@ class IBDataBroker(IBBroker, DataBroker):
                                         type_search = 'CONTRACT',
                                         type_data = 'ID')[0]
         """
+        self.tickers = contract
+        
+        ticker_id = self.searchTickers(search_object = contract,
+                                type_search = 'CONTRACT',
+                                type_data = 'ID')[0]
 
-        ticker_id = 1 # SOME SORT OF INCREMENTAL VALUE
+#        ticker_id = 1 # SOME SORT OF INCREMENTAL VALUE
 
         self._resetCallbackAttribute('tick_Price')
         data = pd.DataFrame(self.callback.tick_Price,
@@ -1957,7 +1966,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 #                                            bar_size = '1 secs')
 #        
         
-        liveData = self.broker.getLiveMarketData( contract= contract )
+#        liveData = self.broker.getLiveMarketData( contract= contract )
+        liveData = self.getLiveMarketData( contract= contract )
         askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]            
         bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]         
             

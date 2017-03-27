@@ -67,9 +67,6 @@ def getID():
     return (int(strID))
     
     
-    
-    
-
 
 # Create a child class that inherits from the base <strategy> class
 # and rename appropriately for system import purposes
@@ -322,11 +319,12 @@ class deltixStrategy(st.Strategy):
 
         action = { 1: 'BUY', -1: 'SELL' }
 #        order_id = self.broker.nextOrderId()+1        
-        order_id = getID()
+#        order_id = getID()
+        order_id = self.broker.nextOrderId()
 
         if (delta_stkExposureReq !=0):
 #            order_id = order_id + 1
-            order_id = getID()
+            order_id = self.broker.nextOrderId()
             hedgeTrade = action[ np.sign(delta_stkExposureReq) ]
             hedge_order = self.broker.createOrder( trade_type=hedgeTrade, amount_units= int(abs(delta_stkExposureReq)), order_type='MARKET' )
             self.broker.placeOrder(order_id=order_id,
@@ -334,14 +332,14 @@ class deltixStrategy(st.Strategy):
                                        order=hedge_order)
         elif ( (delta_stkExposureReq==0) and (desiredFinalExposure ==0) ):
 #            order_id = order_id + 1
-            order_id = getID()
+            order_id = self.broker.nextOrderId()
             self.broker.closePosition(symbol=self.hedgeInstrument , order_type='MARKET')
 
 
     def enterNewPositions(self):
         ''' This should be entered at the close '''
 #        order_id = self.broker.nextOrderId()+2
-        order_id = getID()
+        order_id = self.broker.nextOrderId()
             
         
         todayBulls = pd.Series()
@@ -460,7 +458,7 @@ class deltixStrategy(st.Strategy):
                 buy_order = self.broker.createDollarOrder(trade_type = 'BUY',
                                                              contract = c,
                                                              amount_dollars = self.dW,
-                                                             order_type='MARKET' )  # default is market order
+                                                             order_type='MOC' )  # default is market order
                 self.broker.placeOrder(order_id, c, buy_order )
 
                 time.sleep(1)
@@ -482,7 +480,7 @@ class deltixStrategy(st.Strategy):
                 sell_order = self.broker.createDollarOrder( trade_type = 'SELL',
                                                                amount_dollars = self.dW,
                                                                contract = c,
-                                                               order_type='MARKET')  # default is market order
+                                                               order_type='MOC')  # default is market order
                 time.sleep(1)
                 self.broker.placeOrder( order_id, c, sell_order )
                 time.sleep(1)
@@ -490,4 +488,4 @@ class deltixStrategy(st.Strategy):
                 continue
 
 #            order_id = order_id + 1
-            order_id = getID()
+            order_id = self.broker.nextOrderId()
