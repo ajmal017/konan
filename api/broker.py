@@ -602,8 +602,76 @@ class IBBroker(Broker):
         RESULTS:
 
         """
-        if order_type not in ('LIMIT', 'MARKET', 'MOC'):
-            print("Given order_type is not a proper type.")
+        """
+        ORDER TYPES:
+        Limit	LMT
+        Limit Risk
+        Bracket
+        Market-to-Limit	MTL
+        Market with Protection	MKT PRT
+        Request for Quote	QUOTE
+        Stop	STP
+        Stop Limit	STP LMT
+        Trailing Limit if Touched	TRAIL LIT
+        Trailing Market If Touched	TRAIL MIT
+        Trailing Stop	TRAIL
+        Trailing Stop Limit	TRAIL LIMIT
+        Speed of Execution
+        At Auction
+        Discretionary
+        Market	MKT
+        Market-if-Touched	MIT
+        Market-on-Close	MOC
+        Market-on-Open	MOO
+        Pegged-to-Market	PEG MKT
+        Relative	REL
+        Sweep-to-Fill
+        Price Improvement
+        Box Top	BOX TOP
+        Price Improvement Auction
+        Block
+        Limit-on-Close	LOC
+        Limit-on-Open	LOO
+        Limit if Touched	LIT
+        Pegged-to-Midpoint	PEG MID
+        Privacy
+        Hidden
+        Iceberg/Reserve
+        VWAP - Guaranteed	VWAP
+        Time to Market
+        All-or-None
+        Fill-or-Kill
+        Good-after-Time/Date	GAT
+        Good-till-Date/Time	GTD
+        Good-till-Canceled	GTC
+        Immediate-or-Cancel	IOC
+        Advanced Trading
+        One-Cancels-All	OCA
+        Spreads
+        Volatility	VOL
+        Algorithmic Trading (Algos)
+        Arrival Price
+        Balance Impact and Risk
+        Minimize Impact
+        Percent of volume
+        Scale
+        TWAP
+        VWAP - Best Effort
+        Accumulate/Distribute
+        IBDARK
+        """
+        if order_type not in ('LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT',
+                              'QUOTE', 'STP', 'STP LMT', 'TRAIL LIT',
+                              'TRAIL MIT', 'TRAIL', 'TRAIL LIMIT', 'MIT', 'MOO',
+                              'PEG MKT', 'REL', 'BOX TOP', 'LOC', 'LOO', 'LIT',
+                              'PEG MID', 'VWAP', 'GAT', 'GTD', 'GTC', 'IOC',
+                              'OCA', 'VOL'):
+            print("Given order_type is not a proper type.\nMust be one of: "\
+                  "'LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT', 'QUOTE', 'STP',"\
+                  "'STP LMT', 'TRAIL LIT', 'TRAIL MIT', 'TRAIL',"\
+                  "'TRAIL LIMIT','MIT', 'MOO', 'PEG MKT', 'REL', 'BOX TOP',"\
+                  "'LOC', 'LOO', 'LIT', 'PEG MID', 'VWAP', 'GAT', 'GTD',"\
+                  "'GTC','IOC', 'OCA', 'VOL'.")
             return None
 
         order = Order()
