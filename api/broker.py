@@ -2017,7 +2017,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         self.placeOrder(order_id = order_id, contract = contract, order = order)
         time.sleep(1)
 
-    def _totalDollarToTotalUnits(self, amount_dollars, contract,
+    def _totalDollarToTotalUnits(self, amount_dollars, contract, at_time = False,
                                     data_time = None):
         """
         METHOD SUMMARY
@@ -2030,15 +2030,19 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         RESULTS:
 
         """
-        if data_time == None:
+        if at_time == True and data_time == None:
             data_time = dt.datetime.now()
 
-#        data_contract = self.getDataAtTime(data_time = data_time,
-#                                            contract = contract,
-#                                            bar_size = '1 secs')
-#        
-        
-#        liveData = self.broker.getLiveMarketData( contract= contract )
+            data = self.getDataAtTime(data_time=data_time,contract=contract)
+
+            #TODO: MUST VERIFY DATA STRUCTURE HERE
+            askPrice = data['price'][data['Type'] == 'ASK PRICE'].values[0]
+            bidPrice = data['price'][data['Type'] == 'BID PRICE'].values[0]
+
+            price_per_unit = (askPrice + bidPrice) * 0.5  # mid point
+
+            return int(amount_dollars / price_per_unit)
+
         liveData = self.getLiveMarketData( contract= contract )
         askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]            
         bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]         
@@ -2090,6 +2094,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         RESULTS:
         Creates a local record of an [executed order] at the <<path>> location.
         """
+
         self.tws.placeOrder(order_id, contract, order)
         return self.recordTransaction(contract=contract, path=path,
                                       additional_values=additional_values)
