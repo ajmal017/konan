@@ -360,6 +360,8 @@ class deltixAlgorithm(algo.DecisionAlgorithm):
                         except:
                             print stk, "price data not found. Cannot short"
                             pass
+                        
+      
 
 
     ''' # ========================================================= # '''

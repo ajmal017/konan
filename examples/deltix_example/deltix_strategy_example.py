@@ -84,6 +84,7 @@ class deltixStrategy(st.Strategy):
 
         self.time_stamp_open_day = '09:30:00.0'
         self.time_stamp_close_day = '15:45:00.0'
+        self.time_stamp_close_day = '10:53:00.0'
 #        self.time_stamp_close_day = '13:02:0.0'
 
         action_arguments_none = None
@@ -151,9 +152,9 @@ class deltixStrategy(st.Strategy):
         self.decision_algorithm.generatePositionsForClose(WSHdata, date)
         print("Tentative entries:")
         print("TO LONG:")
-        self.decision_algorithm.bulls
+        print(self.decision_algorithm.bulls)
         print("TO SHORT:")
-        self.decision_algorithm.bears
+        print(self.decision_algorithm.bears)
 
         print('Pickling earnings calendar')
         self.decision_algorithm.pickleCalendars()
@@ -182,10 +183,10 @@ class deltixStrategy(st.Strategy):
         self.hedgePositions( data_time=closeDT )
 
         print('Scrub earnings calendar')
-        self.decision_algorithm.scrubEarningsCalendar(date=date)
+        #self.decision_algorithm.scrubEarningsCalendar(date=date)
 
         print('Pickling calendar')
-        self.decision_algorithm.pickleCalendars()
+        #self.decision_algorithm.pickleCalendars()
                 
         print('Record today PL ')
         performancepath = google_drive+'myPythonProjects\\papertrader\\papar252\\performance\\Deltix\\'
@@ -348,7 +349,10 @@ class deltixStrategy(st.Strategy):
         
         # Get top 30 positions
         
+        ticker_id = 1
+        
         for stk in self.decision_algorithm.bulls.keys():
+            
             
             ''' live Data '''
             contract = self.broker.createContract(ticker=stk, instrument_type='STK')
@@ -366,14 +370,21 @@ class deltixStrategy(st.Strategy):
             prevClosePrice = self.broker.getDataAtTime( type_data='MIDPOINT',
                                          contract = contract,
                                          data_time = prevClose,
-                                         bar_size='1 secs'
+                                         bar_size='1 secs',
+                                         ticker_id = ticker_id
                                          )['close'].iloc[-1]
+            
+            ticker_id = ticker_id + 1
             
             ''' Inter Close-Close returns '''
             todayBulls[stk] = (todayClosePrice - prevClosePrice) /prevClosePrice
+            
+#            print(stk, todayBulls[stk])
         
         
         for stk in self.decision_algorithm.bears.keys():
+            
+            ticker_id = ticker_id + 1
             
             ''' live Data '''
             contract = self.broker.createContract(ticker=stk, instrument_type='STK')
@@ -402,10 +413,14 @@ class deltixStrategy(st.Strategy):
         todayBulls.sort_values( inplace=True, ascending=True )
         todayBears.sort_values( inplace=True, ascending=False )
         
+        
+        
         ''' keep only the top 30 '''
         
         todayBears = todayBears.iloc[ :min(self.decision_algorithm.params[2], todayBears.size)]
-        todayBulls = todayBears.iloc[ :min(self.decision_algorithm.params[2], todayBulls.size)]       
+        todayBulls = todayBulls.iloc[ :min(self.decision_algorithm.params[2], todayBulls.size)]       
+        
+        
         
         ''' List of tickers to remove '''
         # Bears
@@ -427,10 +442,17 @@ class deltixStrategy(st.Strategy):
             
         for stk in popBear:
             self.decision_algorithm.bears.pop(stk, "None")
+            
+            
+        print("Bears: ", self.decision_algorithm.bears)
+        print("Bulls: ", self.decision_algorithm.bulls)
+
 
         for stk in self.decision_algorithm.bulls.keys():
             try:
                 stk_ = stk.replace("."," ")
+#                order_id = getID()
+                order_id =self.broker.nextOrderId()
                 print('Long: ', stk, order_id)
                 c = self.broker.createContract(ticker=stk_,
                                                    instrument_type="STK",
@@ -438,7 +460,7 @@ class deltixStrategy(st.Strategy):
                 buy_order = self.broker.createDollarOrder(trade_type = 'BUY',
                                                              contract = c,
                                                              amount_dollars = self.dW,
-                                                             order_type='MOC' )  # default is market order
+                                                             order_type='MARKET' )  # default is market order
                 self.broker.placeOrder(order_id, c, buy_order )
 
                 time.sleep(1)
@@ -447,9 +469,6 @@ class deltixStrategy(st.Strategy):
             except:
                 print("error:", traceback.format_exc())
                 continue
-
-#            order_id = order_id + 1
-            order_id = getID()
 
 
         for stk in self.decision_algorithm.bears.keys():
@@ -463,7 +482,7 @@ class deltixStrategy(st.Strategy):
                 sell_order = self.broker.createDollarOrder( trade_type = 'SELL',
                                                                amount_dollars = self.dW,
                                                                contract = c,
-                                                               order_type='MOC')  # default is market order
+                                                               order_type='MARKET')  # default is market order
                 time.sleep(1)
                 self.broker.placeOrder( order_id, c, sell_order )
                 time.sleep(1)
