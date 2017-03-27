@@ -1,7 +1,7 @@
 """
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-api.Broker.py
+api.broker.py
 Created on 2017-02-14T16:36:00Z
 @author:Joshua Hu
 """
@@ -46,18 +46,17 @@ class BrokerConnection(object):
     """
     def __init__(self):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        __init__:
+        Basic BrokerConnection constructor. Initializes object properties.
+        
         PARAMETERS:
-
+        None
+        
         RETURNS:
-
+        None
+        
         RESULTS:
-
-        """
-        """
-        Basic BrokerConnection constructor
+        Creates BrokerConnection object.
         """
         super(BrokerConnection, self).__init__()
 
@@ -68,18 +67,19 @@ class IBBrokerConnection(BrokerConnection):
     """
     def __init__(self, callback = IBWrapper()):
         """
-        IBBrokerConnection constructor.
-        Initializes object properties.
-
+        __init__:
+        IBBrokerConnection constructor. Initializes object properties.
+        
         PARAMETERS:
         callback - IBWrapper()
             Implementation of an abstract class in the Interactive Brokers (IB)
             API which stores the results of API calls
-
+        
         RETURNS:
-
+        None
+        
         RESULTS:
-
+        Creates IBBrokerConnection object.
         """
         super(IBBrokerConnection, self).__init__()
         self._interface = EClientSocket(callback)
@@ -2072,11 +2072,43 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
     def placeRecordedOrder(self, order_id, contract, order, path = '',
                            additional_values = {}):
+        """
+        placeRecordedOrder:
+        Places an [order] on the [#Interactive Brokers server] and records the
+        transaction.
+        
+        PARAMETERS:
+        order_id - 
+        contract - 
+        order - 
+        path - 
+        additional_values - 
+        
+        RETURNS:
+        None
+        
+        RESULTS:
+        Creates a local record of an [executed order] at the <<path>> location.
+        """
         self.tws.placeOrder(order_id, contract, order)
         return self.recordTransaction(contract=contract, path=path,
                                       additional_values=additional_values)
 
     def getLiveMidPriceData(self, contract):
+        """
+        getLiveMidPriceData:
+        Method summary
+        
+        PARAMETERS:
+        None
+        
+        RETURNS:
+        None
+        
+        RESULTS:
+        None
+        """
+        
         liveData = self.getLiveMidData(contract)
 
         askPrice = liveData['price'][liveData['Type'] == 'ASK PRICE'].values[0]
