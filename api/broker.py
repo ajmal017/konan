@@ -2109,7 +2109,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         None
         """
         
-        liveData = self.getLiveMidData(contract)
+        liveData = self.getLiveMarketData(contract)
 
         askPrice = liveData['price'][liveData['Type'] == 'ASK PRICE'].values[0]
         bidPrice = liveData['price'][liveData['Type'] == 'BID PRICE'].values[0]
