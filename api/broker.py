@@ -149,6 +149,8 @@ class IBBroker(Broker):
         self._port = port
         self._client_id = client_id
 
+        self._current_order_id = self.nextOrderId(from_IB=True)
+
     """
     CLASS PROPERTIES
     """
@@ -228,6 +230,17 @@ class IBBroker(Broker):
             del self._client_id
         return locals()
     client_id = property(**client_id())
+
+    def current_order_id():
+        doc = "The current_order_id property."
+        def fget(self):
+            return self._current_order_id
+        def fset(self, value):
+            self._current_order_id = value
+        def fdel(self):
+            del self._current_order_id
+        return locals()
+    current_order_idclient_id = property(**current_order_id())
 
     """
     CLASS SPECIAL METHODS
@@ -1649,6 +1662,24 @@ class IBDataBroker(IBBroker, DataBroker):
         order_details.to_csv(path_or_buf = path, encoding = 'utf-8',
                              mode = 'a+', header = None,
                              index_label = ['Server_Time'])
+
+    def getTransactions(self, path = ''):
+        """
+        getTransactions:
+        Returns the executed transactions by a [system] read from a file at the
+        location of <<path>>.
+        
+        PARAMETERS:
+        path - 
+        
+        RETURNS:
+        data - pandas DataFrame
+        
+        RESULTS:
+        Gets the executed transactions of the current day.
+        """
+
+        return None
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
