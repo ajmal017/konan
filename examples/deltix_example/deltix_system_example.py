@@ -27,12 +27,12 @@ import utils.paths as utp
 google_drive = utp.google_drive_path().path
 
 path_system_state = '/Users/jsrhu/Dropbox/'
-exec_path = google_drive+"myPythonprojects\\papertrader\\papar252\\performance\\Deltix\\deltix_execs.csv"
+#exec_path = google_drive+"myPythonprojects\\papertrader\\papar252\\performance\\Deltix\\deltix_execs.csv"
 
 def main():
     # initialize the broker resource
     broker_252 = broker.IBBrokerTotal()    
-    broker_252.exec_path = exec_path
+#    broker_252.exec_path = exec_path
 
     # specify strategies associated with the system account
     dict_strategies = {'Deltix': deltix_strategy_example.deltixStrategy()}
