@@ -35,7 +35,7 @@ from ib.ext.ExecutionFilter import ExecutionFilter
 
 # internal/custom imports
 import directory as dr
-import data
+import data as dat
 import position as pos
 
 class BrokerConnection(object):
@@ -764,7 +764,7 @@ class DataBroker(Broker):
         """
         super(DataBroker, self).__init__()
 
-        self._data_repository = data.Repository(path_root = path_root,
+        self._data_repository = dat.Repository(path_root = path_root,
                                                 project = project,
                                                 data_file = data_file)
         self._path_root = path_root
@@ -1974,7 +1974,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
             order_id += 1
 
-    def closeAllNamePositions(self, order_type = '', tickers = [''], record = False):
+    def closeAllNamePositions(self, order_type = '', tickers = [''],
+                              record = False):
         if order_type not in ('LIMIT', 'MARKET', 'MOC'):
             print("Given order_type is not a proper type.")
             return None
