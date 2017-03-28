@@ -303,7 +303,7 @@ class IBBroker(Broker):
         """
         return self.tws.isConnected()
 
-    def nextOrderId(self, from_IB = False, from_datetime = False):
+    def nextOrderId(self, from_IB = False, from_datetime = True):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -321,14 +321,10 @@ class IBBroker(Broker):
             self.current_order_id = id + 1
             return id
         if from_datetime:
-            dt_ = dt.datetime.now()
-#            strID = "".join((str(dt_.month), str(dt_.day), str(dt_.hour),
-#                             str(dt_.minute), str(dt_.second),
-#                             str(dt_.microsecond)[0:1]))
-            
-            strID = "".join((str(dt_.day), str(dt_.hour),
-                             str(dt_.minute), str(dt_.second),
-                             str(dt_.microsecond)[0:1]))
+            now = dt.datetime.now()
+            strID = "".join((str(now.day), str(now.hour),
+                             str(now.minute), str(now.second),
+                             str(now.microsecond)[0:1]))
             id = int(strID)
             self.current_order_id = id + 1
             return id
