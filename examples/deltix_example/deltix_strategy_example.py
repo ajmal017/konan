@@ -336,7 +336,7 @@ class deltixStrategy(st.Strategy):
             self.broker.placeRecordedOrder(order_id=order_id,
                                        contract=hedgeContract,
                                        order=hedge_order,
-                                       path = self.exec_path
+                                       path = self.broker.exec_path
                                        )
             
             
@@ -467,7 +467,7 @@ class deltixStrategy(st.Strategy):
                 self.broker.placeRecordedOrder(order_id=order_id,
                            contract= c,
                            order=buy_order,
-                           path = self.exec_path
+                           path = self.broker.exec_path
                            )
 
                 time.sleep(1)
@@ -495,7 +495,7 @@ class deltixStrategy(st.Strategy):
                 self.broker.placeRecordedOrder(order_id=order_id,
                            contract= c,
                            order=sell_order,
-                           path = self.exec_path
+                           path = self.broker.exec_path
                            )
 
                 time.sleep(1)

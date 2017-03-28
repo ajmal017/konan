@@ -1202,7 +1202,8 @@ class IBDataBroker(IBBroker, DataBroker):
 
         self._resetCallbackAttribute('historical_Data')
 
-        ticker_id = self._addTicker(ticker = contract.m_symbol)
+#        ticker_id = self._addTicker(ticker = contract.m_symbol)        
+        ticker_id = self.nextOrderId(from_datetime=True)
 
         if type_time in ('OPEN', 'CLOSE'):
             if type_time == 'OPEN':
@@ -1420,11 +1421,10 @@ class IBDataBroker(IBBroker, DataBroker):
         """
         self.tickers = contract
         
-        ticker_id = self.searchTickers(search_object = contract,
-                                type_search = 'CONTRACT',
-                                type_data = 'ID')[0]
-
-#        ticker_id = 1 # SOME SORT OF INCREMENTAL VALUE
+#        ticker_id = self.searchTickers(search_object = contract,
+#                                type_search = 'CONTRACT',
+#                                type_data = 'ID')[0]
+        ticker_id = self.nextOrderId(from_datetime=True)
 
         self._resetCallbackAttribute('tick_Price')
         data = pd.DataFrame(self.callback.tick_Price,
