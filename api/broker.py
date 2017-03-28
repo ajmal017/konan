@@ -750,7 +750,8 @@ class IBBroker(Broker):
 
 class DataBroker(Broker):
     """docstring for DataBroker."""
-    def __init__(self, path_root = '/', project = '', data_file = '', **kw):
+    def __init__(self, path_root = '/', project = '', data_file = '',
+                 exec_path = '', **kw):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -768,6 +769,8 @@ class DataBroker(Broker):
                                                 project = project,
                                                 data_file = data_file)
         self._path_root = path_root
+
+        self._exec_path = exec_path
 
     def data_repository():
         doc = "The data_repository property."
@@ -790,6 +793,17 @@ class DataBroker(Broker):
             del self._path_root
         return locals()
     path_root = property(**path_root())
+
+    def exec_path():
+        doc = "The exec_path property."
+        def fget(self):
+            return self._exec_path
+        def fset(self, value):
+            self._exec_path = value
+        def fdel(self):
+            del self._exec_path
+        return locals()
+    exec_path = property(**exec_path())
 
     def getLocalData(self, type_data = '', path_data = '', file_name = ''): #data.Repository()):
         """
@@ -1871,8 +1885,76 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         RESULTS:
 
         """
-        if order_type not in ('LIMIT', 'MARKET','MOC'):
-            print("Given order_type is not a proper type.")
+        """
+        ORDER TYPES:
+        Limit	LMT
+        Limit Risk
+        Bracket
+        Market-to-Limit	MTL
+        Market with Protection	MKT PRT
+        Request for Quote	QUOTE
+        Stop	STP
+        Stop Limit	STP LMT
+        Trailing Limit if Touched	TRAIL LIT
+        Trailing Market If Touched	TRAIL MIT
+        Trailing Stop	TRAIL
+        Trailing Stop Limit	TRAIL LIMIT
+        Speed of Execution
+        At Auction
+        Discretionary
+        Market	MKT
+        Market-if-Touched	MIT
+        Market-on-Close	MOC
+        Market-on-Open	MOO
+        Pegged-to-Market	PEG MKT
+        Relative	REL
+        Sweep-to-Fill
+        Price Improvement
+        Box Top	BOX TOP
+        Price Improvement Auction
+        Block
+        Limit-on-Close	LOC
+        Limit-on-Open	LOO
+        Limit if Touched	LIT
+        Pegged-to-Midpoint	PEG MID
+        Privacy
+        Hidden
+        Iceberg/Reserve
+        VWAP - Guaranteed	VWAP
+        Time to Market
+        All-or-None
+        Fill-or-Kill
+        Good-after-Time/Date	GAT
+        Good-till-Date/Time	GTD
+        Good-till-Canceled	GTC
+        Immediate-or-Cancel	IOC
+        Advanced Trading
+        One-Cancels-All	OCA
+        Spreads
+        Volatility	VOL
+        Algorithmic Trading (Algos)
+        Arrival Price
+        Balance Impact and Risk
+        Minimize Impact
+        Percent of volume
+        Scale
+        TWAP
+        VWAP - Best Effort
+        Accumulate/Distribute
+        IBDARK
+        """
+        if order_type not in ('LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT',
+                              'QUOTE', 'STP', 'STP LMT', 'TRAIL LIT',
+                              'TRAIL MIT', 'TRAIL', 'TRAIL LIMIT', 'MIT', 'MOO',
+                              'PEG MKT', 'REL', 'BOX TOP', 'LOC', 'LOO', 'LIT',
+                              'PEG MID', 'VWAP', 'GAT', 'GTD', 'GTC', 'IOC',
+                              'OCA', 'VOL'):
+            print("Given order_type is not a proper type.\nMust be one of: " \
+                  "'LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT', 'QUOTE', 'STP'," \
+                  "'STP LMT', 'TRAIL LIT', 'TRAIL MIT', 'TRAIL'," \
+                  "'TRAIL LIMIT','MIT', 'MOO', 'PEG MKT', 'REL', 'BOX TOP'," \
+                  "'LOC', 'LOO', 'LIT', 'PEG MID', 'VWAP', 'GAT', 'GTD'," \
+                  "'GTC','IOC', 'OCA', 'VOL'.")
             return None
 
         positions = self.getPositions()
@@ -1924,8 +2006,18 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
     def closeAllTypePositions(self, order_type = '', instruments = [''],
                                 exclude_symbol = [''], record = False):
-        if order_type not in ('LIMIT', 'MARKET', 'MOC'):
-            print("Given order_type is not a proper type.")
+        if order_type not in ('LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT',
+                              'QUOTE', 'STP', 'STP LMT', 'TRAIL LIT',
+                              'TRAIL MIT', 'TRAIL', 'TRAIL LIMIT', 'MIT', 'MOO',
+                              'PEG MKT', 'REL', 'BOX TOP', 'LOC', 'LOO', 'LIT',
+                              'PEG MID', 'VWAP', 'GAT', 'GTD', 'GTC', 'IOC',
+                              'OCA', 'VOL'):
+            print("Given order_type is not a proper type.\nMust be one of: " \
+                  "'LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT', 'QUOTE', 'STP'," \
+                  "'STP LMT', 'TRAIL LIT', 'TRAIL MIT', 'TRAIL'," \
+                  "'TRAIL LIMIT','MIT', 'MOO', 'PEG MKT', 'REL', 'BOX TOP'," \
+                  "'LOC', 'LOO', 'LIT', 'PEG MID', 'VWAP', 'GAT', 'GTD'," \
+                  "'GTC','IOC', 'OCA', 'VOL'.")
             return None
 
         positions = self.getPositions()
@@ -1976,8 +2068,18 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
     def closeAllNamePositions(self, order_type = '', tickers = [''],
                               record = False):
-        if order_type not in ('LIMIT', 'MARKET', 'MOC'):
-            print("Given order_type is not a proper type.")
+        if order_type not in ('LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT',
+                              'QUOTE', 'STP', 'STP LMT', 'TRAIL LIT',
+                              'TRAIL MIT', 'TRAIL', 'TRAIL LIMIT', 'MIT', 'MOO',
+                              'PEG MKT', 'REL', 'BOX TOP', 'LOC', 'LOO', 'LIT',
+                              'PEG MID', 'VWAP', 'GAT', 'GTD', 'GTC', 'IOC',
+                              'OCA', 'VOL'):
+            print("Given order_type is not a proper type.\nMust be one of: " \
+                  "'LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT', 'QUOTE', 'STP'," \
+                  "'STP LMT', 'TRAIL LIT', 'TRAIL MIT', 'TRAIL'," \
+                  "'TRAIL LIMIT','MIT', 'MOO', 'PEG MKT', 'REL', 'BOX TOP'," \
+                  "'LOC', 'LOO', 'LIT', 'PEG MID', 'VWAP', 'GAT', 'GTD'," \
+                  "'GTC','IOC', 'OCA', 'VOL'.")
             return None
 
         positions = self.getPositions()
@@ -2036,8 +2138,18 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         RESULTS:
 
         """
-        if order_type not in ('LIMIT', 'MARKET', 'MOC'):
-            print("Given order_type is not a proper type.")
+        if order_type not in ('LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT',
+                              'QUOTE', 'STP', 'STP LMT', 'TRAIL LIT',
+                              'TRAIL MIT', 'TRAIL', 'TRAIL LIMIT', 'MIT', 'MOO',
+                              'PEG MKT', 'REL', 'BOX TOP', 'LOC', 'LOO', 'LIT',
+                              'PEG MID', 'VWAP', 'GAT', 'GTD', 'GTC', 'IOC',
+                              'OCA', 'VOL'):
+            print("Given order_type is not a proper type.\nMust be one of: " \
+                  "'LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT', 'QUOTE', 'STP'," \
+                  "'STP LMT', 'TRAIL LIT', 'TRAIL MIT', 'TRAIL'," \
+                  "'TRAIL LIMIT','MIT', 'MOO', 'PEG MKT', 'REL', 'BOX TOP'," \
+                  "'LOC', 'LOO', 'LIT', 'PEG MID', 'VWAP', 'GAT', 'GTD'," \
+                  "'GTC','IOC', 'OCA', 'VOL'.")
             return None
 
         order_id = self.nextOrderId()
