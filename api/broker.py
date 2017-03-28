@@ -123,7 +123,7 @@ class IBBroker(Broker):
     """
     def __init__(self, account_name = 'DU603835',
                     connection = IBBrokerConnection(), host = '', port = 7497,
-                    client_id = 100, **kw):
+                    client_id = 100, **kwargs):
         """
         Broker constructor.
         Initializes object properties.
@@ -135,7 +135,7 @@ class IBBroker(Broker):
         port -
         client_id -
         """
-        super(IBBroker, self).__init__()
+        super(IBBroker, self).__init__(**kwargs)
         self._account_name = account_name
 
         self._callback = IBWrapper()
@@ -751,7 +751,7 @@ class IBBroker(Broker):
 class DataBroker(Broker):
     """docstring for DataBroker."""
     def __init__(self, path_root = '/', project = '', data_file = '',
-                 exec_path = '', **kw):
+                 exec_path = '', **kwargs):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -763,7 +763,7 @@ class DataBroker(Broker):
         RESULTS:
 
         """
-        super(DataBroker, self).__init__()
+        super(DataBroker, self).__init__(**kwargs)
 
         self._data_repository = dat.Repository(path_root = path_root,
                                                 project = project,
@@ -827,7 +827,7 @@ class DataBroker(Broker):
 class IBDataBroker(IBBroker, DataBroker):
     """docstring for IBDataBroker."""
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
-                    client_id = 100, path_root = '/', **kw):
+                    client_id = 100, path_root = '/', **kwargs):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -842,7 +842,7 @@ class IBDataBroker(IBBroker, DataBroker):
         super(IBDataBroker, self).__init__(account_name = account_name,
                                             host = host, port = port,
                                             client_id = client_id,
-                                            path_root = path_root)
+                                            path_root = path_root, **kwargs)
 
         #read state from file or call from IB
         #store as dictionary or DF?
@@ -1714,7 +1714,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
-    def __init__(self, **kw):
+    def __init__(self, **kwargs):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -1726,12 +1726,12 @@ class ExecutionBroker(Broker):
         RESULTS:
 
         """
-        super(ExecutionBroker, self).__init__()
+        super(ExecutionBroker, self).__init__(**kwargs)
 
 class IBExecutionBroker(IBBroker, ExecutionBroker):
     """docstring for IBExecutionBroker."""
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
-                    client_id = 100, **kw):
+                    client_id = 100, **kwargs):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -1745,7 +1745,7 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
         """
         super(IBExecutionBroker, self).__init__(account_name = account_name,
                                                 host = host, port = port,
-                                                client_id = client_id)
+                                                client_id = client_id, **kwargs)
     """
     CLASS PRIVATE METHODS
     """
@@ -1843,7 +1843,7 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
 class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
     """docstring for IBBrokerTotal."""
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
-                    client_id = 100, path_root = '/'):
+                    client_id = 100, path_root = '/', **kwargs):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -1870,7 +1870,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         super(IBBrokerTotal, self).__init__(account_name = account_name,
                                             host = host, port = port,
                                             client_id = client_id,
-                                            path_root = path_root)
+                                            path_root = path_root, **kwargs)
 
     def closeAllPositions(self, order_type = '', exclude_symbol = [''],
                             exclude_instrument = [''], record = False):
