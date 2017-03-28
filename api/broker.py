@@ -149,7 +149,10 @@ class IBBroker(Broker):
         self._port = port
         self._client_id = client_id
 
-        self._current_order_id = self.nextOrderId(from_IB=True)
+        self.connect()
+
+        time.sleep(1)
+        self.nextOrderId(from_IB=True)
 
     """
     CLASS PROPERTIES
@@ -240,7 +243,7 @@ class IBBroker(Broker):
         def fdel(self):
             del self._current_order_id
         return locals()
-    current_order_idclient_id = property(**current_order_id())
+    current_order_id = property(**current_order_id())
 
     """
     CLASS SPECIAL METHODS
