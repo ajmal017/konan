@@ -1859,7 +1859,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                             path_root = path_root)
 
     def closeAllPositions(self, order_type = '', exclude_symbol = [''],
-                            exclude_instrument = ['']):
+                            exclude_instrument = [''], record = False):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -1912,13 +1912,18 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                         price_per_unit = price_per_unit,
                                         order_type = order_type)
 
-            self.placeOrder(order_id = order_id, contract = contract, order = order)
+            if record:
+                self.placeRecordedOrder(order_id=order_id, contract=contract,
+                                        order=order, path=self.exec_path)
+            else:
+                self.placeOrder(order_id = order_id, contract = contract,
+                                order = order)
             time.sleep(1)
 
             order_id += 1
 
     def closeAllTypePositions(self, order_type = '', instruments = [''],
-                                exclude_symbol = ['']):
+                                exclude_symbol = [''], record = False):
         if order_type not in ('LIMIT', 'MARKET', 'MOC'):
             print("Given order_type is not a proper type.")
             return None
@@ -1960,12 +1965,16 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                         price_per_unit = price_per_unit,
                                         order_type = order_type)
 
-            self.placeOrder(order_id = order_id, contract = contract, order = order)
+            if record:
+                self.placeRecordedOrder(order_id=order_id, contract=contract,
+                                        order=order, path=self.exec_path)
+            else:
+                self.placeOrder(order_id = order_id, contract = contract, order = order)
             time.sleep(1)
 
             order_id += 1
 
-    def closeAllNamePositions(self, order_type = '', tickers = ['']):
+    def closeAllNamePositions(self, order_type = '', tickers = [''], record = False):
         if order_type not in ('LIMIT', 'MARKET', 'MOC'):
             print("Given order_type is not a proper type.")
             return None
@@ -2005,12 +2014,16 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                         price_per_unit = price_per_unit,
                                         order_type = order_type)
 
-            self.placeOrder(order_id = order_id, contract = contract, order = order)
+            if record:
+                self.placeRecordedOrder(order_id=order_id, contract=contract,
+                                        order=order, path=self.exec_path)
+            else:
+                self.placeOrder(order_id = order_id, contract = contract, order = order)
             time.sleep(1)
 
             order_id += 1
 
-    def closePosition(self, symbol = '', order_type = ''):
+    def closePosition(self, symbol = '', order_type = '', record = False):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -2062,7 +2075,11 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                     price_per_unit = price_per_unit,
                                     order_type = order_type)
 
-        self.placeOrder(order_id = order_id, contract = contract, order = order)
+        if record:
+            self.placeRecordedOrder(order_id=order_id, contract=contract,
+                                order=order, path=self.exec_path)
+        else:
+            self.placeOrder(order_id = order_id, contract = contract, order = order)
         time.sleep(1)
 
     def _totalDollarToTotalUnits(self, amount_dollars, contract, at_time = False,
