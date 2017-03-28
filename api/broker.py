@@ -2270,8 +2270,9 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         """
 
         self.tws.placeOrder(order_id, contract, order)
-        return self.recordTransaction(contract=contract, path=path,
-                                      additional_values=additional_values)
+        if (path != ''):
+            self.recordTransaction(contract=contract, path=path,
+                                          additional_values=additional_values)
 
     def getLiveMidPriceData(self, contract):
         """
