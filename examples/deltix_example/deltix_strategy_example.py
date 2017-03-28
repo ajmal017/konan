@@ -78,6 +78,9 @@ class deltixStrategy(st.Strategy):
                     time_end = dt.time(hour = 16, minute = 30), time_sleep = 30):
         decision_algorithm = deltixAlgo.deltixAlgorithm()
         portfolio = None #portfolio_example.examplePortfolio()
+                
+#        date_ = str( dt.date.today() )        
+#        self.exec_path = google_drive+"myPythonprojects\\papertrader\\papar252\\performance\\Deltix\\deltix_execs.csv"
 
         self.time_stamp_open_day = '09:30:00.0'
         self.time_stamp_close_day = '15:45:00.0'
@@ -149,9 +152,9 @@ class deltixStrategy(st.Strategy):
         self.decision_algorithm.generatePositionsForClose(WSHdata, date)
         print("Tentative entries:")
         print("TO LONG:")
-        print(self.decision_algorithm.bulls)
+        print( self.decision_algorithm.bulls )
         print("TO SHORT:")
-        print(self.decision_algorithm.bears)
+        print( self.decision_algorithm.bears )
 
         print('Pickling earnings calendar')
         self.decision_algorithm.pickleCalendars()
@@ -180,10 +183,10 @@ class deltixStrategy(st.Strategy):
         self.hedgePositions( data_time=closeDT )
 
         print('Scrub earnings calendar')
-        #self.decision_algorithm.scrubEarningsCalendar(date=date)
+        self.decision_algorithm.scrubEarningsCalendar(date=date)
 
         print('Pickling calendar')
-        #self.decision_algorithm.pickleCalendars()
+        self.decision_algorithm.pickleCalendars()
                 
         print('Record today PL ')
         performancepath = google_drive+'myPythonProjects\\papertrader\\papar252\\performance\\Deltix\\'
@@ -237,7 +240,7 @@ class deltixStrategy(st.Strategy):
                 print(ticker, interDayRtns)
 
                 if ( interDayRtns <= 0 ):
-                    self.broker.closePosition(symbol=ticker, order_type='MARKET')
+                    self.broker.closePosition(symbol=ticker, order_type='MARKET', record=True)
 
     def hedgePositions(self, data_time):
         ''' data_time would be the time we intend to hedge '''
@@ -327,13 +330,20 @@ class deltixStrategy(st.Strategy):
             order_id = self.broker.nextOrderId()
             hedgeTrade = action[ np.sign(delta_stkExposureReq) ]
             hedge_order = self.broker.createOrder( trade_type=hedgeTrade, amount_units= int(abs(delta_stkExposureReq)), order_type='MARKET' )
-            self.broker.placeOrder(order_id=order_id,
+#            self.broker.placeOrder(order_id=order_id,
+#                                       contract=hedgeContract,
+#                                       order=hedge_order)        
+            self.broker.placeRecordedOrder(order_id=order_id,
                                        contract=hedgeContract,
-                                       order=hedge_order)
+                                       order=hedge_order,
+                                       path = self.exec_path
+                                       )
+            
+            
         elif ( (delta_stkExposureReq==0) and (desiredFinalExposure ==0) ):
 #            order_id = order_id + 1
             order_id = self.broker.nextOrderId()
-            self.broker.closePosition(symbol=self.hedgeInstrument , order_type='MARKET')
+            self.broker.closePosition(symbol=self.hedgeInstrument , order_type='MARKET', record=True)
 
 
     def enterNewPositions(self):
@@ -453,7 +463,12 @@ class deltixStrategy(st.Strategy):
                                                              contract = c,
                                                              amount_dollars = self.dW,
                                                              order_type='MARKET' )  # default is market order
-                self.broker.placeOrder(order_id, c, buy_order )
+#                self.broker.placeOrder(order_id, c, buy_order )
+                self.broker.placeRecordedOrder(order_id=order_id,
+                           contract= c,
+                           order=buy_order,
+                           path = self.exec_path
+                           )
 
                 time.sleep(1)
                 self.broker.callback.order_Status
@@ -476,7 +491,13 @@ class deltixStrategy(st.Strategy):
                                                                contract = c,
                                                                order_type='MARKET')  # default is market order
                 time.sleep(1)
-                self.broker.placeOrder( order_id, c, sell_order )
+#                self.broker.placeOrder( order_id, c, sell_order )
+                self.broker.placeRecordedOrder(order_id=order_id,
+                           contract= c,
+                           order=sell_order,
+                           path = self.exec_path
+                           )
+
                 time.sleep(1)
             except:
                 continue
