@@ -1435,7 +1435,7 @@ class IBDataBroker(IBBroker, DataBroker):
                                         type_search = 'CONTRACT',
                                         type_data = 'ID')[0]
         """
-        self.tickers = contract
+        # self.tickers = contract
         
         #ticker_id = self.searchTickers(search_object = contract,
         #                        type_search = 'CONTRACT',
