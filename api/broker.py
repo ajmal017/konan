@@ -375,44 +375,44 @@ class IBBroker(Broker):
         contract.m_primaryExch = primary_exchange
 
         """
-        #The contract's symbol within its primary exchange.
+        The contract's symbol within its primary exchange.
         contract.m_localSymbol = primary_exchange_ticker
 
-        #The contract's primary exchange.
+        The contract's primary exchange.
         contract.m_primaryExch = primary_exchange
 
-        #The trading class name for this contract.
-        #Available in TWS contract description window as well.
-        #For example, GBL Dec '13 future's trading class is "FGBL".
+        The trading class name for this contract.
+        Available in TWS contract description window as well.
+        For example, GBL Dec '13 future's trading class is "FGBL".
         contract.m_tradingClass = trading_class
 
-        #If set to true, contract details requests and historical data queries
-        #can be performed pertaining to expired contracts.
-        #Note: Historical data queries on expired contracts are limited to
-        #the last year of the contracts life, and are initially only supported
-        #for expired futures contracts.
+        If set to true, contract details requests and historical data queries
+        can be performed pertaining to expired contracts.
+        Note: Historical data queries on expired contracts are limited to
+        the last year of the contracts life, and are initially only supported
+        for expired futures contracts.
         contract.m_includeExpired = include_expired
 
-        #Security's identifier when querying contract's details
-        #or placing orders SIN - Example: Apple: US0378331005 CUSIP
-        #- Example: Apple: 037833100 SEDOL - Consists of 6-AN + check digit.
-        #Example: BAE: 0263494 RIC - Consists of exchange-independent RIC Root
-        #and a suffix identifying the exchange.
-        #Example: AAPL.O for Apple on NASDAQ.
+        Security's identifier when querying contract's details
+        or placing orders SIN - Example: Apple: US0378331005 CUSIP
+        - Example: Apple: 037833100 SEDOL - Consists of 6-AN + check digit.
+        Example: BAE: 0263494 RIC - Consists of exchange-independent RIC Root
+        and a suffix identifying the exchange.
+        Example: AAPL.O for Apple on NASDAQ.
         contract.m_secIdType = secIdType
 
-        #Identifier of the security type.
+        Identifier of the security type.
         contract.m_secId = secId
 
-        #Description of the combo legs.
+        Description of the combo legs.
         contract.m_comboLegsDescription = combo_legs_description
 
-        #The legs of a combined contract definition.
+        The legs of a combined contract definition.
         contract.m_comboLegs = combo_legs
 
-        #Delta and underlying price for Delta-Neutral combo orders.
-        #Underlying (STK or FUT), delta and underlying price
-        #goes into this attribute.
+        Delta and underlying price for Delta-Neutral combo orders.
+        Underlying (STK or FUT), delta and underlying price
+        goes into this attribute.
         contract.m_underComp = under_comp
         """
 
@@ -610,7 +610,7 @@ class IBBroker(Broker):
         return contract
 
     def createOrder(self, trade_type, amount_units, price_per_unit = 0.0,
-                    order_type = '', time_in_force = 'GTC'):
+                    total_price = 0.0, order_type = '', time_in_force = None):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -697,18 +697,34 @@ class IBBroker(Broker):
         order = Order()
         order.m_totalQuantity = amount_units
         order.m_action = trade_type
-        order.m_tif = time_in_force
+
+        # TODO: implement function dictionary similar to <createContract>
+        # https://interactivebrokers.github.io/tws-api/basic_orders.html#gsc.tab=0
+
 
         if order_type == 'LIMIT':
             order.m_orderType = 'LMT'
             order.m_lmtPrice = price_per_unit * amount_units
-
         elif order_type == 'MARKET':
             order.m_orderType = 'MKT'
-            
-        elif order_type == 'MOC':
-            order.m_orderType = 'MOC'
-            
+        else:
+            order.m_orderType = order_type
+
+        if order_type in ('MTL', 'MKT', 'LMT'):
+            if order_type == 'MTL' and time_in_force == 'AUC':
+                order.m_tif = time_in_force
+            elif order_type == 'MKT' and time_in_force == 'OPG':
+                order.m_tif = time_in_force
+            elif order_type == 'LMT' and time_in_force == 'OPG':
+                order.m_tif = time_in_force
+            else:
+                print("WARNING: <<order_type>>:", order_type,
+                      "and <<time_in_force>>:",
+                      time_in_force, "parameters are not an appropriate pair.",
+                      "Appropriate pairs include:"\
+                      "<<order_type>> = 'MTL' : <<time_in_force>> = 'AUC',"\
+                      "<<order_type>> = 'MKT' : <<time_in_force>> = 'OPG'," \
+                      "<<order_type>> = 'LMT' : <<time_in_force>> = 'OPG,")
 
         return order
 
@@ -1421,9 +1437,9 @@ class IBDataBroker(IBBroker, DataBroker):
         """
         self.tickers = contract
         
-#        ticker_id = self.searchTickers(search_object = contract,
-#                                type_search = 'CONTRACT',
-#                                type_data = 'ID')[0]
+        #ticker_id = self.searchTickers(search_object = contract,
+        #                        type_search = 'CONTRACT',
+        #                        type_data = 'ID')[0]
         ticker_id = self.nextOrderId(from_datetime=True)
 
         self._resetCallbackAttribute('tick_Price')
@@ -2227,7 +2243,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         return int(amount_dollars / price_per_unit)
 
     def createDollarOrder(self, amount_dollars, contract, trade_type,
-                            price_per_unit = 0.0, order_type = ''):
+                            price_per_unit = 0.0, order_type = '',
+                          time_in_force = ''):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -2245,7 +2262,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         order = self.createOrder(trade_type = trade_type,
                                     amount_units = amount_units,
                                     price_per_unit = price_per_unit,
-                                    order_type = order_type)
+                                    order_type = order_type,
+                                    time_in_force=time_in_force)
         return order
 
     def placeRecordedOrder(self, order_id, contract, order, path = '',
