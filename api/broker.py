@@ -1670,7 +1670,7 @@ class IBDataBroker(IBBroker, DataBroker):
         PNL_day.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'a+')
 
     def recordTransaction(self, contract, path = '', additional_values = {}):
-        order_details = self.getExecutedOrder(contract)
+        order_details = self.getExecutedOrders(contract)
 
         if additional_values:
             additional_details = pd.DataFrame.from_dict([additional_values])
