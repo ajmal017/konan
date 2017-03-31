@@ -47,50 +47,57 @@ class BrokerConnection(object):
     def __init__(self):
         """
         __init__:
-        Basic BrokerConnection constructor. Initializes object properties.
+            Basic BrokerConnection constructor. Initializes object properties.
         
         PARAMETERS:
-        None
+            None
         
         RETURNS:
-        None
+            None
         
         RESULTS:
-        Creates BrokerConnection object.
+            Creates BrokerConnection object.
         """
         super(BrokerConnection, self).__init__()
 
 class IBBrokerConnection(BrokerConnection):
     """
-    Connection interface implementing the Interactive Brokers (IB)
-    EClientSocket API behaviours. Allows the EClientSocket object to be shared.
+    CLASS SUMMARY:
+        Connection interface implementing the Interactive Brokers (IB)
+        EClientSocket API behaviours. Allows the EClientSocket object
+        to be shared.
+    
+    CLASS PROPERTIES:
+        interface:
+            EClientSocket object that takes in the implemented IBWrapper class in which
+            API calls are stored.
+    
+    CLASS PRIVATE METHODS:
+    
+    
+    CLASS PUBLIC METHODS:
+    
     """
     def __init__(self, callback = IBWrapper()):
         """
         __init__:
-        IBBrokerConnection constructor. Initializes object properties.
+            IBBrokerConnection constructor. Initializes object properties.
         
         PARAMETERS:
-        callback - IBWrapper()
-            Implementation of an abstract class in the Interactive Brokers (IB)
-            API which stores the results of API calls
+            callback - IBWrapper()
+                Implementation of an abstract class in the
+                Interactive Brokers (IB) API which stores the results of
+                API calls
         
         RETURNS:
-        None
+            None
         
         RESULTS:
-        Creates IBBrokerConnection object.
+            Creates IBBrokerConnection object.
         """
         super(IBBrokerConnection, self).__init__()
         self._interface = EClientSocket(callback)
 
-    """
-    CLASS PROPERTIES
-
-    interface:
-        EClientSocket object that takes in the implemented IBWrapper class in which
-        API calls are stored
-    """
     def interface():
         doc = "The interface property."
         def fget(self):
@@ -103,17 +110,19 @@ class IBBrokerConnection(BrokerConnection):
     interface = property(**interface())
 
 class Broker(object):
-    """docstring for Broker."""
+    """Parent template for <Broker> type objects."""
     def __init__(self):
         """
-        Broker constructor.
-        Initializes object properties.
+        Broker constructor. Initializes object properties.
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
+            Creates a <Broker> object.
         """
         super(Broker, self).__init__()
 
@@ -125,15 +134,25 @@ class IBBroker(Broker):
                     connection = IBBrokerConnection(), host = '', port = 7497,
                     client_id = 100, **kwargs):
         """
+        __init__:
         Broker constructor.
         Initializes object properties.
 
         PARAMETERS:
-        account_name -
-        connection -
-        host -
-        port -
-        client_id -
+            account_name - string
+                The name of the Interactive Brokers account represented as a
+                string.
+            connection - IBBrokerConnection()
+                The connection object for the broker.
+            host -
+            port -
+            client_id -
+            
+        RETURNS:
+            None
+            
+        RESULTS:
+            Creates an <IBBroker> object.
         """
         super(IBBroker, self).__init__(**kwargs)
         self._account_name = account_name
@@ -1435,11 +1454,13 @@ class IBDataBroker(IBBroker, DataBroker):
                                         type_search = 'CONTRACT',
                                         type_data = 'ID')[0]
         """
-        # self.tickers = contract
+        """
+         self.tickers = contract
         
-        #ticker_id = self.searchTickers(search_object = contract,
-        #                        type_search = 'CONTRACT',
-        #                        type_data = 'ID')[0]
+        ticker_id = self.searchTickers(search_object = contract,
+                                type_search = 'CONTRACT',
+                                type_data = 'ID')[0]
+        """
         ticker_id = self.nextOrderId(from_datetime=True)
 
         self._resetCallbackAttribute('tick_Price')
