@@ -316,10 +316,11 @@ class IBBroker(Broker):
 
         """
         if from_IB:
-            self.tws.reqIds(1)
-            id = self.callback.next_ValidId
-            self.current_order_id = id + 1
-            return id
+#            self.tws.reqIds(1)
+#            id = self.callback.next_ValidId
+#            self.current_order_id = id + 1
+#            return id
+            pass
         if from_datetime:
             now = dt.datetime.now()
             strID = "".join((str(now.day), str(now.hour),
@@ -1572,7 +1573,7 @@ class IBDataBroker(IBBroker, DataBroker):
         self.tws.reqExecutions(1, execution_filter) # TODO: check if request_id is valid and static
 
         time.sleep(1)
-
+        
         execution_contract = self.callback.exec_Details_contract.__dict__
         execution_details = self.callback.exec_Details_execution.__dict__
         execution = dict(execution_contract, **execution_details)
@@ -1607,10 +1608,11 @@ class IBDataBroker(IBBroker, DataBroker):
                                 'm_tradingClass':'Trading_Class'},
                     inplace = True)
 
-        #self._resetCallbackAttribute('exec_Details_contract')
-        #self._resetCallbackAttribute('exec_Details_execution')
+        self._resetCallbackAttribute('exec_Details_contract')
+        self._resetCallbackAttribute('exec_Details_execution')
 
         return data
+#        pass
 
     # TODO: MAKE RECORD AND GETTING STRATEGY SPECIFIC; STRATEGY PNL NOT RECORDED
     # ONLY ACCOUNT WIDE PNL

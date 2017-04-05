@@ -83,7 +83,7 @@ class deltixStrategy(st.Strategy):
 #        self.exec_path = google_drive+"myPythonprojects\\papertrader\\papar252\\performance\\Deltix\\deltix_execs.csv"
 
         self.time_stamp_open_day = '09:30:00.0'
-        self.time_stamp_close_day = '15:45:00.0'
+        self.time_stamp_close_day = '15:55:00.0'
 #        self.time_stamp_close_day = '10:53:00.0'
 #        self.time_stamp_close_day = '13:02:0.0'
 
@@ -163,7 +163,6 @@ class deltixStrategy(st.Strategy):
         self.momentumGuard()
         print('Hedge positions')
         self.hedgePositions(data_time=openDT)
-        
         
         
 
@@ -462,8 +461,8 @@ class deltixStrategy(st.Strategy):
                 buy_order = self.broker.createDollarOrder(trade_type = 'BUY',
                                                              contract = c,
                                                              amount_dollars = self.dW,
-                                                             order_type='MOC',
-                                                             time_in_force='MOC'
+                                                             order_type='MARKET',
+#                                                             time_in_force='MOC'
                                                              )  # default is market order
 #                self.broker.placeOrder(order_id, c, buy_order )
                 self.broker.placeRecordedOrder(order_id=order_id,
@@ -492,7 +491,7 @@ class deltixStrategy(st.Strategy):
                                                                amount_dollars = self.dW,
                                                                contract = c,
                                                                order_type='MARKET',
-                                                               time_in_force='MOC'
+#                                                               time_in_force='MOC'
                                                                )  # default is market order
                 time.sleep(1)
 #                self.broker.placeOrder( order_id, c, sell_order )

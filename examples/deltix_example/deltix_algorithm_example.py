@@ -48,8 +48,6 @@ elif sys.platform == "win32":
 
 
 
-
-
 class deltixAlgorithm(algo.DecisionAlgorithm):
 
     def __init__(self):

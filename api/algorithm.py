@@ -15,7 +15,7 @@ import position
 
 class DecisionAlgorithm(object):
     """docstring for DecisionAlgorithm."""
-    __metaclass__ = abc.ABCMeta
+    _metaclass__ = abc.ABCMeta
 
     @abc.abstractproperty
     def positions():
