@@ -52,7 +52,7 @@ dir_data
 dir_pickle
 dir_csv
 dir_json
-acess_token - need to change to filepath pointing to file storing token
+access_token - need to change to filepath pointing to file storing token
 
 ------------------------
 Arrays: list
@@ -411,7 +411,7 @@ def writeDF():
 
 def pickleDF(df = pd.DataFrame(), name = '', overwrite = False):
     """
-    Pickles a pandas DataFrame witha specified name in the pickle directory.
+    Pickles a pandas DataFrame with a specified name in the pickle directory.
 
     PARAMETERS:
     df - a pandas DataFrame
@@ -475,7 +475,7 @@ def uploadDropbox(path_file = ''):
     Upload file to Dropbox.
 
     PARAMETERS:
-    path_file - taget file for upload
+    path_file - target file for upload
 
     RETURN:
     True - upload is successful
@@ -496,7 +496,7 @@ def downloadDropbox(path_dropbox = '', path_file = None):
     Upload file to Dropbox.
 
     PARAMETERS:
-    path_dropbox - taget file for upload
+    path_dropbox - target file for upload
     path_file - path to save downloaded file to
 
     RETURN:
