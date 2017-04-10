@@ -237,8 +237,19 @@ class Strategy(object):
                 print('event arguments: ', group_args)
                 print('has_executed: ', has_executed)
                 print('----------------')
+                
+                
+                ''' this part is messy and needs to be more elegantly coded? '''
+                ''' assumes only two kinds of format '''
+                dt_ = None
+                
+                try:
+                    dt_ = dt.datetime.strptime(str(event_time), '%H:%M:%S.%f').time()
+                except:
+                    dt_ = dt.datetime.strptime(str(event_time), '%H:%M:%S').time()
+                
 
-                if dt.datetime.now().time() >= dt.datetime.strptime(str(event_time), '%H:%M:%S.%f').time() and not has_executed:
+                if dt.datetime.now().time() >= dt_ and not has_executed:
                     # TODO: implement method of parameter passing
                     event_group()#(self.event_schedule[event_time][1])
                     self.event_schedule[event_time][2] = True # Need to assign value directly or value change will not register

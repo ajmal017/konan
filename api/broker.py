@@ -361,7 +361,8 @@ class IBBroker(Broker):
                         trading_class = None, include_expired = None,
                         secIdType = None, secId = None,
                         combo_legs_description = None, combo_legs = None,
-                        under_comp = None):
+                        under_comp = None, localSymbol=None                    
+                        ):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -393,6 +394,13 @@ class IBBroker(Broker):
         contract.m_currency = currency
 
         contract.m_primaryExch = primary_exchange
+        
+        ''' Futures '''
+        contract.m_multiplier = multiplier
+        contract.m_expiry = expiry
+        contract.m_localSymbol = localSymbol
+        contract.m_includeExpired = include_expired
+        
 
         """
         The contract's symbol within its primary exchange.
@@ -510,11 +518,11 @@ class IBBroker(Broker):
         #(for Options and Futures).
         #Strings with format YYYYMM will be interpreted as the Contract Month
         #whereas YYYYMMDD will be interpreted as Last Trading Day.
-        contract.m_lastTradeDateOrContractMonth = last_trade_date
-        contract.m_expiry = expiry # is this the same as last_trade_date ?
+        
+#        contract.m_expiry = expiry # is this the same as last_trade_date ?
 
         #The instrument's multiplier (i.e. options, futures).
-        contract.m_multiplier = multiplier
+#        contract.m_multiplier = multiplier
         return contract
 
     def _createIndexContract(self, contract = Contract()):
@@ -720,8 +728,8 @@ class IBBroker(Broker):
 
         # TODO: implement function dictionary similar to <createContract>
         # https://interactivebrokers.github.io/tws-api/basic_orders.html#gsc.tab=0
-
-
+        # What are the possible values of trade_types 
+        
         if order_type == 'LIMIT':
             order.m_orderType = 'LMT'
             order.m_lmtPrice = price_per_unit * amount_units
@@ -959,7 +967,7 @@ class IBDataBroker(IBBroker, DataBroker):
                             'tickSnapshotEnd_reqId', 'exec_Details_reqId',
                             'exec_Details_contract', 'exec_Details_execution',
                             'update_MktDepth', 'update_MktDepthL2',
-                            'historical_Data', 'scanner_Data', 'real_timeBar'):
+                            'historical_Data', 'scanner_Data', 'real_timeBar', 'contract_Details'):
             setattr(self.callback, attribute, [])
 
         else:
@@ -1400,6 +1408,52 @@ class IBDataBroker(IBBroker, DataBroker):
             data.minor_xs('value')
             """
             return data
+
+    ''' Added by Ray '''            
+    def get_contract_details(self, contract=Contract(), time_out=5):
+        
+        '''        
+        Returns data frame of chain of contracts meeting certain requirements.
+        Used to obtain non-expired future chain right now.         
+        '''
+            
+        self._resetCallbackAttribute('contract_Details')        
+        self.tws.reqContractDetails(1,contract)
+        
+        time.sleep(1)
+        
+#        print( self.callback.contract_Details. ) 
+        
+#        print(self.callback.contract_Details.m_contractMonth)
+        
+        contractDetails = self.callback.contract_Details
+        
+        
+        futContDict = {}
+
+        for contractDetail in contractDetails:
+    
+            futContDict[contractDetail.m_summary.m_localSymbol] = ( contractDetail.m_marketName, 
+                                                          contractDetail.m_contractMonth, 
+                                                          contractDetail.m_summary.m_expiry, 
+                                                          contractDetail.m_summary.m_symbol,                    
+                                                          contractDetail.m_summary )    
+        futContDF = pd.DataFrame.from_dict( futContDict, orient='index' )
+        futContDF.columns = ['market_symbol', 'contractMonth', 'Expiry', 'IB_symbol', 'Contract object']
+        futContDF.sort_values('Expiry', inplace=True, ascending=True)
+        
+        def convertExpiry(x):                    
+            if( type(x) == str ):
+                return (dt.datetime.strptime(x, "%Y%m%d" )).date() # should be string
+            else:
+                pass
+                
+        futContDF['Expiry'] = futContDF['Expiry'].apply( convertExpiry )
+        
+        
+        return futContDF
+        
+        
 
     def getLiveMarketData(self, contract = Contract(), time_out = 5):
         """
@@ -1901,11 +1955,14 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         port -
         client_id -
         path_root -
-        """
+        """        
         super(IBBrokerTotal, self).__init__(account_name = account_name,
                                             host = host, port = port,
                                             client_id = client_id,
                                             path_root = path_root, **kwargs)
+        
+        pass
+        
 
     def closeAllPositions(self, order_type = '', exclude_symbol = [''],
                             exclude_instrument = [''], record = False):

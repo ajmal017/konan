@@ -42,6 +42,7 @@ class IBWrapper(EWrapper):
         setattr(self, "exec_DetailsEnd_flag", False)
         # Contract
         setattr(self, "contract_Details_flag", False)
+        setattr(self, "contract_Details", [])  # Added by Ray
         # Market Depth
         setattr(self, 'update_MktDepth', [])
         setattr(self, 'update_MktDepthL2', [])
@@ -102,7 +103,6 @@ class IBWrapper(EWrapper):
 
     def positionEnd(self):
         setattr(self, 'positionEnd_flag', True)
-
 
 
 
@@ -238,7 +238,8 @@ class IBWrapper(EWrapper):
     # Contract #################################################################
     def contractDetails(self, reqId, contractDetails):
         self.contract_Details_reqId = reqId
-        self.contract_Details = contractDetails
+#        self.contract_Details = contractDetails
+        self.contract_Details.append( contractDetails )
 
     def contractDetailsEnd(self, reqId):
         self.contract_DetailsEnd_reqId = reqId
