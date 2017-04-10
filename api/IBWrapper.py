@@ -1,5 +1,5 @@
 '''
-Wrapper - Organised by groups. E.g., Accont and Portfolio group, Orders group etc
+Wrapper - Organised by groups. E.g., Account and Portfolio group, Orders group etc
 2016-01-31
 Updated 20 Nov 2016 for Python 3.
 '''
@@ -298,7 +298,7 @@ class IBWrapper(EWrapper):
 
 
 
-    # Financial Advisors #######################################################
+    # Financial Advisers #######################################################
     def managedAccounts(self, accountsList):
         self.managed_Accounts = accountsList
 
@@ -337,10 +337,10 @@ class IBWrapper(EWrapper):
         self.scanner_Parameters = xml
 
     def scannerData(self, reqId, rank, contractDetails, distance, benchmark,
-                    projetion, legsStr):
+                    projection, legsStr):
         scanner_Data = self.scanner_Data
         scanner_Data.append((reqId, rank, contractDetails, distance, benchmark,
-                    projetion, legsStr))
+                    projection, legsStr))
 
     def scannerDataEnd(self, reqId):
         self.scanner_Data_End_reqID = reqId
@@ -355,7 +355,7 @@ class IBWrapper(EWrapper):
 
 
 
-    # Real Tume Bars ###########################################################
+    # Real Time Bars ###########################################################
     def realtimeBar(self, reqId, time, open, high, low, close, volume,
                     wap, count):
         real_timeBar = self.real_timeBar
@@ -421,14 +421,14 @@ class contract():
         return order
 
     def exec_filter(self, client_id, accountName, contract):
-        filt = ExecutionFilter()
-        filt.m_clientId = client_id
-        filt.m_acctCode = accountName
-        #filt.m_time = "20160122-00:00:00"
-        filt.m_symbol = contract.m_symbol
-        filt.m_secType = contract.m_secType
-        filt.m_exchange = contract.m_exchange
-        return filt
+        filter = ExecutionFilter()
+        filter.m_clientId = client_id
+        filter.m_acctCode = accountName
+        #filter.m_time = "20160122-00:00:00"
+        filter.m_symbol = contract.m_symbol
+        filter.m_secType = contract.m_secType
+        filter.m_exchange = contract.m_exchange
+        return filter
 
 
 '''
