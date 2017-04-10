@@ -47,7 +47,7 @@ class DecisionAlgorithm(object):
 """
 EXAMPLE USE CASE:
 #this is written in an external script
-import api.algortihm
+import api.algorithm
 class Deltix_algorithm(DecisionAlgorithm):
     ...
 """
