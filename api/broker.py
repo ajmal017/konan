@@ -1409,8 +1409,7 @@ class IBDataBroker(IBBroker, DataBroker):
             """
             return data
 
-    ''' Added by Ray '''            
-    def get_contract_details(self, contract=Contract(), time_out=5):
+    def getContractDetails(self, contract=Contract(), time_out=5):
         
         '''        
         Returns data frame of chain of contracts meeting certain requirements.
@@ -1426,34 +1425,30 @@ class IBDataBroker(IBBroker, DataBroker):
         
 #        print(self.callback.contract_Details.m_contractMonth)
         
-        contractDetails = self.callback.contract_Details
+        contract_details = self.callback.contract_Details
         
         
-        futContDict = {}
+        fut_cont_dict = {}
 
-        for contractDetail in contractDetails:
-    
-            futContDict[contractDetail.m_summary.m_localSymbol] = ( contractDetail.m_marketName, 
-                                                          contractDetail.m_contractMonth, 
-                                                          contractDetail.m_summary.m_expiry, 
-                                                          contractDetail.m_summary.m_symbol,                    
-                                                          contractDetail.m_summary )    
-        futContDF = pd.DataFrame.from_dict( futContDict, orient='index' )
-        futContDF.columns = ['market_symbol', 'contractMonth', 'Expiry', 'IB_symbol', 'Contract object']
-        futContDF.sort_values('Expiry', inplace=True, ascending=True)
+        for detail in contract_details:
+            fut_cont_dict[detail.m_summary.m_localSymbol] = ( detail.m_marketName,
+                                                          detail.m_contractMonth,
+                                                          detail.m_summary.m_expiry,
+                                                          detail.m_summary.m_symbol,
+                                                          detail.m_summary )
+        fut_cont_dict = pd.DataFrame.from_dict(fut_cont_dict, orient='index' )
+        fut_cont_dict.columns = ['market_symbol', 'contractMonth', 'Expiry', 'IB_symbol', 'Contract object']
+        fut_cont_dict.sort_values('Expiry', inplace=True, ascending=True)
         
         def convertExpiry(x):                    
             if( type(x) == str ):
                 return (dt.datetime.strptime(x, "%Y%m%d" )).date() # should be string
             else:
                 pass
-                
-        futContDF['Expiry'] = futContDF['Expiry'].apply( convertExpiry )
-        
-        
-        return futContDF
-        
-        
+
+        fut_cont_dict['Expiry'] = fut_cont_dict['Expiry'].apply( convertExpiry )
+
+        return fut_cont_dict
 
     def getLiveMarketData(self, contract = Contract(), time_out = 5):
         """
