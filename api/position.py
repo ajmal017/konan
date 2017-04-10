@@ -347,7 +347,7 @@ class PositionStock(Position):
         self._stock_class_specific_attributes = None
 
 class PositionFutures(Position):
-    """docstring for postionFutures."""
+    """docstring for positionFutures."""
 
     """
     CLASS CONSTRUCTOR
@@ -365,8 +365,8 @@ class PositionFutures(Position):
 
         self._futures_class_specific_attributes = None
 
-class postionOptions(Position):
-    """docstring for postionOptions."""
+class positionOptions(Position):
+    """docstring for positionOptions."""
 
     """
     CLASS CONSTRUCTOR
@@ -377,7 +377,7 @@ class postionOptions(Position):
                     date_expiry = dt.date.today().day
                     ):
 
-        super(postionOptions, self).__init__(ID = ID, instrument = instrument,
+        super(positionOptions, self).__init__(ID = ID, instrument = instrument,
                 ticker = ticker, trade_type = trade_type,
                 amount_units = amount_units, amount_wealth = amount_wealth,
                 time_of_trade = time_of_trade, date_expiry = date_expiry)
