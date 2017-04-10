@@ -428,7 +428,7 @@ class Filter(object):
         black -
 
         RETURN:
-        df - filteres pandas DataFrame
+        df - filtered pandas DataFrame
         """
         df = data
         for key in columns:
