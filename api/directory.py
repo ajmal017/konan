@@ -125,7 +125,7 @@ def createDir(path = ''):
         return path
 
 def changeDir(destination = None):
-    if checkPath(path):  #not neccesarily neccesary
+    if checkPath(path):  # may not be necessary
         os.chdir(destination)
 
 def moveFileToDir(target_file = None, destination_file = None):
