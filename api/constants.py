@@ -28,7 +28,7 @@ TIME_SYSTEM_START = dt.time(hour = 9, minute = 00, second = 00, microsecond = 00
 TIME_SYSTEM_END = dt.time(hour = 16, minute = 30, second = 00, microsecond = 00)
 
 # SETS AND LISTS (?)
-# PANDAS COLUMNS AND INDICIES (?)
+# PANDAS COLUMNS AND INDICES (?)
 
 # FILE EXTENSIONS
 FILE_EXTENSION_CSV = '.csv'
