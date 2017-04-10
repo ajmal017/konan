@@ -770,7 +770,7 @@ class IBBroker(Broker):
         """
         """Unpack position object into order and contracts"""
         raise NotImplementedError("API method preparePosition has not been implemented.")
-        return None
+        #return None
 
     def createExecutionFilter(self, contract = None, order_time = None):
         if contract == None:
@@ -1352,7 +1352,7 @@ class IBDataBroker(IBBroker, DataBroker):
         """
         # EXTEND USING getDataAtTime()
         raise NotImplementedError("API method getDataInRange has not been implemented.")
-        return None
+        #return None
 
     def getDailyData(self, stock_list, provider, date_start, date_end = None):
         """
@@ -1793,7 +1793,7 @@ class IBDataBroker(IBBroker, DataBroker):
         """
         raise NotImplementedError("API method <getTransactions >"\
                                   "has not been implemented.")
-        return None
+        #return None
 
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
