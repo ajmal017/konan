@@ -1327,8 +1327,6 @@ class IBDataBroker(IBBroker, DataBroker):
         if bar_size.endswith('month'):
             index_search_format = '%Y%m%d 00:00:00'
 
-        #print(data) #TODO:REMOVE
-
         try:
            return data.loc[data_time.strftime(index_search_format)]
         except:
@@ -1639,7 +1637,7 @@ class IBDataBroker(IBBroker, DataBroker):
             execution_filter = self.createExecutionFilter(contract = contract,
                                                             order_time = since)
 
-        self.tws.reqExecutions(1, execution_filter) # TODO: check if request_id is valid and static
+        self.tws.reqExecutions(1, execution_filter)
 
         time.sleep(1)
         
@@ -1722,7 +1720,6 @@ class IBDataBroker(IBBroker, DataBroker):
         RESULTS:
 
         """
-        # TODO: always write a new file
         PNL = self.getPNLToday()
 
         PNL.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'w+')
@@ -1739,10 +1736,8 @@ class IBDataBroker(IBBroker, DataBroker):
         RESULTS:
 
         """
-        # TODO: append to an existing file if it exists
         PNL = self.getPNLToday()
 
-        # TODO: sum positions to one record
         PNL_day = pd.DataFrame(index = [0])
         PNL_day['Date'] = PNL['Date'].max()
         PNL_day['Unrealized_PnL'] = PNL['Unrealized_PnL'].sum()
@@ -2299,7 +2294,6 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
             data = self.getDataAtTime(data_time=data_time,contract=contract)
 
-            #TODO: MUST VERIFY DATA STRUCTURE HERE
             askPrice = data['price'][data['Type'] == 'ASK PRICE'].values[0]
             bidPrice = data['price'][data['Type'] == 'BID PRICE'].values[0]
 
