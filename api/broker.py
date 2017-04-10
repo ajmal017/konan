@@ -40,7 +40,7 @@ import position as pos
 
 class BrokerConnection(object):
     """
-    Connection resource to be shared by brokers in a sytem's public environment
+    Connection resource to be shared by brokers in a system's public environment
     without disrupting properties of the connection.
     E.g. connection status, object representation.
     """
@@ -177,7 +177,7 @@ class IBBroker(Broker):
     CLASS PROPERTIES
     """
     def account_name():
-        doc = "The unique Interactive Brokers acccount name."
+        doc = "The unique Interactive Brokers account name."
         def fget(self):
             return self._account_name
         def fset(self, value):
@@ -268,7 +268,7 @@ class IBBroker(Broker):
     CLASS SPECIAL METHODS
     """
     def __str__(self):
-        return "Acount Name:{} on Port:{} with Client ID:{} ".format(self.account_name, self.client_id, self.port)
+        return "Account Name:{} on Port:{} with Client ID:{} ".format(self.account_name, self.client_id, self.port)
 
     """
     CLASS PRIVATE METHODS
@@ -390,7 +390,7 @@ class IBBroker(Broker):
         #The destination exchange.
         contract.m_exchange = exchange
 
-        #The underlying's cuurrency.
+        #The underlying's currency.
         contract.m_currency = currency
 
         contract.m_primaryExch = primary_exchange
@@ -862,7 +862,6 @@ class DataBroker(Broker):
             f = files.next()
             if fnmatch.fnmatch(f, '*' + file_name + '.' + type_data):
                 return f
-        return ''
 
 class IBDataBroker(IBBroker, DataBroker):
     """docstring for IBDataBroker."""
@@ -1209,7 +1208,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
         data =  pd.DataFrame(self.callback.account_Summary,
                         columns = ['Request_ID', 'Account', 'Tag', 'Value',
-                                    'Curency'])
+                                    'Currency'])
         return data
 
     def getDataAtTime(self, data_time, type_data = 'BID_ASK',
@@ -1942,7 +1941,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         """
         IBBrokerTotal constructor.
         Initializes object properties.
-        Combines functionalties of <IBExecutionBroker> and <IBDataBroker>.
+        Combines functionality of <IBExecutionBroker> and <IBDataBroker>.
 
         PARAMETERS:
         account_name -
