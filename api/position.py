@@ -30,7 +30,7 @@ class Position(object):
         if trade_type == 'BUY':
             self._trade_type = 1
         elif trade_type == 'SELL':
-            self._trade_type == -1
+            self._trade_type = -1
 
 
         self._amount_units = amount_units
