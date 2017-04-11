@@ -354,15 +354,15 @@ class IBBroker(Broker):
         return id
 
     def createContract(self, ticker, instrument_type,
-                        exchange = 'SMART', currency = 'USD',
-                        last_trade_date = None, expiry = None,
-                        strike_price = None, right = None, multiplier = None,
-                        primary_exchange_ticker = None, primary_exchange = None,
-                        trading_class = None, include_expired = None,
-                        secIdType = None, secId = None,
-                        combo_legs_description = None, combo_legs = None,
-                        under_comp = None, localSymbol=None                    
-                        ):
+                       exchange='SMART', currency='USD',
+                       last_trade_date=None, expiry=None,
+                       strike_price=None, right=None, multiplier=None,
+                       primary_exchange_ticker=None, primary_exchange=None,
+                       trading_class=None, include_expired=None,
+                       secId_type=None, secId=None,
+                       combo_legs_description=None, combo_legs=None,
+                       under_comp=None, localSymbol=None
+                       ):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -374,33 +374,46 @@ class IBBroker(Broker):
         RESULTS:
 
         """
+        # TODO: IMPLEMENT CONTRACT LOGIC FOR ALL CASES
+        # possibly use private methods commented out
         contract = Contract()
 
-        #The unique IB contract identifier.
-        #contract.m_conId = contract_id
+        # The unique IB contract identifier.
+        # contract.m_conId = contract_id
 
-        #The underlying's asset symbol.
+        # The underlying's asset symbol.
         contract.m_symbol = ticker
 
-        #The security's type: STK - stock (or ETF) OPT - option FUT - future
-        #IND - index FOP - futures option CASH - forex pair BAG - combo
-        #WAR - warrant BOND- bond CMDTY- commodity NEWS- news FUND- mutual fund.
+        # The security's type: STK - stock (or ETF) OPT - option FUT - future
+        # IND - index FOP - futures option CASH - forex pair BAG - combo
+        # WAR - warrant BOND- bond CMDTY- commodity NEWS- news FUND- mutual fund.
         contract.m_secType = instrument_type
 
-        #The destination exchange.
+        # The destination exchange.
         contract.m_exchange = exchange
 
-        #The underlying's currency.
+        # The underlying's currency.
         contract.m_currency = currency
 
         contract.m_primaryExch = primary_exchange
-        
+
         ''' Futures '''
         contract.m_multiplier = multiplier
         contract.m_expiry = expiry
         contract.m_localSymbol = localSymbol
         contract.m_includeExpired = include_expired
-        
+
+        ''' Others '''
+        contract.m_comboLegs = combo_legs
+        contract.m_comboLegsDescrip = combo_legs_description
+        contract.m_lastTradeDateOrContractMonth = last_trade_date
+        contract.m_strike = strike_price
+        contract.m_right = right
+        contract.m_localSymbol = primary_exchange_ticker
+        contract.m_tradingClass = trading_class
+        contract.m_secId = secId
+        contract.m_secIdType = secId_type
+        contract.m_underComp = under_comp
 
         """
         The contract's symbol within its primary exchange.
@@ -444,6 +457,8 @@ class IBBroker(Broker):
         contract.m_underComp = under_comp
         """
 
+        """
+        # DO NOT REMOVE: POSSIBLE FUTURE USE WITH SPECIFIC CASES
         dict_instrument_type = {'STK':self._createStockContract,
                                 'OPT':self._createOptionContract,
                                 'FUT':self._createFutureContract,
@@ -458,6 +473,8 @@ class IBBroker(Broker):
 
         # TODO: NEED TO PASS ALL THE AVAILABLE PARAMETERS TO LOWER METHODS
         return dict_instrument_type[instrument_type](contract = contract)
+        """
+        return contract
 
     def _createStockContract(self, contract = Contract()):
         """
