@@ -466,9 +466,9 @@ class deltixStrategy(st.Strategy):
                 buy_order = self.broker.createDollarOrder(trade_type = 'BUY',
                                                              contract = c,
                                                              amount_dollars = self.dW,
-                                                             order_type='MOC',
-                                                             time_in_force='MOC'
-                                                             )  # default is market order
+                                                             order_type='MARKET',)
+#                                                             time_in_force='MOC'
+#                                                             )  # default is market order
 #                self.broker.placeOrder(order_id, c, buy_order )
                 self.broker.placeRecordedOrder(order_id=order_id,
                            contract= c,
@@ -495,9 +495,9 @@ class deltixStrategy(st.Strategy):
                 sell_order = self.broker.createDollarOrder( trade_type = 'SELL',
                                                                amount_dollars = self.dW,
                                                                contract = c,
-                                                               order_type='MARKET',
-                                                               time_in_force='MOC'
-                                                               )  # default is market order
+                                                               order_type='MARKET',)
+#                                                               time_in_force='MOC'
+#                                                               )  # default is market order
                 time.sleep(1)
 #                self.broker.placeOrder( order_id, c, sell_order )
                 self.broker.placeRecordedOrder(order_id=order_id,

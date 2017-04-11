@@ -1639,7 +1639,10 @@ class IBDataBroker(IBBroker, DataBroker):
 
         self.tws.reqExecutions(1, execution_filter)
 
-        time.sleep(1)
+        time.sleep(2)
+        
+        ''' this will complain if MOC is used '''
+        ''' It's trying to look fo rexecutions before it has happened '''
         
         execution_contract = self.callback.exec_Details_contract.__dict__
         execution_details = self.callback.exec_Details_execution.__dict__
