@@ -337,6 +337,7 @@ class IBBroker(Broker):
         RESULTS:
 
         """
+        
         if from_IB:
             self.tws.reqIds(1)
             id = self.callback.next_ValidId
@@ -1685,7 +1686,7 @@ class IBDataBroker(IBBroker, DataBroker):
     def getDataAtTime(self, data_time, type_data = 'BID_ASK',
                         contract = Contract(), type_time = '',
                         in_trading_hours = False, duration = '60 S',
-                        bar_size = '1 min', try_time = 15, time_out = 15):
+                        bar_size = '1 min', try_time = 2, time_out = 15):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -2779,7 +2780,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             data_time = dt.datetime.now()
 
             data = self.getDataAtTime(data_time=data_time,contract=contract)
-
+            
             askPrice = data['price'][data['Type'] == 'ASK PRICE'].values[0]
             bidPrice = data['price'][data['Type'] == 'BID PRICE'].values[0]
 
@@ -2787,13 +2788,22 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
             return int(amount_dollars / price_per_unit)
 
-        liveData = self.getLiveMarketData( contract= contract )
-        askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]            
-        bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]         
-            
-        price_per_unit = ( askPrice + bidPrice )*0.5 #mid point
+
         
-#       price_per_unit = data_contract['open'].iloc[-1]
+        liveData = self.getLiveMarketData( contract= contract )
+        
+        liveData = liveData[ liveData['price']!=-1 ]   # remove -1's
+        
+        try:
+            askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]       # Try to get mid price .. if not use Close price     
+            bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]         
+                
+            price_per_unit = ( askPrice + bidPrice )*0.5 #mid point
+        except:        
+            price_per_unit = liveData['price'][ liveData['Type']=='CLOSE PRICE' ].values[0]
+        
+        
+
         return int(amount_dollars / price_per_unit)
 
     def createDollarOrder(self, amount_dollars, contract, trade_type,
@@ -2810,9 +2820,18 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         RESULTS:
 
         """
-        amount_units = self._totalDollarToTotalUnits(amount_dollars = amount_dollars,
-                                                    contract = contract)
-
+                
+        amount_units = self._totalDollarToTotalUnits( amount_dollars = amount_dollars,
+                                                      contract = contract)
+        
+        
+        if( amount_units==0 ):
+            print ( "We are trying to buy " + str(amount_units) + " units of a stock. Something is wrong. ")
+            
+            
+            
+            
+    
         order = self.createOrder(trade_type = trade_type,
                                     amount_units = amount_units,
                                     price_per_unit = price_per_unit,
