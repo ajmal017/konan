@@ -344,9 +344,11 @@ class IBBroker(Broker):
             return id
         if from_datetime:
             now = dt.datetime.now()
-            strID = "".join((str(now.day), str(now.hour),
-                             str(now.minute), str(now.second),
-                             str(now.microsecond)[0:1]))
+            strID = "".join((str('{:02d}'.format(now.day)),
+                             str('{:02d}'.format(now.hour)),
+                             str('{:02d}'.format(now.minute)),
+                             str('{:02d}'.format(now.second)),
+                             str('{:02d}'.format(now.microsecond)[:1])))
             id = int(strID)
             self.current_order_id = id + 1
             return id
