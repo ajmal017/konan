@@ -344,13 +344,10 @@ class deltixStrategy(st.Strategy):
         print ("Hedge required: ", delta_stkExposureReq, " stock units")
 
         action = { 1: 'BUY', -1: 'SELL' }
-#        order_id = self.broker.nextOrderId()+1        
-#        order_id = getID()
-        order_id = self.broker.nextOrderId()
 
         if (delta_stkExposureReq !=0):
-#            order_id = order_id + 1
-            order_id = self.broker.nextOrderId()
+
+
             hedgeTrade = action[ np.sign(delta_stkExposureReq) ]
             hedge_order = self.broker.createOrder( trade_type=hedgeTrade, amount_units= int(abs(delta_stkExposureReq)), order_type='MARKET' )
 #            self.broker.placeOrder(order_id=order_id,
@@ -371,9 +368,6 @@ class deltixStrategy(st.Strategy):
 
     def enterNewPositions(self):
         ''' This should be entered at the close '''
-#        order_id = self.broker.nextOrderId()+2
-        order_id = self.broker.nextOrderId()
-            
         
         todayBulls = pd.Series()
         todayBears = pd.Series()
@@ -403,9 +397,8 @@ class deltixStrategy(st.Strategy):
                                          )['close'].iloc[-1]
                                     
             ''' Inter Close-Close returns '''
-            todayBulls[stk] = (todayClosePrice - prevClosePrice) /prevClosePrice
-            
-#            print(stk, todayBulls[stk])
+            todayBulls[stk] = (todayClosePrice - prevClosePrice) /prevClosePrice        
+            print(stk, todayBulls[stk])
         
         
         for stk in self.decision_algorithm.bears.keys():
@@ -476,7 +469,7 @@ class deltixStrategy(st.Strategy):
         for stk in self.decision_algorithm.bulls.keys():
             try:
                 stk_ = stk.replace("."," ")
-#                order_id = getID()                
+
                 c = self.broker.createContract(ticker=stk_,
                                                    instrument_type="STK",
                                                    primary_exchange ='NYSE')
