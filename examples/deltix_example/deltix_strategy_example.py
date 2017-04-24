@@ -216,16 +216,35 @@ class deltixStrategy(st.Strategy):
                                               target_date=dt.date.today(),
                                               move=0)
                 prevClose = dt.datetime.combine( nysecal[idx-1], dt.time(16,0,0) )                                                
-                prevClosePrice = self.broker.getDataAtTime( type_data='MIDPOINT',
-                                             contract = contract,
-                                             data_time = prevClose,
-                                             bar_size='1 secs'
-                                             )['close'].iloc[-1]
+                
+                try:
+                    prevClosePrice = self.broker.getDataAtTime( type_data='MIDPOINT',
+                                                 contract = contract,
+                                                 data_time = prevClose,
+                                                 bar_size='1 secs'
+                                                 )['close'].iloc[-1]
+                except:
+                    
+                    try:
+                        prevClosePrice = self.broker.getDataAtTime( type_data='BID',
+                                                     contract = contract,
+                                                     data_time = prevClose,
+                                                     bar_size='1 secs'
+                                                     )['close'].iloc[-1]
+                                                                       
+                    except:
+                        prevClosePrice = self.broker.getDataAtTime( type_data='ASK',
+                             contract = contract,
+                             data_time = prevClose,
+                             bar_size='1 secs'
+                             )['close'].iloc[-1]
+
                 
                 
                 print(ticker, prevClosePrice)
 #                prevClose = self.broker.getDailyData(ticker, provider='yahoo', date_start=nysecal[idx-1], date_end=nysecal[idx-1] )
 #                prevClosePrice = prevClose['Adj Close'].values[0]
+                time.sleep(1)
                                                            
                 liveData = self.broker.getLiveMarketData(contract=contract)
                                 
@@ -337,7 +356,7 @@ class deltixStrategy(st.Strategy):
 #            self.broker.placeOrder(order_id=order_id,
 #                                       contract=hedgeContract,
 #                                       order=hedge_order)        
-            self.broker.placeRecordedOrder(order_id=order_id,
+            self.broker.placeRecordedOrder(order_id=self.broker.nextOrderId(),
                                        contract=hedgeContract,
                                        order=hedge_order,
                                        path = self.broker.exec_path
@@ -346,7 +365,7 @@ class deltixStrategy(st.Strategy):
             
         elif ( (delta_stkExposureReq==0) and (desiredFinalExposure ==0) ):
 #            order_id = order_id + 1
-            order_id = self.broker.nextOrderId()
+#            order_id = self.broker.nextOrderId()
             self.broker.closePosition(symbol=self.hedgeInstrument , order_type='MARKET', record=True)
 
 
@@ -457,9 +476,7 @@ class deltixStrategy(st.Strategy):
         for stk in self.decision_algorithm.bulls.keys():
             try:
                 stk_ = stk.replace("."," ")
-#                order_id = getID()
-                order_id =self.broker.nextOrderId()
-                print('Long: ', stk, order_id)
+#                order_id = getID()                
                 c = self.broker.createContract(ticker=stk_,
                                                    instrument_type="STK",
                                                    primary_exchange ='NYSE')
@@ -470,11 +487,13 @@ class deltixStrategy(st.Strategy):
 #                                                             time_in_force='MOC'
 #                                                             )  # default is market order
 #                self.broker.placeOrder(order_id, c, buy_order )
+                order_id =self.broker.nextOrderId()                
                 self.broker.placeRecordedOrder(order_id=order_id,
                            contract= c,
                            order=buy_order,
                            path = self.broker.exec_path
                            )
+                print('Long: ', stk, order_id)                
 
                 time.sleep(1)
                 self.broker.callback.order_Status
@@ -487,8 +506,7 @@ class deltixStrategy(st.Strategy):
         for stk in self.decision_algorithm.bears.keys():
 
             try:
-                stk_ = stk.replace("."," ")
-                print('Short: ', stk, order_id)
+                
                 c = self.broker.createContract(ticker=stk_,
                                                    instrument_type="STK",
                                                    primary_exchange ='NYSE')
@@ -500,11 +518,15 @@ class deltixStrategy(st.Strategy):
 #                                                               )  # default is market order
                 time.sleep(1)
 #                self.broker.placeOrder( order_id, c, sell_order )
+                stk_ = stk.replace("."," ")
+                
+                order_id =self.broker.nextOrderId()                
                 self.broker.placeRecordedOrder(order_id=order_id,
                            contract= c,
                            order=sell_order,
                            path = self.broker.exec_path
                            )
+                print('Short: ', stk, order_id)             
 
                 time.sleep(1)
             except:

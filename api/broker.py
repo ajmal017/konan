@@ -1979,7 +1979,7 @@ class IBDataBroker(IBBroker, DataBroker):
                                 type_search = 'CONTRACT',
                                 type_data = 'ID')[0]
         """
-        ticker_id = self.nextOrderId(from_datetime=True)
+#        ticker_id = self.nextOrderId(from_datetime=True)
 
         self._resetCallbackAttribute('tick_Price')
         data = pd.DataFrame(self.callback.tick_Price,
@@ -1992,7 +1992,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
         while data.equals(data_null) and now <= end_wait:
 
-            self.tws.reqMktData(tickerId = ticker_id, contract = contract,
+            self.tws.reqMktData(tickerId = self.nextOrderId(), contract = contract,
                                 genericTickList = '', snapshot = True)
 
             time.sleep(1)
@@ -2114,9 +2114,14 @@ class IBDataBroker(IBBroker, DataBroker):
         
         ''' this will complain if MOC is used '''
         ''' It's trying to look fo rexecutions before it has happened '''
+        ''' We should store this internally eventually '''
+        try:
+            execution_contract = self.callback.exec_Details_contract.__dict__
+            execution_details = self.callback.exec_Details_execution.__dict__            
+        except:            
+            return pd.DataFrame()
         
-        execution_contract = self.callback.exec_Details_contract.__dict__
-        execution_details = self.callback.exec_Details_execution.__dict__
+            
         execution = dict(execution_contract, **execution_details)
 
         data = pd.DataFrame.from_dict([execution])
@@ -2557,7 +2562,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                 order = order)
             time.sleep(1)
 
-            order_id += 1
+#            order_id += 1
+            order_id = self.nextOrderId()
 
     def closeAllTypePositions(self, order_type = '', instruments = [''],
                                 exclude_symbol = [''], record = False):
@@ -2613,13 +2619,14 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                         order_type = order_type)
 
             if record:
-                self.placeRecordedOrder(order_id=order_id, contract=contract,
+                self.placeRecordedOrder(order_id=self.nextOrderId(), contract=contract,
                                         order=order, path=self.exec_path)
             else:
-                self.placeOrder(order_id = order_id, contract = contract, order = order)
+                self.placeOrder(order_id = self.nextOrderId(), contract = contract, order = order)
             time.sleep(1)
 
-            order_id += 1
+#            order_id += 1
+            order_id = self.nextOrderId()
 
     def closeAllNamePositions(self, order_type = '', tickers = [''],
                               record = False):
@@ -2679,7 +2686,8 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                 self.placeOrder(order_id = order_id, contract = contract, order = order)
             time.sleep(1)
 
-            order_id += 1
+#            order_id += 1
+            order_id = self.nextOrderId()
 
     def closePosition(self, symbol = '', order_type = '', record = False):
         """
@@ -2707,7 +2715,6 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                   "'GTC','IOC', 'OCA', 'VOL'.")
             return None
 
-        order_id = self.nextOrderId()
 
         positions = self.getPositions()
 
@@ -2742,13 +2749,18 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                     amount_units = amount_units,
                                     price_per_unit = price_per_unit,
                                     order_type = order_type)
+        
+#        order_id = self.nextOrderId()    
+#        print( symbol, order_id )
 
         if record:
-            self.placeRecordedOrder(order_id=order_id, contract=contract,
+            self.placeRecordedOrder(order_id=self.nextOrderId(), contract=contract,
                                 order=order, path=self.exec_path)
+            
+#            print( symbol, order_id )
         else:
-            self.placeOrder(order_id = order_id, contract = contract, order = order)
-        time.sleep(1)
+            self.placeOrder(order_id = self.nextOrderId(), contract = contract, order = order)
+        time.sleep(1.1)
 
     def _totalDollarToTotalUnits(self, amount_dollars, contract, at_time = False,
                                     data_time = None):
@@ -2779,7 +2791,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]            
         bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]         
             
-        price_per_unit = ( askPrice +bidPrice )*0.5 #mid point
+        price_per_unit = ( askPrice + bidPrice )*0.5 #mid point
         
 #       price_per_unit = data_contract['open'].iloc[-1]
         return int(amount_dollars / price_per_unit)
