@@ -160,9 +160,9 @@ class deltixStrategy(st.Strategy):
         self.decision_algorithm.pickleCalendars()
 
         print('Momentum Guard')
-        self.momentumGuard()
+        #self.momentumGuard()
         print('Hedge positions')
-        self.hedgePositions(data_time=openDT)
+        #self.hedgePositions(data_time=openDT)
         
         
         
@@ -193,7 +193,6 @@ class deltixStrategy(st.Strategy):
         self.broker.recordPNLToday( path=os.path.join(performancepath, str(date)+"positionPNL.csv" ) )
         self.broker.recordPNLDailyPerformance( path=os.path.join(performancepath, "deltixAggregatedPNL.csv" ) )
                 
-        
 
     def momentumGuard(self):
         pos = self.broker.getPositions()
@@ -346,11 +345,11 @@ class deltixStrategy(st.Strategy):
         action = { 1: 'BUY', -1: 'SELL' }
 #        order_id = self.broker.nextOrderId()+1        
 #        order_id = getID()
-        order_id = self.broker.nextOrderId()
+#        order_id = self.broker.nextOrderId()
 
         if (delta_stkExposureReq !=0):
 #            order_id = order_id + 1
-            order_id = self.broker.nextOrderId()
+#            order_id = self.broker.nextOrderId()
             hedgeTrade = action[ np.sign(delta_stkExposureReq) ]
             hedge_order = self.broker.createOrder( trade_type=hedgeTrade, amount_units= int(abs(delta_stkExposureReq)), order_type='MARKET' )
 #            self.broker.placeOrder(order_id=order_id,
@@ -372,7 +371,7 @@ class deltixStrategy(st.Strategy):
     def enterNewPositions(self):
         ''' This should be entered at the close '''
 #        order_id = self.broker.nextOrderId()+2
-        order_id = self.broker.nextOrderId()
+#        order_id = self.broker.nextOrderId()
             
         
         todayBulls = pd.Series()
@@ -384,6 +383,8 @@ class deltixStrategy(st.Strategy):
             
             
             ''' live Data '''
+            
+            
             contract = self.broker.createContract(ticker=stk, instrument_type='STK')
             liveData = self.broker.getLiveMarketData(contract=contract)                                
             askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]
@@ -404,6 +405,10 @@ class deltixStrategy(st.Strategy):
                                     
             ''' Inter Close-Close returns '''
             todayBulls[stk] = (todayClosePrice - prevClosePrice) /prevClosePrice
+            
+            
+            print ("BULLS: ")
+            print ( stk, todayClosePrice, prevClosePrice )
             
 #            print(stk, todayBulls[stk])
         
@@ -433,7 +438,9 @@ class deltixStrategy(st.Strategy):
             
             ''' Inter Close-Close returns '''
             todayBears[stk] = (todayClosePrice - prevClosePrice) /prevClosePrice
-            
+                
+            print ("BEARS: ")            
+            print ( stk, todayClosePrice, prevClosePrice )
         
         todayBulls.sort_values( inplace=True, ascending=True )
         todayBears.sort_values( inplace=True, ascending=False )
@@ -495,9 +502,9 @@ class deltixStrategy(st.Strategy):
                            )
                 print('Long: ', stk, order_id)                
 
-                time.sleep(1)
+                time.sleep(.5)
                 self.broker.callback.order_Status
-                time.sleep(1)
+                time.sleep(.5)
             except:
                 print("error:", traceback.format_exc())
                 continue
@@ -533,4 +540,4 @@ class deltixStrategy(st.Strategy):
                 continue
 
 #            order_id = order_id + 1
-            order_id = self.broker.nextOrderId()
+#            order_id = self.broker.nextOrderId()
