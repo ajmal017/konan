@@ -1,10 +1,10 @@
-"""
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-api.broker.py
-Created on 2017-02-14T16:36:00Z
-@author:Joshua Hu
-"""
+# api.broker.py
+# Created on 2017-02-14T16:36:00Z
+# @author:jsrhu
+# @author:Joshua Hu
+
 # imports from future
 from __future__ import print_function
 
@@ -171,7 +171,10 @@ class IBBroker(Broker):
         self.connect()
 
         time.sleep(1)
-        self.nextOrderId(from_IB=True)
+
+        # TODO: MOVE TO AN INITIALIZER
+        # needed in the case of id number overflow? TODO: CHECK THIS LOGIC
+        # self.nextOrderId(from_IB=True)
 
     """
     CLASS PROPERTIES
@@ -335,11 +338,10 @@ class IBBroker(Broker):
 
         """
         if from_IB:
-#            self.tws.reqIds(1)
-#            id = self.callback.next_ValidId
-#            self.current_order_id = id + 1
-#            return id
-            pass
+            self.tws.reqIds(1)
+            id = self.callback.next_ValidId
+            self.current_order_id = id + 1
+            return id
         if from_datetime:
             now = dt.datetime.now()
             strID = "".join((str(now.day), str(now.hour),
@@ -655,7 +657,8 @@ class IBBroker(Broker):
         return contract
 
     def createOrder(self, trade_type, amount_units, price_per_unit = 0.0,
-                    total_price = 0.0, order_type = '', time_in_force = None):
+                    total_price = 0.0, order_type = '', time_in_force = None,
+                    solicited = None):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -756,6 +759,39 @@ class IBBroker(Broker):
             order.m_orderType = order_type
 
         if order_type in ('MTL', 'MKT', 'LMT'):
+            """
+            DAY - Valid for the day only.
+            GTC - Good until canceled.
+                The order will continue to work within the system and in the
+                marketplace until it executes or is canceled.
+                GTC orders will be automatically be cancelled under the
+                following conditions:
+                    If a corporate action on a security results in a stock split
+                    (forward or reverse), exchange for shares, or
+                    distribution of shares.
+                    If you do not log into your IB account for 90 days.
+                    At the end of the calendar quarter following thecurrent quarter.
+                        For example, an order placed during the third quarter of
+                        2011 will be canceled at the end of the first quarter
+                        of 2012.
+                    If the last day is a non-trading day, the cancellation will
+                    occur at the close of the final trading day of that quarter.
+                        For example, if the last day of the quarter is Sunday,
+                        the orders will be cancelled on the preceding Friday.
+                Orders that are modified will be assigned a new "Auto Expire"
+                date consistent with the end of the calendar quarter
+                following the current quarter.
+                Orders submitted to IB that remain in force for more than
+                one day will not be reduced for dividends. To allow adjustment
+                to your order price on ex-dividend date, consider using a
+                Good-Til-Date/Time (GTD) or Good-after-Time/Date (GAT)
+                order type, or a combination of the two.
+            IOC - Immediate or Cancel. Any portion that is not filled as soon as it becomes available in the market is canceled.
+            GTD - Good until Date. It will remain working within the system and in the marketplace until it executes or until the close of the market on the date specified
+            OPG - Use OPG to send a market-on-open (MOO) or limit-on-open (LOO) order.
+            FOK - If the entire Fill-or-Kill order does not execute as soon as it becomes available, the entire order is canceled.
+            DTC - Day until Canceled.
+            """
             if order_type == 'MTL' and time_in_force == 'AUC':
                 order.m_tif = time_in_force
             elif order_type == 'MKT' and time_in_force == 'OPG':
@@ -771,6 +807,422 @@ class IBBroker(Broker):
                       "<<order_type>> = 'MKT' : <<time_in_force>> = 'OPG'," \
                       "<<order_type>> = 'LMT' : <<time_in_force>> = 'OPG,")
 
+        #order.m_orderId = None
+        order.m_solicited = solicited
+
+        """
+        OrderId - The API client's order id.
+        IS THIS NEEDED
+        
+        double 	LmtPrice [get, set]
+            The LIMIT price. Used for limit, stop-limit and relative orders. In all other cases specify zero. For relative orders with no limit price, also specify zero. 
+
+        double 	AuxPrice [get, set]
+            Generic field to contain the stop price for STP LMT orders, trailing amount, etc. 
+
+        string 	Tif [get, set]
+            The time in force. Valid values are: 
+        
+        string 	OcaGroup [get, set]
+            One-Cancels-All group identifier. 
+
+        int 	OcaType [get, set]
+            Tells how to handle remaining orders in an OCA group when one order or part of an order executes. Valid values are:
+        1 = Cancel all remaining orders with block.
+        2 = Remaining orders are proportionately reduced in size with block.
+        3 = Remaining orders are proportionately reduced in size with no block.
+        If you use a value "with block" gives your order has overfill protection. This means that only one order in the group will be routed at a time to remove the possibility of an overfill. 
+
+        string 	OrderRef [get, set]
+            The order reference. Intended for institutional customers only, although all customers may use it to identify the API client that sent the order when multiple API clients are running. 
+
+        bool 	Transmit [get, set]
+            Specifies whether the order will be transmitted by TWS. If set to false, the order will be created at TWS but will not be sent. 
+
+        int 	ParentId [get, set]
+            The order ID of the parent order, used for bracket and auto trailing stop orders. 
+
+        bool 	BlockOrder [get, set]
+            If set to true, specifies that the order is an ISE Block order. 
+
+        bool 	SweepToFill [get, set]
+            If set to true, specifies that the order is a Sweep-to-Fill order. 
+
+        int 	DisplaySize [get, set]
+            The publicly disclosed order size, used when placing Iceberg orders. 
+
+        int 	TriggerMethod [get, set]
+            Specifies how Simulated Stop, Stop-Limit and Trailing Stop orders are triggered. Valid values are:
+        0 - The default value. The "double bid/ask" function will be used for orders for OTC stocks and US options. All other orders will used the "last" function.
+        1 - use "double bid/ask" function, where stop orders are triggered based on two consecutive bid or ask prices.
+        2 - "last" function, where stop orders are triggered based on the last price.
+        3 double last function.
+        4 bid/ask function.
+        7 last or bid/ask function.
+        8 mid-point function.
+        . 
+
+        bool 	OutsideRth [get, set]
+            If set to true, allows orders to also trigger or fill outside of regular trading hours. 
+
+        bool 	Hidden [get, set]
+            If set to true, the order will not be visible when viewing the market depth. This option only applies to orders routed to the ISLAND exchange. 
+
+        string 	GoodAfterTime [get, set]
+            Specifies the date and time after which the order will be active. Format: yyyymmdd hh:mm:ss {optional Timezone}. 
+
+        string 	GoodTillDate [get, set]
+            The date and time until the order will be active. You must enter GTD as the time in force to use this string. The trade's "Good Till Date," format "YYYYMMDD hh:mm:ss (optional time zone)". 
+
+        bool 	OverridePercentageConstraints [get, set]
+            Overrides TWS constraints. Precautionary constraints are defined on the TWS Presets page, and help ensure tha tyour price and size order values are reasonable. Orders sent from the API are also validated against these safety constraints, and may be rejected if any constraint is violated. To override validation, set this parameter’s value to True. 
+
+        string 	Rule80A [get, set]
+
+        Individual = 'I'
+        Agency = 'A'
+        AgentOtherMember = 'W'
+        IndividualPTIA = 'J'
+        AgencyPTIA = 'U'
+        AgentOtherMemberPTIA = 'M'
+        IndividualPT = 'K'
+        AgencyPT = 'Y'
+        AgentOtherMemberPT = 'N'
+
+
+        bool 	AllOrNone [get, set]
+            Indicates whether or not all the order has to be filled on a single execution. 
+
+        int 	MinQty [get, set]
+            Identifies a minimum quantity order type. 
+
+        double 	PercentOffset [get, set]
+            The percent offset amount for relative orders. 
+
+        double 	TrailStopPrice [get, set]
+            Trail stop price for TRAILIMIT orders. 
+
+        double 	TrailingPercent [get, set]
+            Specifies the trailing amount of a trailing stop order as a percentage. Observe the following guidelines when using the trailingPercent field:
+        . More...
+
+        string 	FaGroup [get, set]
+            The Financial Advisor group the trade will be allocated to. Use an empty string if not applicable. 
+
+        string 	FaProfile [get, set]
+            The Financial Advisor allocation profile the trade will be allocated to. Use an empty string if not applicable. 
+
+        string 	FaMethod [get, set]
+            The Financial Advisor allocation method the trade will be allocated to. Use an empty string if not applicable. 
+
+        string 	FaPercentage [get, set]
+            The Financial Advisor percentage concerning the trade's allocation. Use an empty string if not applicable. 
+
+        string 	OpenClose [get, set]
+            For institutional customers only. Available for institutional clients to determine if this order is to open or close a position. Valid values are O (open), C (close). 
+
+        int 	Origin [get, set]
+            The order's origin. Same as TWS "Origin" column. Identifies the type of customer from which the order originated. Valid values are 0 (customer), 1 (firm). 
+
+        int 	ShortSaleSlot [get, set]
+
+        For institutions only. Valid values are: 1 (broker holds shares) or 2 (shares come from elsewhere).
+
+
+        string 	DesignatedLocation [get, set]
+            Used only when shortSaleSlot is 2. For institutions only. Indicates the location where the shares to short come from. Used only when short sale slot is set to 2 (which means that the shares to short are held elsewhere and not with IB). 
+
+        int 	ExemptCode [get, set]
+
+
+
+        double 	DiscretionaryAmt [get, set]
+            The amount off the limit price allowed for discretionary orders. 
+
+        bool 	ETradeOnly [get, set]
+            Trade with electronic quotes. 
+
+        bool 	FirmQuoteOnly [get, set]
+            Trade with firm quotes. 
+
+        double 	NbboPriceCap [get, set]
+            Maximum smart order distance from the NBBO. 
+
+        bool 	OptOutSmartRouting [get, set]
+            Use to opt out of default SmartRouting for orders routed directly to ASX. This attribute defaults to false unless explicitly set to true. When set to false, orders routed directly to ASX will NOT use SmartRouting. When set to true, orders routed directly to ASX orders WILL use SmartRouting. 
+
+        int 	AuctionStrategy [get, set]
+
+        For BOX orders only. Values include: 1 - match 
+        2 - improvement 
+        3 - transparent 
+
+
+        double 	StartingPrice [get, set]
+            The auction's starting price. For BOX orders only. 
+
+        double 	StockRefPrice [get, set]
+            The stock's reference price. The reference price is used for VOL orders to compute the limit price sent to an exchange (whether or not Continuous Update is selected), and for price range monitoring. 
+
+        double 	Delta [get, set]
+            The stock's Delta. For orders on BOX only. 
+
+        double 	StockRangeLower [get, set]
+            The lower value for the acceptable underlying stock price range. For price improvement option orders on BOX and VOL orders with dynamic management. 
+
+        double 	StockRangeUpper [get, set]
+            The upper value for the acceptable underlying stock price range. For price improvement option orders on BOX and VOL orders with dynamic management. 
+
+        double 	Volatility [get, set]
+            The option price in volatility, as calculated by TWS' Option Analytics. This value is expressed as a percent and is used to calculate the limit price sent to the exchange. 
+
+        int 	VolatilityType [get, set]
+            Values include:
+        1 - Daily Volatility 2 - Annual Volatility. 
+
+        int 	ContinuousUpdate [get, set]
+            Specifies whether TWS will automatically update the limit price of the order as the underlying price moves. VOL orders only. 
+
+        int 	ReferencePriceType [get, set]
+            Specifies how you want TWS to calculate the limit price for options, and for stock range price monitoring. VOL orders only. Valid values include: 
+        1 - Average of NBBO 
+        2 - NBB or the NBO depending on the action and right. 
+        . 
+
+        string 	DeltaNeutralOrderType [get, set]
+            Enter an order type to instruct TWS to submit a delta neutral trade on full or partial execution of the VOL order. VOL orders only. For no hedge delta order to be sent, specify NONE. 
+
+        double 	DeltaNeutralAuxPrice [get, set]
+            Use this field to enter a value if the value in the deltaNeutralOrderType field is an order type that requires an Aux price, such as a REL order. VOL orders only. 
+
+        int 	DeltaNeutralConId [get, set]
+
+        DOC_TODO
+
+
+        string 	DeltaNeutralSettlingFirm [get, set]
+
+        DOC_TODO
+
+
+        string 	DeltaNeutralClearingAccount [get, set]
+
+        DOC_TODO
+
+
+        string 	DeltaNeutralClearingIntent [get, set]
+
+        DOC_TODO
+
+
+        string 	DeltaNeutralOpenClose [get, set]
+            Specifies whether the order is an Open or a Close order and is used when the hedge involves a CFD and and the order is clearing away. 
+
+        bool 	DeltaNeutralShortSale [get, set]
+            Used when the hedge involves a stock and indicates whether or not it is sold short. 
+
+        int 	DeltaNeutralShortSaleSlot [get, set]
+
+        Has a value of 1 (the clearing broker holds shares) or 2 (delivered from a third party). If you use 2, then you must specify a deltaNeutralDesignatedLocation.
+
+
+        string 	DeltaNeutralDesignatedLocation [get, set]
+
+        Used only when deltaNeutralShortSaleSlot = 2.
+
+
+        double 	BasisPoints [get, set]
+
+        DOC_TODO For EFP orders only.
+
+
+        int 	BasisPointsType [get, set]
+
+        DOC_TODO For EFP orders only.
+
+
+        int 	ScaleInitLevelSize [get, set]
+            Defines the size of the first, or initial, order component. For Scale orders only. 
+
+        int 	ScaleSubsLevelSize [get, set]
+            Defines the order size of the subsequent scale order components. For Scale orders only. Used in conjunction with scaleInitLevelSize(). 
+
+        double 	ScalePriceIncrement [get, set]
+            Defines the price increment between scale components. For Scale orders only. This value is compulsory. 
+
+        double 	ScalePriceAdjustValue [get, set]
+
+        DOC_TODO For extended Scale orders.
+
+
+        int 	ScalePriceAdjustInterval [get, set]
+
+        DOC_TODO For extended Scale orders.
+
+
+        double 	ScaleProfitOffset [get, set]
+
+        DOC_TODO For extended scale orders.
+
+
+        bool 	ScaleAutoReset [get, set]
+
+        DOC_TODO For extended scale orders.
+
+
+        int 	ScaleInitPosition [get, set]
+
+        DOC_TODO For extended scale orders.
+
+
+        int 	ScaleInitFillQty [get, set]
+
+        DOC_TODO For extended scale orders.
+
+
+        bool 	ScaleRandomPercent [get, set]
+
+        DOC_TODO For extended scale orders.
+
+
+        string 	HedgeType [get, set]
+            For hedge orders. Possible values include:
+        D - delta 
+        B - beta 
+        F - FX 
+        P - Pair 
+        . 
+
+        string 	HedgeParam [get, set]
+
+        DOC_TODO Beta = x for Beta hedge orders, ratio = y for Pair hedge order
+
+
+        string 	Account [get, set]
+            The account the trade will be allocated to. 
+
+        string 	SettlingFirm [get, set]
+
+        DOC_TODO Institutions only. Indicates the firm which will settle the trade.
+
+
+        string 	ClearingAccount [get, set]
+            Specifies the true beneficiary of the order. For IBExecution customers. This value is required for FUT/FOP orders for reporting to the exchange. 
+
+        string 	ClearingIntent [get, set]
+            For exeuction-only clients to know where do they want their shares to be cleared at. Valid values are: IB, Away, and PTA (post trade allocation). 
+
+        string 	AlgoStrategy [get, set]
+            The algorithm strategy. As of API verion 9.6, the following algorithms are supported:
+        ArrivalPx - Arrival Price 
+        DarkIce - Dark Ice 
+        PctVol - Percentage of Volume 
+        Twap - TWAP (Time Weighted Average Price) 
+        Vwap - VWAP (Volume Weighted Average Price) 
+        For more information about IB's API algorithms, refer to https://www.interactivebrokers.com/en/software/api/apiguide/tables/ibalgo_parameters.htm. 
+
+        List< TagValue > 	AlgoParams [get, set]
+            The list of parameters for the IB algorithm. For more information about IB's API algorithms, refer to https://www.interactivebrokers.com/en/software/api/apiguide/tables/ibalgo_parameters.htm. 
+
+        bool 	WhatIf [get, set]
+            Allows to retrieve the commissions and margin information. When placing an order with this attribute set to true, the order will not be placed as such. Instead it will used to request the commissions and margin information that would result from this order. 
+
+        string 	AlgoId [get, set]
+
+        bool 	NotHeld [get, set]
+            Orders routed to IBDARK are tagged as “post only” and are held in IB's order book, where incoming SmartRouted orders from other IB customers are eligible to trade against them. For IBDARK orders only. 
+
+        List< TagValue > 	SmartComboRoutingParams [get, set]
+            Parameters for combo routing. For more information, refer to https://www.interactivebrokers.com/en/software/api/apiguide/tables/smart_combo_routing.htm. 
+
+        List< OrderComboLeg > 	OrderComboLegs [get, set]
+            The attributes for all legs within a combo order. 
+
+        List< TagValue > 	OrderMiscOptions [get, set]
+
+        DOC_TODO
+
+
+        string 	ActiveStartTime [get, set]
+            for GTC orders. 
+
+        string 	ActiveStopTime [get, set]
+            for GTC orders. 
+
+        string 	ScaleTable [get, set]
+            Used for scale orders. 
+
+        string 	ModelCode [get, set]
+            model code 
+
+        string 	ExtOperator [get, set]
+            This is a regulartory attribute that applies to all US Commodity (Futures) Exchanges, provided to allow client to comply with CFTC Tag 50 Rules. 
+
+        double 	CashQty [get, set]
+            The native cash quantity. 
+
+        bool 	RandomizeSize [get, set]
+
+        DOC_TODO
+
+
+        bool 	RandomizePrice [get, set]
+
+        DOC_TODO
+
+
+        int 	ReferenceContractId [get, set]
+            Pegged-to-benchmark orders: this attribute will contain the conId of the contract against which the order will be pegged. 
+
+        bool 	IsPeggedChangeAmountDecrease [get, set]
+            Pegged-to-benchmark orders: indicates whether the order's pegged price should increase or decreases. 
+
+        double 	PeggedChangeAmount [get, set]
+            Pegged-to-benchmark orders: amount by which the order's pegged price should move. 
+
+        double 	ReferenceChangeAmount [get, set]
+            Pegged-to-benchmark orders: the amount the reference contract needs to move to adjust the pegged order. 
+
+        string 	ReferenceExchange [get, set]
+            Pegged-to-benchmark orders: the exchange against which we want to observe the reference contract. 
+
+        string 	AdjustedOrderType [get, set]
+            Adjusted Stop orders: the parent order will be adjusted to the given type when the adjusted trigger price is penetrated. 
+
+        double 	TriggerPrice [get, set]
+
+        DOC_TODO
+
+
+        double 	LmtPriceOffset [get, set]
+
+        DOC_TODO
+
+
+        double 	AdjustedStopPrice [get, set]
+            Adjusted Stop orders: specifies the stop price of the adjusted (STP) parent. 
+
+        double 	AdjustedStopLimitPrice [get, set]
+            Adjusted Stop orders: specifies the stop limit price of the adjusted (STPL LMT) parent. 
+
+        double 	AdjustedTrailingAmount [get, set]
+            Adjusted Stop orders: specifies the trailing amount of the adjusted (TRAIL) parent. 
+
+        int 	AdjustableTrailingUnit [get, set]
+            Adjusted Stop orders: specifies where the trailing unit is an amount (set to 0) or a percentage (set to 1) 
+
+        List< OrderCondition > 	Conditions [get, set]
+            Conditions determining when the order will be activated or canceled. 
+
+        bool 	ConditionsIgnoreRth [get, set]
+            Indicates whether or not conditions will also be valid outside Regular Trading Hours. 
+
+        bool 	ConditionsCancelOrder [get, set]
+            Conditions can determine if an order should become active or canceled. 
+
+        SoftDollarTier 	Tier [get, set]
+            Define the Soft Dollar Tier used for the order. Only provided for registered professional advisors and hedge and mutual funds. 
+        """
         return order
 
     def preparePosition(self, position = pos.Position()):
