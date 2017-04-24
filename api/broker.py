@@ -1683,7 +1683,7 @@ class IBDataBroker(IBBroker, DataBroker):
     def getDataAtTime(self, data_time, type_data = 'BID_ASK',
                         contract = Contract(), type_time = '',
                         in_trading_hours = False, duration = '60 S',
-                        bar_size = '1 min', time_out = 10):
+                        bar_size = '1 min', try_time = 15, time_out = 15):
         """
         METHOD SUMMARY
         METHOD DESCRIPTION
@@ -1714,7 +1714,7 @@ class IBDataBroker(IBBroker, DataBroker):
 
         self._resetCallbackAttribute('historical_Data')
 
-#        ticker_id = self._addTicker(ticker = contract.m_symbol)        
+#        ticker_id = self._addTicker(ticker = contract.m_symbol)
         ticker_id = self.nextOrderId(from_datetime=True)
 
         if type_time in ('OPEN', 'CLOSE'):
@@ -1749,7 +1749,7 @@ class IBDataBroker(IBBroker, DataBroker):
                                      whatToShow = type_data,
                                      useRTH = trading_hours, formatDate = 1)
 
-            time.sleep(1)
+            time.sleep(try_time)
             #end modularize
 
             #could modularize
