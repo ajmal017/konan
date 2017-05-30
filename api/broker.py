@@ -38,6 +38,7 @@ import directory as dr
 import data as dat
 import position as pos
 
+
 class BrokerConnection(object):
     """
     Connection resource to be shared by brokers in a system's public environment
@@ -59,6 +60,7 @@ class BrokerConnection(object):
             Creates BrokerConnection object.
         """
         super(BrokerConnection, self).__init__()
+
 
 class IBBrokerConnection(BrokerConnection):
     """
@@ -109,6 +111,7 @@ class IBBrokerConnection(BrokerConnection):
         return locals()
     interface = property(**interface())
 
+
 class Broker(object):
     """Parent template for <Broker> type objects."""
     def __init__(self):
@@ -125,6 +128,7 @@ class Broker(object):
             Creates a <Broker> object.
         """
         super(Broker, self).__init__()
+
 
 class IBBroker(Broker):
     """
@@ -169,12 +173,6 @@ class IBBroker(Broker):
         self._client_id = client_id
 
         self.connect()
-
-        time.sleep(1)
-
-        # TODO: MOVE TO AN INITIALIZER
-        # needed in the case of id number overflow? TODO: CHECK THIS LOGIC
-        # self.nextOrderId(from_IB=True)
 
     """
     CLASS PROPERTIES
@@ -1260,6 +1258,7 @@ class IBBroker(Broker):
             execution_filter.m_time = order_time.strftime('%Y%m%d %H:%M:%S')
         return execution_filter
 
+
 class DataBroker(Broker):
     """docstring for DataBroker."""
     def __init__(self, path_root = '/', project = '', data_file = '',
@@ -1334,6 +1333,7 @@ class DataBroker(Broker):
             f = files.next()
             if fnmatch.fnmatch(f, '*' + file_name + '.' + type_data):
                 return f
+
 
 class IBDataBroker(IBBroker, DataBroker):
     """docstring for IBDataBroker."""
@@ -2270,6 +2270,7 @@ class IBDataBroker(IBBroker, DataBroker):
                                   "has not been implemented.")
         #return None
 
+
 class ExecutionBroker(Broker):
     """docstring for ExecutionBroker."""
     def __init__(self, **kwargs):
@@ -2285,6 +2286,7 @@ class ExecutionBroker(Broker):
 
         """
         super(ExecutionBroker, self).__init__(**kwargs)
+
 
 class IBExecutionBroker(IBBroker, ExecutionBroker):
     """docstring for IBExecutionBroker."""
@@ -2398,6 +2400,7 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
         """
         self.tws.cancelOrder(order_id)
 
+
 class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
     """docstring for IBBrokerTotal."""
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
@@ -2431,7 +2434,6 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                                             path_root = path_root, **kwargs)
         
         pass
-        
 
     def closeAllPositions(self, order_type = '', exclude_symbol = [''],
                             exclude_instrument = [''], record = False):
@@ -2788,8 +2790,6 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
             return int(amount_dollars / price_per_unit)
 
-
-        
         liveData = self.getLiveMarketData( contract= contract )
         
         liveData = liveData[ liveData['price']!=-1 ]   # remove -1's
@@ -2799,10 +2799,9 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]         
                 
             price_per_unit = ( askPrice + bidPrice )*0.5 #mid point
+
         except:        
             price_per_unit = liveData['price'][ liveData['Type']=='CLOSE PRICE' ].values[0]
-        
-        
 
         return int(amount_dollars / price_per_unit)
 
@@ -2823,15 +2822,10 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                 
         amount_units = self._totalDollarToTotalUnits( amount_dollars = amount_dollars,
                                                       contract = contract)
-        
-        
+
         if( amount_units==0 ):
             print ( "We are trying to buy " + str(amount_units) + " units of a stock. Something is wrong. ")
-            
-            
-            
-            
-    
+
         order = self.createOrder(trade_type = trade_type,
                                     amount_units = amount_units,
                                     price_per_unit = price_per_unit,
