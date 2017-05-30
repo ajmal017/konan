@@ -41,14 +41,27 @@ import position as pos
 
 class BrokerConnection(object):
     """
-    Connection resource to be shared by brokers in a system's public environment
-    without disrupting properties of the connection.
-    E.g. connection status, object representation.
+    CLASS SUMMARY:
+        Connection resource to be shared by brokers in a system's public
+        environment without disrupting properties of the connection.
+        E.g. connection status, object representation.
+
+    CLASS PROPERTIES:
+        None
+
+    CLASS SPECIAL METHODS:
+        None
+
+    CLASS PRIVATE METHODS:
+        None
+
+    CLASS PUBLIC METHODS:
+        None
     """
     def __init__(self):
         """
         __init__:
-            Basic BrokerConnection constructor. Initializes object properties.
+            Basic BrokerConnection initializer. Initializes object properties.
         
         PARAMETERS:
             None
@@ -61,6 +74,21 @@ class BrokerConnection(object):
         """
         super(BrokerConnection, self).__init__()
 
+    """
+    CLASS PROPERTIES
+    """
+
+    """
+    CLASS SPECIAL METHODS
+    """
+
+    """
+    CLASS PRIVATE METHODS
+    """
+
+    """
+    CLASS PUBLIC METHODS
+    """
 
 class IBBrokerConnection(BrokerConnection):
     """
@@ -73,17 +101,20 @@ class IBBrokerConnection(BrokerConnection):
         interface:
             EClientSocket object that takes in the implemented IBWrapper class in which
             API calls are stored.
+
+    CLASS SPECIAL METHODS:
+        None
     
     CLASS PRIVATE METHODS:
-    
+        None
     
     CLASS PUBLIC METHODS:
-    
+        None
     """
     def __init__(self, callback = IBWrapper()):
         """
         __init__:
-            IBBrokerConnection constructor. Initializes object properties.
+            IBBrokerConnection initializer. Initializes object properties.
         
         PARAMETERS:
             callback - IBWrapper()
@@ -100,6 +131,9 @@ class IBBrokerConnection(BrokerConnection):
         super(IBBrokerConnection, self).__init__()
         self._interface = EClientSocket(callback)
 
+    """
+    CLASS PROPERTIES
+    """
     def interface():
         doc = "The interface property."
         def fget(self):
@@ -111,12 +145,39 @@ class IBBrokerConnection(BrokerConnection):
         return locals()
     interface = property(**interface())
 
+    """
+    CLASS SPECIAL METHODS
+    """
+
+    """
+    CLASS PRIVATE METHODS
+    """
+
+    """
+    CLASS PUBLIC METHODS
+    """
+
 
 class Broker(object):
-    """Parent template for <Broker> type objects."""
+    """
+    CLASS SUMMARY:
+        Parent template for <Broker> type objects.
+
+    CLASS PROPERTIES:
+        None
+
+    CLASS SPECIAL METHODS:
+        None
+
+    CLASS PRIVATE METHODS:
+        None
+
+    CLASS PUBLIC METHODS:
+        None
+    """
     def __init__(self):
         """
-        Broker constructor. Initializes object properties.
+        Broker initializer. Initializes object properties.
 
         PARAMETERS:
             None
@@ -129,18 +190,70 @@ class Broker(object):
         """
         super(Broker, self).__init__()
 
+    """
+    CLASS PROPERTIES
+    """
+
+    """
+    CLASS SPECIAL METHODS
+    """
+
+    """
+    CLASS PRIVATE METHODS
+    """
+
+    """
+    CLASS PUBLIC METHODS
+    """
+
 
 class IBBroker(Broker):
     """
-    docstring for IBBroker.
+    CLASS SUMMARY:
+        Interactive Brokers <Broker> interface object.
+
+    CLASS PROPERTIES:
+        account_name -
+        callback -
+        connection -
+        tws -
+        host -
+        port -
+        client_id -
+        current_order_id -
+
+    CLASS SPECIAL METHODS:
+        __str__ -
+
+    CLASS PRIVATE METHODS:
+        _createStockContract -
+        _createOptionContract -
+        _createFutureContract -
+        _createIndexContract -
+        _createStockCashContract -
+        _createCombinationContract -
+        _createWarrantContract -
+        _createBondContract -
+        _createCommodityContract -
+        _createNewsContract -
+        _createMutualFundContract -
+
+    CLASS PUBLIC METHODS:
+        connect -
+        disconnect -
+        connected -
+        nextOrderId -
+        createContract -
+        createOrder -
+        preparePosition -
+        createExecutionFilter -
     """
     def __init__(self, account_name = 'DU603835',
                     connection = IBBrokerConnection(), host = '', port = 7497,
                     client_id = 100, **kwargs):
         """
         __init__:
-        Broker constructor.
-        Initializes object properties.
+        Broker initializer. Initializes object properties.
 
         PARAMETERS:
             account_name - string
@@ -274,6 +387,184 @@ class IBBroker(Broker):
     """
     CLASS PRIVATE METHODS
     """
+    # MAY NOT NEED ANY; SEE <createContract>
+    def _createStockContract(self, contract=Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        return contract
+
+    def _createOptionContract(self, contract=Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        # The contract's last trading day or contract month
+        # (for Options and Futures).
+        # Strings with format YYYYMM will be interpreted as the Contract Month
+        # whereas YYYYMMDD will be interpreted as Last Trading Day.
+        contract.m_lastTradeDateOrContractMonth = last_trade_date
+        contract.m_expiry = expiry  # is this the same as last_trade_date ?
+
+        # The option's strike price.
+        contract.m_strike = strike_price
+
+        # Either Put or Call (i.e. Options). Valid values are P, PUT, C, CALL.
+        contract.m_right = right
+
+        # The instrument's multiplier (i.e. options, futures).
+        contract.m_multiplier = multiplier
+        return contract
+
+    def _createFutureContract(self, contract=Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        # The contract's last trading day or contract month
+        # (for Options and Futures).
+        # Strings with format YYYYMM will be interpreted as the Contract Month
+        # whereas YYYYMMDD will be interpreted as Last Trading Day.
+
+        #        contract.m_expiry = expiry # is this the same as last_trade_date ?
+
+        # The instrument's multiplier (i.e. options, futures).
+        #        contract.m_multiplier = multiplier
+        return contract
+
+    def _createIndexContract(self, contract=Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        return contract
+
+    def _createCashContract(self, contract=Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        return contract
+
+    def _createCombinationContract(self, contract=Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        return contract
+
+    def _createWarrantContract(self, contract=Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        return contract
+
+    def _createBondContract(self, contract=Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        return contract
+
+    def _createCommodityContract(self, contract=Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        return contract
+
+    def _createNewsContract(self, contract=Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        return contract
+
+    def _createMutualFundContract(self, contract=Contract()):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        return contract
 
     """
     CLASS PUBLIC METHODS
@@ -476,184 +767,6 @@ class IBBroker(Broker):
 
         # TODO: NEED TO PASS ALL THE AVAILABLE PARAMETERS TO LOWER METHODS
         return dict_instrument_type[instrument_type](contract = contract)
-        """
-        return contract
-
-    def _createStockContract(self, contract = Contract()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        return contract
-
-    def _createOptionContract(self, contract = Contract()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        #The contract's last trading day or contract month
-        #(for Options and Futures).
-        #Strings with format YYYYMM will be interpreted as the Contract Month
-        #whereas YYYYMMDD will be interpreted as Last Trading Day.
-        contract.m_lastTradeDateOrContractMonth = last_trade_date
-        contract.m_expiry = expiry # is this the same as last_trade_date ?
-
-        #The option's strike price.
-        contract.m_strike = strike_price
-
-        #Either Put or Call (i.e. Options). Valid values are P, PUT, C, CALL.
-        contract.m_right = right
-
-        #The instrument's multiplier (i.e. options, futures).
-        contract.m_multiplier = multiplier
-        return contract
-
-    def _createFutureContract(self, contract = Contract()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        #The contract's last trading day or contract month
-        #(for Options and Futures).
-        #Strings with format YYYYMM will be interpreted as the Contract Month
-        #whereas YYYYMMDD will be interpreted as Last Trading Day.
-        
-#        contract.m_expiry = expiry # is this the same as last_trade_date ?
-
-        #The instrument's multiplier (i.e. options, futures).
-#        contract.m_multiplier = multiplier
-        return contract
-
-    def _createIndexContract(self, contract = Contract()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        return contract
-
-    def _createCashContract(self, contract = Contract()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        return contract
-
-    def _createCombinationContract(self, contract = Contract()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        return contract
-
-    def _createWarrantContract(self, contract = Contract()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        return contract
-
-    def _createBondContract(self, contract = Contract()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        return contract
-
-    def _createCommodityContract(self, contract = Contract()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        return contract
-
-    def _createNewsContract(self, contract = Contract()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        return contract
-
-    def _createMutualFundContract(self, contract = Contract()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
         """
         return contract
 
@@ -1260,7 +1373,24 @@ class IBBroker(Broker):
 
 
 class DataBroker(Broker):
-    """docstring for DataBroker."""
+    """
+    CLASS SUMMARY:
+        General data broker.
+
+    CLASS PROPERTIES:
+        data_repository -
+        path_root -
+        exec_path -
+
+    CLASS SPECIAL METHODS:
+        None
+
+    CLASS PRIVATE METHODS:
+        None
+
+    CLASS PUBLIC METHODS:
+        getLocalData -
+    """
     def __init__(self, path_root = '/', project = '', data_file = '',
                  exec_path = '', **kwargs):
         """
@@ -1283,6 +1413,9 @@ class DataBroker(Broker):
 
         self._exec_path = exec_path
 
+    """
+    CLASS PROPERTIES
+    """
     def data_repository():
         doc = "The data_repository property."
         def fget(self):
@@ -1334,9 +1467,60 @@ class DataBroker(Broker):
             if fnmatch.fnmatch(f, '*' + file_name + '.' + type_data):
                 return f
 
+    """
+    CLASS SPECIAL METHODS
+    """
+
+    """
+    CLASS PRIVATE METHODS
+    """
+
+    """
+    CLASS PUBLIC METHODS
+    """
+
 
 class IBDataBroker(IBBroker, DataBroker):
-    """docstring for IBDataBroker."""
+    """
+    CLASS SUMMARY:
+        <DataBroker> for <IBBroker>.
+
+    CLASS PROPERTIES:
+        current_request_id -
+        tickers -
+        current_ticker_id -
+
+    CLASS SPECIAL METHODS:
+        None
+
+    CLASS PRIVATE METHODS:
+        _resetCallbackAttribute -
+        _incrementTickerID -
+        _addTicker -
+        _isInTradingHours -
+
+    CLASS PUBLIC METHODS:
+        getCallbackAttribute -
+        searchTickers -
+        tickerSearch -
+        contractSearch -
+        removeFromTickers -
+        getAccountInformation -
+        getDataAtTime -
+        getDataInRange -
+        getDailyData -
+        getContractDetails -
+        getLiveMarketData -
+        getPostiions -
+        getPortfolio -
+        getExecutedOrders -
+        getPNLToday -
+        recordPNLToday -
+        recordPNLDailyPerformance -
+        recordTransaction -
+        getTransactions -
+    """
+
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, path_root = '/', **kwargs):
         """
@@ -1363,6 +1547,9 @@ class IBDataBroker(IBBroker, DataBroker):
         self._tickers = {}
         self._current_ticker_id = 1
 
+    """
+    CLASS PROPERTIES
+    """
     def current_request_id():
         doc = "The current_request_id property."
         def fget(self):
@@ -1408,6 +1595,13 @@ class IBDataBroker(IBBroker, DataBroker):
         return locals()
     current_ticker_id = property(**current_ticker_id())
 
+    """
+    CLASS SPECIAL METHODS
+    """
+
+    """
+    CLASS PRIVATE METHODS
+    """
     def _resetCallbackAttribute(self, attribute = ''):
         """
         METHOD SUMMARY
@@ -1509,6 +1703,9 @@ class IBDataBroker(IBBroker, DataBroker):
             return 1
         return 0
 
+    """
+    CLASS PUBLIC METHODS
+    """
     def searchTickers(self, search_object, type_search = '', type_data = ''):
         """
         METHOD SUMMARY
@@ -2272,7 +2469,23 @@ class IBDataBroker(IBBroker, DataBroker):
 
 
 class ExecutionBroker(Broker):
-    """docstring for ExecutionBroker."""
+    """
+    CLASS SUMMARY:
+        Broker for trade executions.
+
+    CLASS PROPERTIES:
+        None
+
+    CLASS SPECIAL METHODS:
+        None
+
+    CLASS PRIVATE METHODS:
+        None
+
+    CLASS PUBLIC METHODS:
+        None
+    """
+
     def __init__(self, **kwargs):
         """
         METHOD SUMMARY
@@ -2287,9 +2500,42 @@ class ExecutionBroker(Broker):
         """
         super(ExecutionBroker, self).__init__(**kwargs)
 
+    """
+    CLASS PROPERTIES
+    """
+
+    """
+    CLASS SPECIAL METHODS
+    """
+
+    """
+    CLASS PRIVATE METHODS
+    """
+
+    """
+    CLASS PUBLIC METHODS
+    """
+
 
 class IBExecutionBroker(IBBroker, ExecutionBroker):
-    """docstring for IBExecutionBroker."""
+    """
+    CLASS SUMMARY:
+        <ExecutionBroker> for <IBBroker>.
+
+    CLASS PROPERTIES:
+        None
+
+    CLASS SPECIAL METHODS:
+        None
+
+    CLASS PRIVATE METHODS:
+        None
+
+    CLASS PUBLIC METHODS:
+        placeOrder -
+        cancelOrder -
+    """
+
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, **kwargs):
         """
@@ -2306,6 +2552,15 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
         super(IBExecutionBroker, self).__init__(account_name = account_name,
                                                 host = host, port = port,
                                                 client_id = client_id, **kwargs)
+
+    """
+    CLASS PROPERTIES
+    """
+
+    """
+    CLASS SPECIAL METHODS
+    """
+
     """
     CLASS PRIVATE METHODS
     """
@@ -2313,7 +2568,6 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
     """
     CLASS PUBLIC METHODS
     """
-
     def placeOrder(self, order_id, contract, order):
         """
         METHOD SUMMARY
@@ -2402,7 +2656,29 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
 
 
 class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
-    """docstring for IBBrokerTotal."""
+    """
+    CLASS SUMMARY:
+        Aggregate <Broker> for Interactive Brokers.
+
+    CLASS PROPERTIES:
+        None
+
+    CLASS SPECIAL METHODS:
+        None
+
+    CLASS PRIVATE METHODS:
+        _totalDollarToTotalUnits -
+
+    CLASS PUBLIC METHODS:
+        closeAllPositions -
+        closeAllTypePositions -
+        closeAllNamePositions -
+        closePosition -
+        createDollarOder -
+        palceRecordedOrder -
+        getLiveMidPriceData -
+    """
+
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, path_root = '/', **kwargs):
         """
@@ -2417,7 +2693,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
         """
         """
-        IBBrokerTotal constructor.
+        IBBrokerTotal initializer.
         Initializes object properties.
         Combines functionality of <IBExecutionBroker> and <IBDataBroker>.
 
@@ -2435,6 +2711,65 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         
         pass
 
+    """
+    CLASS PROPERTIES
+    """
+
+    """
+    CLASS SPECIAL METHODS
+    """
+
+    """
+    CLASS PRIVATE METHODS
+    """
+
+    def _totalDollarToTotalUnits(self, amount_dollars, contract, at_time=False,
+                                 data_time=None):
+        """
+        METHOD SUMMARY
+        METHOD DESCRIPTION
+
+        PARAMETERS:
+
+        RETURNS:
+
+        RESULTS:
+
+        """
+        if at_time == True and data_time == None:
+            data_time = dt.datetime.now()
+
+            data = self.getDataAtTime(data_time=data_time, contract=contract)
+
+            askPrice = data['price'][data['Type'] == 'ASK PRICE'].values[0]
+            bidPrice = data['price'][data['Type'] == 'BID PRICE'].values[0]
+
+            price_per_unit = (askPrice + bidPrice) * 0.5  # mid point
+
+            return int(amount_dollars / price_per_unit)
+
+        liveData = self.getLiveMarketData(contract=contract)
+
+        liveData = liveData[liveData['price'] != -1]  # remove -1's
+
+        try:
+            askPrice = \
+            liveData['price'][liveData['Type'] == 'ASK PRICE'].values[
+                0]  # Try to get mid price .. if not use Close price
+            bidPrice = \
+            liveData['price'][liveData['Type'] == 'BID PRICE'].values[0]
+
+            price_per_unit = (askPrice + bidPrice) * 0.5  # mid point
+
+        except:
+            price_per_unit = \
+            liveData['price'][liveData['Type'] == 'CLOSE PRICE'].values[0]
+
+        return int(amount_dollars / price_per_unit)
+
+    """
+    CLASS PUBLIC METHODS
+    """
     def closeAllPositions(self, order_type = '', exclude_symbol = [''],
                             exclude_instrument = [''], record = False):
         """
@@ -2764,46 +3099,6 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
         else:
             self.placeOrder(order_id = self.nextOrderId(), contract = contract, order = order)
         time.sleep(1.1)
-
-    def _totalDollarToTotalUnits(self, amount_dollars, contract, at_time = False,
-                                    data_time = None):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        if at_time == True and data_time == None:
-            data_time = dt.datetime.now()
-
-            data = self.getDataAtTime(data_time=data_time,contract=contract)
-            
-            askPrice = data['price'][data['Type'] == 'ASK PRICE'].values[0]
-            bidPrice = data['price'][data['Type'] == 'BID PRICE'].values[0]
-
-            price_per_unit = (askPrice + bidPrice) * 0.5  # mid point
-
-            return int(amount_dollars / price_per_unit)
-
-        liveData = self.getLiveMarketData( contract= contract )
-        
-        liveData = liveData[ liveData['price']!=-1 ]   # remove -1's
-        
-        try:
-            askPrice = liveData['price'][ liveData['Type']=='ASK PRICE' ].values[0]       # Try to get mid price .. if not use Close price     
-            bidPrice = liveData['price'][ liveData['Type']=='BID PRICE' ].values[0]         
-                
-            price_per_unit = ( askPrice + bidPrice )*0.5 #mid point
-
-        except:        
-            price_per_unit = liveData['price'][ liveData['Type']=='CLOSE PRICE' ].values[0]
-
-        return int(amount_dollars / price_per_unit)
 
     def createDollarOrder(self, amount_dollars, contract, trade_type,
                             price_per_unit = 0.0, order_type = '',
