@@ -60,7 +60,7 @@ class BrokerConnection(object):
     """
     def __init__(self):
         """
-        __init__:
+        SUMMARY:
             Basic BrokerConnection initializer. Initializes object properties.
         
         PARAMETERS:
@@ -113,7 +113,7 @@ class IBBrokerConnection(BrokerConnection):
     """
     def __init__(self, callback = IBWrapper()):
         """
-        __init__:
+        SUMMARY:
             IBBrokerConnection initializer. Initializes object properties.
         
         PARAMETERS:
@@ -177,7 +177,8 @@ class Broker(object):
     """
     def __init__(self):
         """
-        Broker initializer. Initializes object properties.
+        SUMMARY:
+            Broker initializer. Initializes object properties.
 
         PARAMETERS:
             None
@@ -252,8 +253,8 @@ class IBBroker(Broker):
                     connection = IBBrokerConnection(), host = '', port = 7497,
                     client_id = 100, **kwargs):
         """
-        __init__:
-        Broker initializer. Initializes object properties.
+        SUMMARY:
+            Broker initializer. Initializes object properties.
 
         PARAMETERS:
             account_name - string
@@ -390,29 +391,33 @@ class IBBroker(Broker):
     # MAY NOT NEED ANY; SEE <createContract>
     def _createStockContract(self, contract=Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         return contract
 
     def _createOptionContract(self, contract=Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         # The contract's last trading day or contract month
         # (for Options and Futures).
@@ -433,15 +438,17 @@ class IBBroker(Broker):
 
     def _createFutureContract(self, contract=Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         # The contract's last trading day or contract month
         # (for Options and Futures).
@@ -456,113 +463,129 @@ class IBBroker(Broker):
 
     def _createIndexContract(self, contract=Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         return contract
 
     def _createCashContract(self, contract=Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         return contract
 
     def _createCombinationContract(self, contract=Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         return contract
 
     def _createWarrantContract(self, contract=Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         return contract
 
     def _createBondContract(self, contract=Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         return contract
 
     def _createCommodityContract(self, contract=Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         return contract
 
     def _createNewsContract(self, contract=Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         return contract
 
     def _createMutualFundContract(self, contract=Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         return contract
 
@@ -571,15 +594,17 @@ class IBBroker(Broker):
     """
     def connect(self):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         if self.connected():
             print('Broker is already connected.')
@@ -588,45 +613,50 @@ class IBBroker(Broker):
 
     def disconnect(self):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         self.tws.eDisconnect()
 
     def connected(self):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         return self.tws.isConnected()
 
     def nextOrderId(self, from_IB = False, from_datetime = True):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
+        SUMMARY:
+            Method summary
         
+        PARAMETERS:
+            None
+        
+        RETURNS:
+            None
+        
+        RESULTS:
+            None
+        """
         if from_IB:
             self.tws.reqIds(1)
             id = self.callback.next_ValidId
@@ -658,15 +688,17 @@ class IBBroker(Broker):
                        under_comp=None, localSymbol=None
                        ):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         # TODO: IMPLEMENT CONTRACT LOGIC FOR ALL CASES
         # possibly use private methods commented out
@@ -774,15 +806,17 @@ class IBBroker(Broker):
                     total_price = 0.0, order_type = '', time_in_force = None,
                     solicited = None):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         """
         ORDER TYPES:
@@ -1341,21 +1375,35 @@ class IBBroker(Broker):
 
     def preparePosition(self, position = pos.Position()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Unpack position object into order and contracts.
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
-        """Unpack position object into order and contracts"""
         raise NotImplementedError("API method preparePosition has not been implemented.")
         #return None
 
     def createExecutionFilter(self, contract = None, order_time = None):
+        """
+        SUMMARY:
+            Method summary
+        
+        PARAMETERS:
+            None
+        
+        RETURNS:
+            None
+        
+        RESULTS:
+            None
+        """
         if contract == None:
             return ExecutionFilter()
         execution_filter = ExecutionFilter()
@@ -1394,15 +1442,17 @@ class DataBroker(Broker):
     def __init__(self, path_root = '/', project = '', data_file = '',
                  exec_path = '', **kwargs):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         super(DataBroker, self).__init__(**kwargs)
 
@@ -1449,24 +1499,6 @@ class DataBroker(Broker):
         return locals()
     exec_path = property(**exec_path())
 
-    def getLocalData(self, type_data = '', path_data = '', file_name = ''): #data.Repository()):
-        """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
-        PARAMETERS:
-
-        RETURNS:
-
-        RESULTS:
-
-        """
-        files = glob.iglob(path_data + '*.' + type_data)
-        while True:
-            f = files.next()
-            if fnmatch.fnmatch(f, '*' + file_name + '.' + type_data):
-                return f
-
     """
     CLASS SPECIAL METHODS
     """
@@ -1478,6 +1510,25 @@ class DataBroker(Broker):
     """
     CLASS PUBLIC METHODS
     """
+    def getLocalData(self, type_data = '', path_data = '', file_name = ''): #data.Repository()):
+        """
+        SUMMARY:
+            Method summary
+
+        PARAMETERS:
+            None
+
+        RETURNS:
+            None
+
+        RESULTS:
+            None
+        """
+        files = glob.iglob(path_data + '*.' + type_data)
+        while True:
+            f = files.next()
+            if fnmatch.fnmatch(f, '*' + file_name + '.' + type_data):
+                return f
 
 
 class IBDataBroker(IBBroker, DataBroker):
@@ -1524,15 +1575,17 @@ class IBDataBroker(IBBroker, DataBroker):
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, path_root = '/', **kwargs):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         super(IBDataBroker, self).__init__(account_name = account_name,
                                             host = host, port = port,
@@ -1604,15 +1657,17 @@ class IBDataBroker(IBBroker, DataBroker):
     """
     def _resetCallbackAttribute(self, attribute = ''):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         if attribute in ('accountDownloadEnd_flag', 'account_SummaryEnd_flag',
                             'positionEnd_flag', 'tickSnapshotEnd_flag',
@@ -1640,45 +1695,52 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def getCallbackAttribute(self, attribute = ''):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         return getattr(self.callback, attribute)
 
     def _incrementTickerID(self):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         self.current_ticker_id += 1
 
     # MAY NOT NEED ANYMORE
     def _addTicker(self, ticker = '', contract = Contract()):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
+
         if ticker in self.tickers:
             ticker_id = self.tickers[ticker]
         else:
@@ -1689,15 +1751,17 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def _isInTradingHours(self, yes = True):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         if yes:
             return 1
@@ -1708,15 +1772,17 @@ class IBDataBroker(IBBroker, DataBroker):
     """
     def searchTickers(self, search_object, type_search = '', type_data = ''):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         if type_data not in ('ID','CONTRACT','TUPLE'):
             print("Type of data must be 'ID', 'CONTRACT' or 'TUPLE'.")
@@ -1736,15 +1802,17 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def tickerSearch(self, ticker, type_data = ''):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         items = []
         for element in self.tickers:
@@ -1759,15 +1827,17 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def contractSearch(self, contract, type_data = ''):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         items = []
         for element in self.tickers:
@@ -1781,6 +1851,19 @@ class IBDataBroker(IBBroker, DataBroker):
         return items
 
     def removeFromTickers(self, search_object, type_object):
+        """
+        SUMMARY:
+            Method summary
+
+        PARAMETERS:
+            None
+
+        RETURNS:
+            None
+
+        RESULTS:
+            None
+        """
         if type_object not in ('ID','TICKER','CONTRACT'):
             print("Type of data must be 'ID', 'TICKER' or 'CONTRACT'.")
             return None
@@ -1800,15 +1883,17 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def getAccountInformation(self, all_accounts = True, attributes = ','):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         """
         attributes values:
@@ -1885,15 +1970,17 @@ class IBDataBroker(IBBroker, DataBroker):
                         in_trading_hours = False, duration = '60 S',
                         bar_size = '1 min', try_time = 2, time_out = 15):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         """
         REQUIRED PARAMETERS:
@@ -2007,15 +2094,17 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def getDataInRange(self):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         # EXTEND USING getDataAtTime()
         raise NotImplementedError("API method getDataInRange has not been implemented.")
@@ -2023,8 +2112,8 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def getDailyData(self, stock_list, provider, date_start, date_end = None):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
             date_start - days will consider from this date to current days
@@ -2045,7 +2134,7 @@ class IBDataBroker(IBBroker, DataBroker):
             <<return_as_panel>> method parameter is set to <<False>>
 
         RESULTS:
-
+            None
         """
 #        data = pdr.data.DataReader(stock_list, provider, date_start, date_end)
         data = web.DataReader(stock_list, provider, date_start, date_end)
@@ -2076,12 +2165,20 @@ class IBDataBroker(IBBroker, DataBroker):
             return data
 
     def getContractDetails(self, contract=Contract(), time_out=5):
-        
-        '''        
-        Returns data frame of chain of contracts meeting certain requirements.
-        Used to obtain non-expired future chain right now.         
-        '''
-            
+        """
+        SUMMARY:
+            Returns data frame of chain of contracts meeting certain
+            requirements. Used to obtain non-expired future chain right now.
+
+        PARAMETERS:
+            None
+
+        RETURNS:
+            None
+
+        RESULTS:
+            None
+        """
         self._resetCallbackAttribute('contract_Details')        
         self.tws.reqContractDetails(1,contract)
         
@@ -2117,6 +2214,19 @@ class IBDataBroker(IBBroker, DataBroker):
         return fut_cont_dict
 
     def getLiveMarketData(self, contract = Contract(), time_out = 5):
+        """
+        SUMMARY:
+            Method summary
+
+        PARAMETERS:
+            None
+
+        RETURNS:
+            None
+
+        RESULTS:
+            None
+        """
         """
         genericTickList options:
         100 Option Volume (currently for stocks)
@@ -2215,15 +2325,17 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def getPositions(self):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         self._resetCallbackAttribute('update_Position')
 
@@ -2246,15 +2358,17 @@ class IBDataBroker(IBBroker, DataBroker):
     # TODO: CHECK IF IT IS POSSIBLE TO ACQUIRE PAST PORTFOLIO VALUES
     def getPortfolio(self):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         self._resetCallbackAttribute('update_Portfolio')
 
@@ -2290,15 +2404,17 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def getExecutedOrders(self, contract = Contract(), since = None):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         if since == None:
             execution_filter = self.createExecutionFilter(contract = contract)
@@ -2363,15 +2479,17 @@ class IBDataBroker(IBBroker, DataBroker):
     # TODO: CHECK IF IT IS POSSIBLE TO ACQUIRE PAST PORTFOLIO VALUES
     def getPNLToday(self):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         portfolio = self.getPortfolio()
 
@@ -2387,15 +2505,17 @@ class IBDataBroker(IBBroker, DataBroker):
     # ONLY ACCOUNT WIDE PNL
     def recordPNLToday(self, path = ''):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         PNL = self.getPNLToday()
 
@@ -2403,15 +2523,17 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def recordPNLDailyPerformance(self, path = ''):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
+        SUMMARY:
+            Method summary
 
         PARAMETERS:
+            None
 
         RETURNS:
+            None
 
         RESULTS:
-
+            None
         """
         PNL = self.getPNLToday()
 
@@ -2429,6 +2551,19 @@ class IBDataBroker(IBBroker, DataBroker):
         PNL_day.to_csv(path_or_buf = path, encoding = 'utf-8', mode = 'a+')
 
     def recordTransaction(self, contract, path = '', additional_values = {}):
+        """
+        SUMMARY:
+            Method summary
+
+        PARAMETERS:
+            None
+
+        RETURNS:
+            None
+
+        RESULTS:
+            None
+        """
         order_details = self.getExecutedOrders(contract)
 
         if additional_values:
@@ -2445,20 +2580,19 @@ class IBDataBroker(IBBroker, DataBroker):
 
     def getTransactions(self, path = ''):
         """
-        getTransactions:
-        Returns the executed transactions by a [system] read from a file at the
-        location of <<path>>.
-        
-        PARAMETERS:
-        path - 
-        
-        RETURNS:
-        data - pandas DataFrame
-        
-        RESULTS:
-        Gets the executed transactions of the current day.
-        """
+        SUMMARY:
+            Returns the executed transactions by a [system] read from a file
+            at the location of <<path>>.
 
+        PARAMETERS:
+            path -
+
+        RETURNS:
+            data -
+
+        RESULTS:
+            Gets the executed transactions of the current day.
+        """
         """
         TODO: just a read or prepare in some fashion? from strategy POV how
         should the strategy deal with reading from state?
@@ -2488,15 +2622,17 @@ class ExecutionBroker(Broker):
 
     def __init__(self, **kwargs):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         super(ExecutionBroker, self).__init__(**kwargs)
 
@@ -2539,15 +2675,17 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, **kwargs):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         super(IBExecutionBroker, self).__init__(account_name = account_name,
                                                 host = host, port = port,
@@ -2570,29 +2708,33 @@ class IBExecutionBroker(IBBroker, ExecutionBroker):
     """
     def placeOrder(self, order_id, contract, order):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         self.tws.placeOrder(order_id, contract, order)
 
     def cancelOrder(self, order_id):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         """
         ORDER TYPES:
@@ -2682,15 +2824,17 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
     def __init__(self, account_name = 'DU603835', host = '', port = 7497,
                     client_id = 100, path_root = '/', **kwargs):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         """
         IBBrokerTotal initializer.
@@ -2726,15 +2870,17 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
     def _totalDollarToTotalUnits(self, amount_dollars, contract, at_time=False,
                                  data_time=None):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         if at_time == True and data_time == None:
             data_time = dt.datetime.now()
@@ -2773,15 +2919,17 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
     def closeAllPositions(self, order_type = '', exclude_symbol = [''],
                             exclude_instrument = [''], record = False):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         """
         ORDER TYPES:
@@ -2905,6 +3053,19 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
     def closeAllTypePositions(self, order_type = '', instruments = [''],
                                 exclude_symbol = [''], record = False):
+        """
+        SUMMARY:
+            Method summary
+        
+        PARAMETERS:
+            None
+        
+        RETURNS:
+            None
+        
+        RESULTS:
+            None
+        """
         if order_type not in ('LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT',
                               'QUOTE', 'STP', 'STP LMT', 'TRAIL LIT',
                               'TRAIL MIT', 'TRAIL', 'TRAIL LIMIT', 'MIT', 'MOO',
@@ -2968,6 +3129,19 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
     def closeAllNamePositions(self, order_type = '', tickers = [''],
                               record = False):
+        """
+        SUMMARY:
+            Method summary
+        
+        PARAMETERS:
+            None
+        
+        RETURNS:
+            None
+        
+        RESULTS:
+            None
+        """
         if order_type not in ('LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT',
                               'QUOTE', 'STP', 'STP LMT', 'TRAIL LIT',
                               'TRAIL MIT', 'TRAIL', 'TRAIL LIMIT', 'MIT', 'MOO',
@@ -3029,15 +3203,17 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
     def closePosition(self, symbol = '', order_type = '', record = False):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
         if order_type not in ('LIMIT', 'MARKET', 'MOC', 'MTL', 'MKT PRT',
                               'QUOTE', 'STP', 'STP LMT', 'TRAIL LIT',
@@ -3104,17 +3280,18 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
                             price_per_unit = 0.0, order_type = '',
                           time_in_force = ''):
         """
-        METHOD SUMMARY
-        METHOD DESCRIPTION
-
+        SUMMARY:
+            Method summary
+        
         PARAMETERS:
-
+            None
+        
         RETURNS:
-
+            None
+        
         RESULTS:
-
+            None
         """
-                
         amount_units = self._totalDollarToTotalUnits( amount_dollars = amount_dollars,
                                                       contract = contract)
 
@@ -3131,24 +3308,24 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
     def placeRecordedOrder(self, order_id, contract, order, path = '',
                            additional_values = {}):
         """
-        placeRecordedOrder:
-        Places an [order] on the [#Interactive Brokers server] and records the
-        transaction.
+        SUMMARY:
+            Places an [order] on the [#Interactive Brokers server] and records
+            the transaction.
         
         PARAMETERS:
-        order_id - 
-        contract - 
-        order - 
-        path - 
-        additional_values - 
+            order_id - 
+            contract - 
+            order - 
+            path - 
+            additional_values - 
         
         RETURNS:
-        None
+            None
         
         RESULTS:
-        Creates a local record of an [executed order] at the <<path>> location.
+            Creates a local record of an [executed order] at the
+            <<path>> location.
         """
-
         self.tws.placeOrder(order_id, contract, order)
         if (path != ''):
             self.recordTransaction(contract=contract, path=path,
@@ -3156,19 +3333,18 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
 
     def getLiveMidPriceData(self, contract):
         """
-        getLiveMidPriceData:
-        Method summary
+        SUMMARY:
+            Method summary
         
         PARAMETERS:
-        None
+            None
         
         RETURNS:
-        None
+            None
         
         RESULTS:
-        None
+            None
         """
-        
         liveData = self.getLiveMarketData(contract)
 
         askPrice = liveData['price'][liveData['Type'] == 'ASK PRICE'].values[0]
