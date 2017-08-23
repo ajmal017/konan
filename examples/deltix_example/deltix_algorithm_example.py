@@ -44,6 +44,7 @@ elif sys.platform == "win32":
     google_drive = utp.google_drive_path().path
 
     nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
+#    nyse = pd.read_csv( google_drive+"myPythonprojects\\konan\\rd\\mcal.csv", header=0, index_col=0, parse_dates=True )
     nysecal = list(nyse.index.date)
 
 
@@ -80,7 +81,6 @@ class deltixAlgorithm(algo.DecisionAlgorithm):
         ''' Establish Enter Date '''
         enterDate = None
         if ( TOD in ['Before Market', 'During Market'] ):
-
 
             ''' Back shift enter date if necessary '''
             idx = utils.find_date_in_list(calendar=calendar, target_date=nextED, move=0 )

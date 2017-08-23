@@ -93,7 +93,7 @@ class IBWrapper(EWrapper):
 
     def position(self, account, contract, pos, avgCost):
         update_Position = self.update_Position
-        update_Position.append((account, contract.m_conId, contract.m_currency,
+        update_Position.append((account, contract.m_conId, contract, contract.m_currency,
                                 contract.m_exchange, contract.m_expiry,
                                 contract.m_includeExpired, contract.m_localSymbol,
                                 contract.m_multiplier, contract.m_right,

@@ -1879,6 +1879,9 @@ class IBDataBroker(IBBroker, DataBroker):
         if type_object == 'CONTRACT':
             ticker_id = self.contractSearch(contract = search_object,
                                             type_data = 'ID')
+            # FOR ERROR HANDLING THE BELOW IF STATEMENT WAS ADDED 10/07/17            
+            if len(ticker_id) == 0:
+                return
             del self.tickers[ticker_id[0]]
 
     def getAccountInformation(self, all_accounts = True, attributes = ','):
@@ -2317,7 +2320,8 @@ class IBDataBroker(IBBroker, DataBroker):
 
             self.removeFromTickers(search_object = contract,
                                     type_object = 'CONTRACT')
-            return None
+            return pd.DataFrame()
+            # CHANGED FUNDAMENTAL ASSUMPTION; ALWAYS RETURNING A DATAFRAME FOR EASIER ERROR HANDLING 10/07/17
 
         data["Type"] = data["field"].map(tick_type)
 
@@ -2344,7 +2348,7 @@ class IBDataBroker(IBBroker, DataBroker):
         time.sleep(1)
 
         data = pd.DataFrame(self.callback.update_Position,
-                            columns = ['Account_Name', 'Contract_Id',
+                            columns = ['Account_Name', 'Contract_Id','Contract_Object',
                                         'Currency', 'Exchange', 'Expiry',
                                         'Include_Expired', 'Local_Symbol',
                                         'Multiplier', 'Right',
@@ -3052,7 +3056,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             order_id = self.nextOrderId()
 
     def closeAllTypePositions(self, order_type = '', instruments = [''],
-                                exclude_symbol = [''], record = False):
+                                exclude_symbol = [''], record = False, exchange='SMART'):
         """
         SUMMARY:
             Method summary
@@ -3093,39 +3097,62 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             instrument_type = position_details['Financial_Instrument']
             if instrument_type not in instruments:
                 continue
+            
+            if ( instrument_type=='STK' ):
+                contract = self.createContract(ticker = ticker,
+                                                instrument_type = instrument_type,
+                                                exchange = 'SMART',
+                                                currency = 'USD')
+                
+            if ( instrument_type=='FUT' ):            
+#                print( position_details['Local_Symbol'] )
+#                
+##                localSymbol = position_details['Local_Symbol']#.values[0]
+#                expiry = position_details['Expiry']#.values[0]
+#                symbol = position_details['Symbol']#.values[0]
+#                mult = position_details['Multiplier']#.values[0]
+#                
+#                contract = self.createContract( ticker=symbol, #localSymbol=localSymbol,
+#                                                    instrument_type = instrument_type,
+#                                                    expiry=expiry,
+#                                                    multiplier = mult,
+#                                                    exchange = 'DTB',
+#                                                    currency = 'USD')                
+                contract = position_details['Contract_Object']
+                
 
-            contract = self.createContract(ticker = ticker,
-                                            instrument_type = instrument_type,
-                                            exchange = 'SMART',
-                                            currency = 'USD')
-            # Make new contract? or is there some way to access previous contracts?
+            
+            for ex in exchange:
+                contract.m_exchange = ex
+            
+                # Make new contract? or is there some way to access previous contracts?
 
-            direction = position_details['Number_of_Units']
-            amount_units = int(abs(direction))
-            price_per_unit = float(position_details['Average_Unit_Price'])
-
-            if direction < 0:
-                trade_type = 'BUY'
-            elif direction > 0:
-                trade_type = 'SELL'
-            elif direction == 0:
-                print(str(ticker) + ": Position is already closed.")
-                continue
-
-            order = self.createOrder(trade_type = trade_type,
-                                        amount_units = amount_units,
-                                        price_per_unit = price_per_unit,
-                                        order_type = order_type)
-
-            if record:
-                self.placeRecordedOrder(order_id=self.nextOrderId(), contract=contract,
-                                        order=order, path=self.exec_path)
-            else:
-                self.placeOrder(order_id = self.nextOrderId(), contract = contract, order = order)
-            time.sleep(1)
-
-#            order_id += 1
-            order_id = self.nextOrderId()
+                direction = position_details['Number_of_Units']
+                amount_units = int(abs(direction))
+                price_per_unit = float(position_details['Average_Unit_Price'])
+    
+                if direction < 0:
+                    trade_type = 'BUY'
+                elif direction > 0:
+                    trade_type = 'SELL'
+                elif direction == 0:
+                    print(str(ticker) + ": Position is already closed.")
+                    continue
+    
+                order = self.createOrder(trade_type = trade_type,
+                                            amount_units = amount_units,
+                                            price_per_unit = price_per_unit,
+                                            order_type = order_type)
+    
+                if record:
+                    self.placeRecordedOrder(order_id=self.nextOrderId(), contract=contract,
+                                            order=order, path=self.exec_path)
+                else:
+                    self.placeOrder(order_id = self.nextOrderId(), contract = contract, order = order)
+                time.sleep(1)
+    
+    #            order_id += 1
+                order_id = self.nextOrderId()
 
     def closeAllNamePositions(self, order_type = '', tickers = [''],
                               record = False):

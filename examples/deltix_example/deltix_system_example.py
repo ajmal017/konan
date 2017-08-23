@@ -21,8 +21,8 @@ import konan.api.system as system
 import konan.api.broker as broker
 
 import deltix_strategy_example
-
 import utils.paths as utp
+
 
 google_drive = utp.google_drive_path().path
 
@@ -40,7 +40,7 @@ def main():
     # create
     system_papar252 = system.System(path_system_state = path_system_state,
                             strategies = dict_strategies,
-                            time_end = dt.time(hour = 16, minute = 30),
+                            time_end = dt.time(hour = 12, minute = 30),
                             time_sleep = 30, broker = broker_252)
 
     for event in system_papar252.strategy_schedule:
