@@ -3056,7 +3056,7 @@ class IBBrokerTotal(IBExecutionBroker, IBDataBroker):
             order_id = self.nextOrderId()
 
     def closeAllTypePositions(self, order_type = '', instruments = [''],
-                                exclude_symbol = [''], record = False, exchange='SMART'):
+                                exclude_symbol = [''], record = False, exchange=['SMART']):
         """
         SUMMARY:
             Method summary

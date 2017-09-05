@@ -195,7 +195,7 @@ class deltixStrategy(st.Strategy):
 #        '''
         print('Close all positions')
 #        self.broker.closeAllTypePositions(order_type='MARKET', instruments=['STK'], exclude_symbol=['SPY'])
-        self.broker.closeAllTypePositions(order_type='MOC', instruments=['STK'], exclude_symbol=['SPY'])
+        self.broker.closeAllTypePositions(order_type='MOC', instruments=['STK'], exclude_symbol=['SPY'], exchange=['SMART'])
 
         print('Enter new positions')
         self.enterNewPositions()
