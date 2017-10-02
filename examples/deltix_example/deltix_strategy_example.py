@@ -45,7 +45,8 @@ if sys.platform == "linux" or sys.platform == "linux2":
     pass
 elif sys.platform == "darwin":
     # OS X: Josh
-    nyse = pickle.load( open('./rd/mcal_test.p', 'rb') )
+#    nyse = pickle.load( open('./rd/mcal_test.p', 'rb') )
+    nyse = pd.read_pickle( './rd/mcal_test.p' )
     nysecal = list(nyse.index.date)
 elif sys.platform == "win32":
     # Windows: Ray
@@ -56,7 +57,8 @@ elif sys.platform == "win32":
     google_drive = utp.google_drive_path().path
 
 #    nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
-    nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
+#    nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
+    nyse = pd.read_pickle( google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p" )
 #    nyse = pd.read_csv( google_drive+"myPythonprojects\\konan\\rd\\mcal.csv", header=0, index_col=0, parse_dates=True )
     nysecal = list(nyse.index.date)
     

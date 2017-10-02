@@ -33,7 +33,8 @@ if sys.platform == "linux" or sys.platform == "linux2":
     pass
 elif sys.platform == "darwin":
     # OS X: Josh
-    nyse = pickle.load( open('./rd/mcal_test.p', 'rb') )
+#    nyse = pickle.load( open('./rd/mcal_test.p', 'rb') )
+    nyse = pd.read_pickle( './rd/mcal_test.p' )
     nysecal = list(nyse.index.date)
 elif sys.platform == "win32":
     # Windows: Ray
@@ -43,7 +44,8 @@ elif sys.platform == "win32":
     dropbox = utp.dropbox_path().path
     google_drive = utp.google_drive_path().path
 
-    nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
+#    nyse = pickle.load( open(google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p", 'rb') )
+    nyse = pd.read_pickle( google_drive+"myPythonprojects\\konan\\rd\\mcal_test.p" )
 #    nyse = pd.read_csv( google_drive+"myPythonprojects\\konan\\rd\\mcal.csv", header=0, index_col=0, parse_dates=True )
     nysecal = list(nyse.index.date)
 
@@ -159,8 +161,8 @@ class deltixAlgorithm(algo.DecisionAlgorithm):
             fileName =  os.path.join(dirName,file_)
 
             if(os.path.exists)(fileName):
-                self.earningsCalendar = pickle.load( open(fileName, "rb") )
-
+#                self.earningsCalendar = pickle.load( open(fileName, "rb") )
+                self.earningsCalendar = pd.read_pickle( fileName )
             return self.earningsCalendar
 
 
@@ -175,7 +177,8 @@ class deltixAlgorithm(algo.DecisionAlgorithm):
             fileName =  os.path.join(dirName,file_)
 
             if(os.path.exists)(fileName):
-                self.actualCutoff = pickle.load( open(fileName, "rb") )
+#                self.actualCutoff = pickle.load( open(fileName, "rb") )
+                self.actualCutoff = pd.read_pickle( fileName  )
             return self.actualCutoff
 
         else:
